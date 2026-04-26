@@ -785,7 +785,9 @@ async function loadData(){
 
 function toggleHide() {
     showBalance = !showBalance;
-    document.getElementById('eye-icon').setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off');
+    const eyeIcon = document.getElementById('eye-icon');
+    eyeIcon.setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off');
+    lucide.createIcons();
     render();
 }
 
@@ -1053,10 +1055,13 @@ function confirmPay(){
   const amt=parseFloat(document.getElementById('pm-amount').value), wid=document.getElementById('pm-wallet').value;
   if(!amt||amt<=0){document.getElementById('pm-amount').focus();return;}
   const w=wById(wid);
-  if(w&&w.balance<amt){alert('Not enough balance in '+w.name);return;}
-  if(w)w.balance-=amt;
+  const isOwed = d.type === 'owed'; // money being paid back TO me
+  if(!isOwed && w&&w.balance<amt){alert('Not enough balance in '+w.name);return;}
+  if(w) w.balance += isOwed ? amt : -amt;
   d.paid=Math.min(d.paid+amt,d.total);
-  S.transactions.unshift({id:Date.now(),type:'expense',desc:'Payment: '+d.name,amount:amt,wallet:wid,cat:'Debt/Installment',month:nowMonth(),date:new Date().toLocaleDateString('en-GB')});
+  const txType = isOwed ? 'income' : 'expense';
+  const txDesc = isOwed ? 'Received: '+d.name : 'Payment: '+d.name;
+  S.transactions.unshift({id:Date.now(),type:txType,desc:txDesc,amount:amt,wallet:wid,cat:'Debt/Installment',month:nowMonth(),date:new Date().toLocaleDateString('en-GB')});
   closePayModal();scheduleSave();render();
   if(currentPage==='chart') renderCharts();
 }
