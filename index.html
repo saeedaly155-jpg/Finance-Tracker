@@ -16,18 +16,19 @@
 <style>
 
 /* إصلاح تداخل خيارات الـ Metrics في نافذة إضافة الرسوم البيانية */
-label {
+label:has(> input[type="checkbox"]),
+label:has(> input[type="radio"]) {
     display: inline-flex;
     align-items: center;
-    gap: 6px; /* المسافة بين المربع والكلمة */
-    margin-right: 16px; /* المسافة بين كل خيار والتاني */
-    margin-bottom: 8px; /* المسافة في حالة نزول الخيارات لسطر جديد */
+    gap: 6px;
+    margin-right: 16px;
+    margin-bottom: 8px;
     cursor: pointer;
 }
 
 input[type="checkbox"], 
 input[type="radio"] {
-    margin: 0 !important; /* إلغاء أي هوامش افتراضية مسببة للمشكلة */
+    margin: 0 !important;
 }
 
 /* ── التصميم الأساسي والألوان ── */
@@ -249,6 +250,16 @@ body.dark-mode { --calendar-filter: invert(1); }
   .btn-row .btn { width: 100%; justify-content: center; }
   .chart-filter-bar select { flex: 1; }
 }
+
+/* ── Utility classes ── */
+.empty { padding: 1.5rem 0; text-align: center; color: var(--text3); font-size: 14px; }
+.g { color: var(--green) !important; }
+.r { color: var(--red) !important; }
+.entry-icon.transfer { background: var(--blue-bg); color: var(--blue); }
+
+.warn-box { display: none; align-items: center; padding: 12px 16px; border-radius: var(--radius); margin-bottom: 1rem; font-size: 14px; font-weight: 600; }
+.warn-box.red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-mid); }
+.warn-box.amber { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-mid); }
 
 /* ── Chart Manager ── */
 .chart-card { transition: box-shadow 0.2s, transform 0.15s; }
@@ -805,6 +816,7 @@ async function loadData(){
 function toggleHide() {
     showBalance = !showBalance;
     document.getElementById('eye-icon').setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     render();
 }
 
@@ -1161,7 +1173,7 @@ function render(){
   renderWallets();renderWalletHistory();renderSummary();
   updateMonthFilter();renderTxList();renderDebts();renderSources();renderBudget();
   if(currentPage==='chart')renderCharts();
-  lucide.createIcons();
+  if(typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function renderWallets(){
@@ -1856,7 +1868,7 @@ function buildFilterHTML(type, f, prefix) {
   const txTypeOpts = ['all','expense','income'].map(v=>`<option value="${v}" ${(f.txType||'all')===v?'selected':''}>${v==='all'?'All Types':v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join('');
 
   if (type === 'overview') return `
-    <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet" class="field input">${walletOpts}</select></div>`;
+    <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div>`;
 
   if (type === 'bar' || type === 'pie') return `
     <div class="field" style="margin-bottom:10px;"><label>Month</label><select id="${prefix}-f-month">${monthOpts}</select></div>
