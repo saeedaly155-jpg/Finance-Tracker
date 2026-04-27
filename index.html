@@ -10,7 +10,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
+
+/* إصلاح تداخل خيارات الـ Metrics في نافذة إضافة الرسوم البيانية */
+label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; /* المسافة بين المربع والكلمة */
+    margin-right: 16px; /* المسافة بين كل خيار والتاني */
+    margin-bottom: 8px; /* المسافة في حالة نزول الخيارات لسطر جديد */
+    cursor: pointer;
+}
+
+input[type="checkbox"], 
+input[type="radio"] {
+    margin: 0 !important; /* إلغاء أي هوامش افتراضية مسببة للمشكلة */
+}
+
 /* ── التصميم الأساسي والألوان ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
@@ -785,9 +804,7 @@ async function loadData(){
 
 function toggleHide() {
     showBalance = !showBalance;
-    const eyeIcon = document.getElementById('eye-icon');
-    eyeIcon.setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off');
-    lucide.createIcons();
+    document.getElementById('eye-icon').setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off');
     render();
 }
 
@@ -1055,13 +1072,10 @@ function confirmPay(){
   const amt=parseFloat(document.getElementById('pm-amount').value), wid=document.getElementById('pm-wallet').value;
   if(!amt||amt<=0){document.getElementById('pm-amount').focus();return;}
   const w=wById(wid);
-  const isOwed = d.type === 'owed'; // money being paid back TO me
-  if(!isOwed && w&&w.balance<amt){alert('Not enough balance in '+w.name);return;}
-  if(w) w.balance += isOwed ? amt : -amt;
+  if(w&&w.balance<amt){alert('Not enough balance in '+w.name);return;}
+  if(w)w.balance-=amt;
   d.paid=Math.min(d.paid+amt,d.total);
-  const txType = isOwed ? 'income' : 'expense';
-  const txDesc = isOwed ? 'Received: '+d.name : 'Payment: '+d.name;
-  S.transactions.unshift({id:Date.now(),type:txType,desc:txDesc,amount:amt,wallet:wid,cat:'Debt/Installment',month:nowMonth(),date:new Date().toLocaleDateString('en-GB')});
+  S.transactions.unshift({id:Date.now(),type:'expense',desc:'Payment: '+d.name,amount:amt,wallet:wid,cat:'Debt/Installment',month:nowMonth(),date:new Date().toLocaleDateString('en-GB')});
   closePayModal();scheduleSave();render();
   if(currentPage==='chart') renderCharts();
 }
@@ -1878,6 +1892,8 @@ window.onload = async () => {
 
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+
+
 
 </body>
 </html>
