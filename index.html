@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#1c1b18"/>
 <title>Finance Tracker</title>
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%231c1b18&quot;}">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
+<script src="https://unpkg.com/lucide@latest" defer></script>
 
-<script src="https://apis.google.com/js/api.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 
 <style>
 
@@ -1883,11 +1883,19 @@ function updateMonthFilter() {
   if(currentPage==='chart') renderCharts();
 }
 
-window.onload = async () => {
+function startApp() {
     initChartList();
-    await loadData();
-    lucide.createIcons();
-};
+    loadData().then(() => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+}
+
+// Wait for deferred scripts to be ready
+if (document.readyState === 'complete') {
+    startApp();
+} else {
+    window.addEventListener('load', startApp);
+}
 </script>
 
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
