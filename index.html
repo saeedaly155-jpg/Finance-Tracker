@@ -6,34 +6,22 @@
 <meta name="theme-color" content="#1c1b18"/>
 <title>Finance Tracker</title>
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%231c1b18&quot;}">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript> <style> /* إصلاح تداخل خيارات الـ Metrics في نافذة إضافة الرسوم البيانية */
-label:has(> input[type="checkbox"]),
-label:has(> input[type="radio"]) {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-right: 16px;
-    margin-bottom: 8px;
-    cursor: pointer;
-}
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 
-input[type="checkbox"], 
-input[type="radio"] {
-    margin: 0 !important;
-}
-
+<style>
 /* ── التصميم الأساسي والألوان ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
 :root{
   --bg: #f7f6f3; --surface: #fff; --border: #e8e6e0; --border2: #d4d1c8;
   --text: #1c1b18; --text2: #6b6860; --text3: #a09e98;
-  --green: #0f7a5a; --green-bg: #e8f5f0; --green-mid: #10b981;
-  --red: #c0392b; --red-bg: #fdf0ee; --red-mid: #f43f5e;
-  --amber: #9a6800; --amber-bg: #fef8e7; --amber-mid: #f59e0b;
-  --blue: #1a5fa8; --blue-bg: #eef4fd; --blue-mid: #3b82f6;
-  --purple: #5b3fa8; --purple-bg: #f0eeff; --purple-mid: #8b5cf6;
+  --green: #0f7a5a; --green-bg: #e8f5f0; --green-mid: #2db584;
+  --red: #c0392b; --red-bg: #fdf0ee; --red-mid: #e05c4b;
+  --amber: #9a6800; --amber-bg: #fef8e7; --amber-mid: #f0b429;
+  --blue: #1a5fa8; --blue-bg: #eef4fd; --blue-mid: #4a90d9;
+  --purple: #5b3fa8; --purple-bg: #f0eeff; --purple-mid: #8b6dd1;
   --radius: 12px; --radius-lg: 16px;
   --shadow: 0 2px 6px rgba(0,0,0,.04);
   --shadow-md: 0 8px 24px rgba(0,0,0,.08);
@@ -149,13 +137,13 @@ body.dark-mode { --calendar-filter: invert(1); }
 .btn:hover{background:var(--bg); transform:translateY(-1px);}
 .btn:active{transform:scale(.97);}
 .btn.g-btn{background:var(--green-bg);border-color:var(--green-mid);color:var(--green);}
-.btn.g-btn:hover{background:rgba(16,185,129,0.2);}
+.btn.g-btn:hover{background:rgba(45,181,132,0.2);}
 .btn.r-btn{background:var(--red-bg);border-color:var(--red-mid);color:var(--red);}
-.btn.r-btn:hover{background:rgba(244,63,94,0.2);}
+.btn.r-btn:hover{background:rgba(224,92,75,0.2);}
 .btn.b-btn{background:var(--blue-bg);border-color:var(--blue-mid);color:var(--blue);}
-.btn.b-btn:hover{background:rgba(59,130,246,0.2);}
+.btn.b-btn:hover{background:rgba(74,144,217,0.2);}
 .btn.p-btn{background:var(--purple-bg);border-color:var(--purple-mid);color:var(--purple);}
-.btn.p-btn:hover{background:rgba(139,92,246,0.2);}
+.btn.p-btn:hover{background:rgba(139,109,209,0.2);}
 .btn.sm{padding:8px 14px;font-size:13px;}
 .btn.danger{background:var(--red-bg);border-color:var(--red-mid);color:var(--red);font-size:13px;}
 
@@ -167,6 +155,9 @@ body.dark-mode { --calendar-filter: invert(1); }
 .entry:last-child{border-bottom:none;}
 .entry-left{display:flex;align-items:center;gap:12px;min-width:0;flex:1;}
 .entry-icon{width:38px;height:38px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.entry-icon.income{background:var(--green-bg); color:var(--green);}
+.entry-icon.expense{background:var(--red-bg); color:var(--red);}
+.entry-icon.transfer{background:var(--blue-bg); color:var(--blue);}
 .entry-desc{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .entry-meta{font-size:12px;color:var(--text3); margin-top:2px;}
 .entry-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
@@ -211,20 +202,7 @@ body.dark-mode { --calendar-filter: invert(1); }
 .debt-actions .btn { flex: 1; min-width: 80px; }
 .debt-actions .btn.danger { flex: 0 0 auto; padding: 8px 12px; }
 
-/* ── تصميم اختيار الأقسام ── */
-.icon-grid::-webkit-scrollbar { width: 4px; }
-.icon-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-.icon-item { display:flex; align-items:center; justify-content:center; padding:8px; border:1px solid var(--border); border-radius:8px; cursor:pointer; color:var(--text2); transition:0.2s; }
-.icon-item:hover { background:var(--surface); border-color:var(--text); color:var(--text); }
-.icon-item.selected { border-color:var(--blue-mid); background:var(--blue-bg); color:var(--blue); }
-.cat-list-item { display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-bottom:1px solid var(--border); }
-.cat-list-item:last-child { border-bottom:none; }
-
-.chart-wrap{position:relative;width:100%;height:280px; margin-bottom: 8px;}
-
-/* ── تصميم فلتر الشارت ── */
-.chart-filter-bar { display:flex; gap:10px; align-items:center; background:var(--surface); padding:12px; border-radius:var(--radius-lg); border:1px solid var(--border); margin-bottom:1.5rem; box-shadow:var(--shadow); flex-wrap:wrap;}
-.chart-filter-bar label { font-weight:700; font-size:13px; color:var(--text); display:flex; align-items:center; gap:6px; margin-right:8px;}
+.chart-wrap{position:relative;width:100%;height:240px;}
 
 @media(max-width:768px){
   .wallet-card .actions { opacity: 1; }
@@ -240,34 +218,261 @@ body.dark-mode { --calendar-filter: invert(1); }
   .field { min-width: 100%; }
   .btn-row { flex-direction: column; }
   .btn-row .btn { width: 100%; justify-content: center; }
-  .chart-filter-bar select { flex: 1; }
 }
-
-/* ── Utility classes ── */
-.empty { padding: 1.5rem 0; text-align: center; color: var(--text3); font-size: 14px; }
-.g { color: var(--green) !important; }
-.r { color: var(--red) !important; }
-.entry-icon.transfer { background: var(--blue-bg); color: var(--blue); }
-
-.warn-box { display: none; align-items: center; padding: 12px 16px; border-radius: var(--radius); margin-bottom: 1rem; font-size: 14px; font-weight: 600; }
-.warn-box.red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-mid); }
-.warn-box.amber { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-mid); }
-
-/* ── Chart Manager ── */
-.chart-card { transition: box-shadow 0.2s, transform 0.15s; }
-.chart-card.edit-mode-card { border: 2px dashed var(--border2); }
-.chart-card.drag-over { box-shadow: 0 0 0 3px var(--blue-mid), var(--shadow-md); transform: scale(1.01); }
-.chart-card[draggable="true"] { user-select: none; }
-.chart-card[draggable="true"]:active { cursor: grabbing; }
 </style>
 </head>
 <body>
-<div class="app"> <div class="top-bar"> <div class="app-title">Finance Tracker</div> <div class="top-right"> <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i id="theme-icon" data-lucide="moon"></i></button> <button class="icon-btn" onclick="toggleHide()" title="Hide/Show Balance"><i id="eye-icon" data-lucide="eye"></i></button> <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()"> Sync</button> <span id="sync_status" style="font-size: 12px; font-weight:600; color: var(--text3); margin-right: 4px;">Not Synced</span> <div class="save-indicator"><div class="save-dot" id="save-dot"></div><span id="save-label">Saved</span></div> <select class="ctrl" id="currency-select" onchange="changeCurrency()"> <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option> <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option> <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option> </select> </div> </div> <div class="nav-tabs"> <button class="nav-tab active" onclick="showPage('wallets')"> Wallets</button> <button class="nav-tab" onclick="showPage('transactions')"> Transactions</button> <button class="nav-tab" onclick="showPage('debts')"> Debts</button> <button class="nav-tab" onclick="showPage('budget')"> Budget</button> <button class="nav-tab" onclick="showPage('chart')"> Charts</button> <button class="nav-tab" onclick="showPage('data')"> Data</button> </div> <div id="page-wallets"> <div class="wallets-grid" id="wallets-grid"></div> <div class="card"> <div class="card-title"> Add or withdraw money</div> <div class="form-row"> <div class="field"><label>Wallet</label><select id="aw-wallet"></select></div> <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="aw-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Note (optional)</label><input type="text" id="aw-note" placeholder="e.g. ATM..."/></div> </div> <div class="btn-row"> <button class="btn g-btn" onclick="walletOp('add')"> Add money</button> <button class="btn r-btn" onclick="walletOp('withdraw')"> Withdraw</button> </div> </div> <div class="card"> <div class="card-title"> Transfer between wallets</div> <div class="form-row"> <div class="field"><label>From</label><select id="tf-from"></select></div> <div class="transfer-arrow"></div> <div class="field"><label>To</label><select id="tf-to"></select></div> <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="tf-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Note</label><input type="text" id="tf-note" placeholder="Transfer note..."/></div> </div> <div class="btn-row"><button class="btn b-btn" onclick="doTransfer()"> Transfer</button></div> </div> <div class="card"> <div class="card-title"> Wallet history</div> <div class="entries-wrap" id="wallet-history"><div class="empty">No wallet transactions yet.</div></div> </div> </div> <div id="page-transactions" style="display:none;"> <div class="summary-grid"> <div class="metric"><div class="metric-label">Total income</div><div class="metric-value g" id="total-income">0</div></div> <div class="metric"><div class="metric-label">Total expenses</div><div class="metric-value r" id="total-expense">0</div></div> <div class="metric"><div class="metric-label">Net</div><div class="metric-value" id="net-balance">0</div></div> </div> <div class="card"> <div class="card-title"> Add transaction</div> <div class="form-row"> <div class="field"><label>Description</label><input type="text" id="tx-desc" placeholder="e.g. Groceries..."/></div> <div class="field" style="max-width:150px;"><label>Amount</label><input type="number" id="tx-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field" style="max-width:150px;"><label>Wallet</label><select id="tx-wallet"></select></div> <div class="field" style="max-width:150px;"> <div style="display:flex; justify-content:space-between; align-items:center;"> <label>Category</label> </div> <select id="tx-cat"></select> </div> <div class="field" style="max-width:160px;"><label>Month</label><input type="month" id="tx-month"/></div> </div> <div class="btn-row"> <button class="btn g-btn" onclick="addTx('income')"> Income</button> <button class="btn r-btn" onclick="addTx('expense')"> Expense</button> </div> </div> <div class="card"> <div class="month-filter"> <label>Filter:</label> <select class="ctrl" id="month-filter-select" onchange="renderTxList()"><option value="all">All months</option></select> </div> <div class="section-tabs"> <button class="section-tab active" id="stab-all" onclick="filterTx('all')">All</button> <button class="section-tab" id="stab-income" onclick="filterTx('income')">Income</button> <button class="section-tab" id="stab-expense" onclick="filterTx('expense')">Expenses</button> </div> <div class="entries-wrap" id="tx-list"><div class="empty">No transactions yet.</div></div> </div> </div> <div id="page-debts" style="display:none;"> <div class="summary-grid"> <div class="metric"><div class="metric-label">I owe</div><div class="metric-value r" id="total-owe">0</div></div> <div class="metric"><div class="metric-label">Owed to me</div><div class="metric-value g" id="total-owed">0</div></div> <div class="metric"><div class="metric-label">Installments</div><div class="metric-value" style="color:var(--purple);" id="total-install">0</div></div> </div> <button class="btn p-btn" style="width:100%; margin-bottom:1.5rem; font-size:15px; padding:12px;" onclick="openDebtModal()"> Add Debt or Installment</button> <div id="debts-list"><div class="empty">No debts or installments yet.</div></div> </div> <div id="page-budget" style="display:none;"> <div id="warn-box" class="warn-box"></div> <div id="budget-bar-wrap" style="display:none;" class="card"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"> <span style="font-weight:600;font-size:14px;"> Monthly expense budget</span> <span id="budget-bar-label" style="font-weight:600;font-family:'DM Mono',monospace;font-size:14px;"></span> </div> <div style="background:var(--border);border-radius:999px;height:8px;overflow:hidden;"><div id="budget-bar-fill" style="height:100%;border-radius:999px;transition:width .4s;background:var(--green-mid);width:0%;"></div></div> <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:var(--text3); font-weight: 500;"> <span id="budget-spent-label"></span><span id="budget-remaining-label"></span> </div> </div> <div class="card"> <div class="card-title"> Set budget</div> <div class="form-row"> <div class="field"><label>Monthly limit</label><input type="number" id="budget-input" placeholder="Enter amount..." min="0" step="1"/></div> <button class="btn b-btn" style="align-self:flex-end;" onclick="setBudget()">Set Budget</button> <button class="btn sm" style="align-self:flex-end;color:var(--text3);" onclick="clearBudget()"> Clear</button> </div> </div> <div class="card"> <div class="card-title"> Income sources</div> <div class="form-row" style="margin-bottom:12px;"> <div class="field"><label>Source name</label><input type="text" id="src-name" placeholder="e.g. Main job..."/></div> <div class="field" style="max-width:140px;"><label>Type</label> <select id="src-type"><option>Salary</option><option>Freelance</option><option>Business</option><option>Rental</option><option>Investment</option><option>Pension</option><option>Gift</option><option>Other</option></select> </div> <div class="field" style="max-width:150px;"><label>Monthly amount</label><input type="number" id="src-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field" style="max-width:150px;"><label>Into wallet</label><select id="src-wallet"></select></div> <button class="btn g-btn" style="align-self:flex-end;" onclick="addSource()"> Add Source</button> </div> <div id="sources-list"><div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div></div> </div> </div> <div id="page-chart" style="display:none;"> <!-- Toolbar --> <div style="display:flex; gap:10px; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;"> <button class="btn b-btn" onclick="openAddChartModal()" style="gap:6px;"> Add Chart</button> <button class="btn" onclick="toggleEditMode()" id="edit-mode-btn" style="gap:6px;"> Edit Layout</button> <span style="margin-left:auto; font-size:12px; color:var(--text3); font-weight:600;" id="edit-mode-hint"></span> </div> <!-- Dynamic Chart Container --> <div id="charts-container"></div> <!-- Add Chart Modal --> <div class="modal-overlay" id="add-chart-modal"> <div class="modal" style="max-width:500px;"> <div class="modal-title">Add Chart</div> <div class="field" style="margin-bottom:14px;"> <label>Chart Type</label> <select id="new-chart-type" onchange="updateAddChartFilters()"> <option value="overview">Income vs Expenses Overview</option> <option value="bar">Categories Bar Chart</option> <option value="pie">Categories Pie Chart</option> <option value="timeline">Custom Timeline</option> <option value="wallet">Wallet Balances</option> <option value="debt">Debts Timeline</option> </select> </div> <div id="add-chart-filters"></div> <div class="modal-footer"> <button class="btn sm" onclick="closeAddChartModal()">Cancel</button> <button class="btn b-btn" onclick="confirmAddChart()"> Add</button> </div> </div> </div> <!-- Edit Chart Modal --> <div class="modal-overlay" id="edit-chart-modal"> <div class="modal" style="max-width:500px;"> <div class="modal-title">Edit Chart</div> <div id="edit-chart-filters"></div> <div class="modal-footer"> <button class="btn danger sm" onclick="deleteChartFromModal()"> Remove Chart</button> <button class="btn sm" onclick="closeEditChartModal()">Cancel</button> <button class="btn b-btn" onclick="saveEditChart()"> Save</button> </div> </div> </div> </div> <div id="page-data" style="display:none;"> <div class="card"> <div class="card-title"> Backup data</div> <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">احفظ نسخة احتياطية من بياناتك في ملف خارجي.</p> <button class="btn g-btn" onclick="exportData()"> Export backup</button> </div> <div class="card"> <div class="card-title"> Restore data</div> <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">استرجع بياناتك من ملف قمت بحفظه مسبقاً.</p> <button class="btn b-btn" onclick="document.getElementById('import-input').click()"> Import backup</button> <input type="file" id="import-input" accept=".json" style="display:none;" onchange="importData(event)"/> </div> <div class="card"> <div class="card-title" style="color:var(--red);"> Danger zone</div> <button class="btn danger" onclick="confirmClearAll()"> Clear all data</button> </div> </div>
-</div> <div class="modal-overlay" id="wallet-modal"> <div class="modal"> <div class="modal-title" id="wallet-modal-title">Add new wallet</div> <div class="form-row" style="flex-direction:column; align-items:stretch;"> <div class="field"><label>Wallet name</label><input type="text" id="wm-name" placeholder="e.g. Cash, CIB Visa..."/></div> <div class="field"><label>Type</label> <select id="wm-type"><option value="Cash">Cash</option><option value="Debit card">Debit card</option><option value="Credit card">Credit card</option><option value="Savings">Savings</option><option value="E-wallet">E-wallet</option><option value="Other">Other</option></select> </div> <div class="field"><label>Currency</label> <select id="wm-currency"> <option value="default">Default (Global)</option> <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option> <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option> <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option> </select> </div> <div class="field"><label>Balance</label><input type="number" id="wm-balance" placeholder="0.00" step="0.01" value="0"/></div> <div class="field"><label>Color</label><div class="color-picker-row" id="color-picker"></div></div> </div> <div class="modal-footer"> <button class="btn sm" onclick="closeWalletModal()">Cancel</button> <button class="btn g-btn" id="wallet-save-btn" onclick="saveWallet()">Save</button> </div> </div>
-</div> <div class="modal-overlay" id="cat-modal"> <div class="modal"> <div class="modal-title">Manage Categories</div> <div class="form-row" style="flex-direction:column; align-items:stretch; margin-bottom:1rem;"> <div class="field"><label>New Category Name</label><input type="text" id="new-cat-name" placeholder="e.g. Pets, Subscriptions..."/></div> </div> <label style="font-size:13px;color:var(--text2);font-weight:600;display:block;margin-bottom:8px;">Select Icon</label> <div class="icon-grid" id="cat-icon-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(38px,1fr)); gap:8px; margin-bottom:14px; max-height:120px; overflow-y:auto; padding-right:4px;"></div> <button class="btn b-btn" style="width:100%; margin-bottom:1.5rem;" onclick="addNewCategory()"> Add Category</button> <label style="font-size:13px;color:var(--text2);font-weight:600;display:block;margin-bottom:8px;">Current Categories</label> <div id="cat-list" style="max-height:160px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius); padding:8px;"></div> <div class="modal-footer"> <button class="btn sm" onclick="closeCatModal()">Done</button> </div> </div>
-</div> <div class="modal-overlay" id="debt-modal"> <div class="modal"> <div class="modal-title" id="debt-modal-title">Add Debt / Installment</div> <div class="form-row" style="flex-direction:column; align-items:stretch;"> <div class="field"><label>Name</label><input type="text" id="dm-name" placeholder="e.g. Car loan, Ahmed..."/></div> <div class="field"><label>Type</label> <select id="dm-type"><option value="owe">I owe</option><option value="owed">Owed to me</option><option value="install">Installment</option></select> </div> <div class="form-row" style="margin:0; gap:12px;"> <div class="field"><label>Total Amount</label><input type="number" id="dm-total" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Paid So Far</label><input type="number" id="dm-paid" placeholder="0.00" min="0" step="0.01" value="0"/></div> </div> <div class="form-row" style="margin:0; gap:12px;"> <div class="field"><label>Monthly Payment</label><input type="number" id="dm-monthly" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Wallet</label><select id="dm-wallet"></select></div> </div> <div class="form-row" style="margin:0; gap:12px;"> <div class="field"><label>Start Date</label><input type="date" id="dm-start"/></div> <div class="field"><label>Due Date</label><input type="date" id="dm-due"/></div> </div> </div> <div class="modal-footer"> <button class="btn sm" onclick="closeDebtModal()">Cancel</button> <button class="btn p-btn" id="debt-save-btn" onclick="saveDebt()">Save</button> </div> </div>
-</div> <div class="modal-overlay" id="pay-modal"> <div class="modal"> <div class="modal-title" id="pay-modal-title">Make a payment</div> <div class="form-row" style="flex-direction:column; align-items:stretch;"> <div class="field"><label>Payment amount</label><input type="number" id="pm-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>From wallet</label><select id="pm-wallet"></select></div> </div> <div class="modal-footer"> <button class="btn sm" onclick="closePayModal()">Cancel</button> <button class="btn g-btn" onclick="confirmPay()">Confirm Pay</button> </div> </div>
-</div> <script>
+<div class="app">
+  <div class="top-bar">
+    <div class="app-title">Finance Tracker</div>
+    <div class="top-right">
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i id="theme-icon" data-lucide="moon"></i></button>
+      <button class="icon-btn" onclick="toggleHide()" title="Hide/Show Balance"><i id="eye-icon" data-lucide="eye"></i></button>
+      <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()"><i data-lucide="cloud"></i> Sync</button>
+      <span id="sync_status" style="font-size: 12px; font-weight:600; color: var(--text3); margin-right: 4px;">Not Synced</span>
+      <div class="save-indicator"><div class="save-dot" id="save-dot"></div><span id="save-label">Saved</span></div>
+      <select class="ctrl" id="currency-select" onchange="changeCurrency()">
+        <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option>
+        <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option>
+        <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('wallets')"><i data-lucide="wallet"></i> Wallets</button>
+    <button class="nav-tab" onclick="showPage('transactions')"><i data-lucide="list"></i> Transactions</button>
+    <button class="nav-tab" onclick="showPage('debts')"><i data-lucide="banknote"></i> Debts</button>
+    <button class="nav-tab" onclick="showPage('budget')"><i data-lucide="pie-chart"></i> Budget</button>
+    <button class="nav-tab" onclick="showPage('chart')"><i data-lucide="bar-chart-2"></i> Chart</button>
+    <button class="nav-tab" onclick="showPage('data')"><i data-lucide="database"></i> Data</button>
+  </div>
+
+  <div id="page-wallets">
+    <div class="wallets-grid" id="wallets-grid"></div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="plus-circle"></i> Add or withdraw money</div>
+      <div class="form-row">
+        <div class="field"><label>Wallet</label><select id="aw-wallet"></select></div>
+        <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="aw-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Note (optional)</label><input type="text" id="aw-note" placeholder="e.g. ATM..."/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn g-btn" onclick="walletOp('add')"><i data-lucide="plus"></i> Add money</button>
+        <button class="btn r-btn" onclick="walletOp('withdraw')"><i data-lucide="minus"></i> Withdraw</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="arrow-right-left"></i> Transfer between wallets</div>
+      <div class="form-row">
+        <div class="field"><label>From</label><select id="tf-from"></select></div>
+        <div class="transfer-arrow"><i data-lucide="arrow-right"></i></div>
+        <div class="field"><label>To</label><select id="tf-to"></select></div>
+        <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="tf-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Note</label><input type="text" id="tf-note" placeholder="Transfer note..."/></div>
+      </div>
+      <div class="btn-row"><button class="btn b-btn" onclick="doTransfer()"><i data-lucide="arrow-right"></i> Transfer</button></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="history"></i> Wallet history</div>
+      <div class="entries-wrap" id="wallet-history"><div class="empty">No wallet transactions yet.</div></div>
+    </div>
+  </div>
+
+  <div id="page-transactions" style="display:none;">
+    <div class="summary-grid">
+      <div class="metric"><div class="metric-label">Total income</div><div class="metric-value g" id="total-income">0</div></div>
+      <div class="metric"><div class="metric-label">Total expenses</div><div class="metric-value r" id="total-expense">0</div></div>
+      <div class="metric"><div class="metric-label">Net</div><div class="metric-value" id="net-balance">0</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="plus-circle"></i> Add transaction</div>
+      <div class="form-row">
+        <div class="field"><label>Description</label><input type="text" id="tx-desc" placeholder="e.g. Groceries..."/></div>
+        <div class="field" style="max-width:150px;"><label>Amount</label><input type="number" id="tx-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field" style="max-width:150px;"><label>Wallet</label><select id="tx-wallet"></select></div>
+        <div class="field" style="max-width:150px;"><label>Category</label>
+          <select id="tx-cat"><option>Food</option><option>Transport</option><option>Housing</option><option>Health</option><option>Entertainment</option><option>Shopping</option><option>Utilities</option><option>Education</option><option>Savings</option><option>Salary</option><option>Freelance</option><option>Other</option></select>
+        </div>
+        <div class="field" style="max-width:160px;"><label>Month</label><input type="month" id="tx-month"/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn g-btn" onclick="addTx('income')"><i data-lucide="arrow-up"></i> Income</button>
+        <button class="btn r-btn" onclick="addTx('expense')"><i data-lucide="arrow-down"></i> Expense</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="month-filter">
+        <label>Filter:</label>
+        <select class="ctrl" id="month-filter-select" onchange="renderTxList()"><option value="all">All months</option></select>
+      </div>
+      <div class="section-tabs">
+        <button class="section-tab active" id="stab-all" onclick="filterTx('all')">All</button>
+        <button class="section-tab" id="stab-income" onclick="filterTx('income')">Income</button>
+        <button class="section-tab" id="stab-expense" onclick="filterTx('expense')">Expenses</button>
+      </div>
+      <div class="entries-wrap" id="tx-list"><div class="empty">No transactions yet.</div></div>
+    </div>
+  </div>
+
+  <div id="page-debts" style="display:none;">
+    <div class="summary-grid">
+      <div class="metric"><div class="metric-label">I owe</div><div class="metric-value r" id="total-owe">0</div></div>
+      <div class="metric"><div class="metric-label">Owed to me</div><div class="metric-value g" id="total-owed">0</div></div>
+      <div class="metric"><div class="metric-label">Installments</div><div class="metric-value" style="color:var(--purple);" id="total-install">0</div></div>
+    </div>
+    <button class="btn p-btn" style="width:100%; margin-bottom:1.5rem; font-size:15px; padding:12px;" onclick="openDebtModal()"><i data-lucide="plus"></i> Add Debt or Installment</button>
+    <div id="debts-list"><div class="empty">No debts or installments yet.</div></div>
+  </div>
+
+  <div id="page-budget" style="display:none;">
+    <div id="warn-box" class="warn-box"></div>
+    <div id="budget-bar-wrap" style="display:none;" class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-weight:600;font-size:14px;"><i data-lucide="target" style="width:16px; margin-right:4px;"></i> Monthly expense budget</span>
+        <span id="budget-bar-label" style="font-weight:600;font-family:'DM Mono',monospace;font-size:14px;"></span>
+      </div>
+      <div style="background:var(--border);border-radius:999px;height:8px;overflow:hidden;"><div id="budget-bar-fill" style="height:100%;border-radius:999px;transition:width .4s;background:var(--green-mid);width:0%;"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:var(--text3); font-weight: 500;">
+        <span id="budget-spent-label"></span><span id="budget-remaining-label"></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="settings"></i> Set budget</div>
+      <div class="form-row">
+        <div class="field"><label>Monthly limit</label><input type="number" id="budget-input" placeholder="Enter amount..." min="0" step="1"/></div>
+        <button class="btn b-btn" style="align-self:flex-end;" onclick="setBudget()">Set Budget</button>
+        <button class="btn sm" style="align-self:flex-end;color:var(--text3);" onclick="clearBudget()"><i data-lucide="x"></i> Clear</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="briefcase"></i> Income sources</div>
+      <div class="form-row" style="margin-bottom:12px;">
+        <div class="field"><label>Source name</label><input type="text" id="src-name" placeholder="e.g. Main job..."/></div>
+        <div class="field" style="max-width:140px;"><label>Type</label>
+          <select id="src-type"><option>Salary</option><option>Freelance</option><option>Business</option><option>Rental</option><option>Investment</option><option>Pension</option><option>Gift</option><option>Other</option></select>
+        </div>
+        <div class="field" style="max-width:150px;"><label>Monthly amount</label><input type="number" id="src-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field" style="max-width:150px;"><label>Into wallet</label><select id="src-wallet"></select></div>
+        <button class="btn g-btn" style="align-self:flex-end;" onclick="addSource()"><i data-lucide="plus"></i> Add Source</button>
+      </div>
+      <div id="sources-list"><div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div></div>
+    </div>
+  </div>
+
+  <div id="page-chart" style="display:none;">
+    
+    <div class="card">
+      <div class="card-title"><i data-lucide="trending-up"></i> Custom Timeline</div>
+      <div class="form-row" style="margin-bottom: 14px; align-items: flex-end;">
+        <div class="field" style="flex:2;">
+          <label>Select metric to track</label>
+          <select id="timeline-select"></select>
+        </div>
+        <button class="btn b-btn" onclick="addTimelineMetric()"><i data-lucide="plus"></i> Add to Chart</button>
+      </div>
+      <div id="timeline-chips" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;"></div>
+      <div class="chart-wrap"><canvas id="timeline-chart" role="img"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i data-lucide="bar-chart"></i> Income vs expenses by category</div>
+      <div class="chart-wrap"><canvas id="cat-chart" role="img" aria-label="Chart">Chart.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="pie-chart"></i> Wallet balances</div>
+      <div class="chart-wrap"><canvas id="wallet-chart" role="img" aria-label="Wallets">Balances.</canvas></div>
+    </div>
+  </div>
+
+  <div id="page-data" style="display:none;">
+    <div class="card">
+      <div class="card-title"><i data-lucide="save"></i> Backup data</div>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">احفظ نسخة احتياطية من بياناتك في ملف خارجي.</p>
+      <button class="btn g-btn" onclick="exportData()"><i data-lucide="download"></i> Export backup</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><i data-lucide="upload-cloud"></i> Restore data</div>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">استرجع بياناتك من ملف قمت بحفظه مسبقاً.</p>
+      <button class="btn b-btn" onclick="document.getElementById('import-input').click()"><i data-lucide="upload"></i> Import backup</button>
+      <input type="file" id="import-input" accept=".json" style="display:none;" onchange="importData(event)"/>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--red);"><i data-lucide="alert-triangle"></i> Danger zone</div>
+      <button class="btn danger" onclick="confirmClearAll()"><i data-lucide="trash-2"></i> Clear all data</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="wallet-modal">
+  <div class="modal">
+    <div class="modal-title" id="wallet-modal-title">Add new wallet</div>
+    <div class="form-row" style="flex-direction:column; align-items:stretch;">
+      <div class="field"><label>Wallet name</label><input type="text" id="wm-name" placeholder="e.g. Cash, CIB Visa..."/></div>
+      <div class="field"><label>Type</label>
+        <select id="wm-type"><option value="Cash">Cash</option><option value="Debit card">Debit card</option><option value="Credit card">Credit card</option><option value="Savings">Savings</option><option value="E-wallet">E-wallet</option><option value="Other">Other</option></select>
+      </div>
+      <div class="field"><label>Currency</label>
+        <select id="wm-currency">
+          <option value="default">Default (Global)</option>
+          <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option>
+          <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option>
+          <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option>
+        </select>
+      </div>
+      <div class="field"><label>Balance</label><input type="number" id="wm-balance" placeholder="0.00" step="0.01" value="0"/></div>
+      <div class="field"><label>Color</label><div class="color-picker-row" id="color-picker"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn sm" onclick="closeWalletModal()">Cancel</button>
+      <button class="btn g-btn" id="wallet-save-btn" onclick="saveWallet()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="debt-modal">
+  <div class="modal">
+    <div class="modal-title" id="debt-modal-title">Add Debt / Installment</div>
+    <div class="form-row" style="flex-direction:column; align-items:stretch;">
+      <div class="field"><label>Name</label><input type="text" id="dm-name" placeholder="e.g. Car loan, Ahmed..."/></div>
+      <div class="field"><label>Type</label>
+        <select id="dm-type"><option value="owe">I owe</option><option value="owed">Owed to me</option><option value="install">Installment</option></select>
+      </div>
+      <div class="form-row" style="margin:0; gap:12px;">
+        <div class="field"><label>Total Amount</label><input type="number" id="dm-total" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Paid So Far</label><input type="number" id="dm-paid" placeholder="0.00" min="0" step="0.01" value="0"/></div>
+      </div>
+      <div class="form-row" style="margin:0; gap:12px;">
+        <div class="field"><label>Monthly Payment</label><input type="number" id="dm-monthly" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Wallet</label><select id="dm-wallet"></select></div>
+      </div>
+      <div class="form-row" style="margin:0; gap:12px;">
+        <div class="field"><label>Start Date</label><input type="date" id="dm-start"/></div>
+        <div class="field"><label>Due Date</label><input type="date" id="dm-due"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn sm" onclick="closeDebtModal()">Cancel</button>
+      <button class="btn p-btn" id="debt-save-btn" onclick="saveDebt()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="pay-modal">
+  <div class="modal">
+    <div class="modal-title" id="pay-modal-title">Make a payment</div>
+    <div class="form-row" style="flex-direction:column; align-items:stretch;">
+      <div class="field"><label>Payment amount</label><input type="number" id="pm-amount" placeholder="0.00" min="0" step="0.01"/></div>
+      <div class="field"><label>From wallet</label><select id="pm-wallet"></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn sm" onclick="closePayModal()">Cancel</button>
+      <button class="btn g-btn" onclick="confirmPay()">Confirm Pay</button>
+    </div>
+  </div>
+</div>
+
+<script>
 // --- Dark Mode Logic ---
 let isDark = localStorage.getItem('theme') === 'dark';
 if (isDark) document.body.classList.add('dark-mode');
@@ -399,20 +604,7 @@ const WALLET_COLORS=[
   {name:'Rose',grad:'linear-gradient(135deg,#be185d,#881337)',hex:'#be185d'},
   {name:'Amber',grad:'linear-gradient(135deg,#b45309,#78350f)',hex:'#b45309'},
 ];
-const CHART_PALETTE = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e', '#14b8a6', '#f97316', '#0ea5e9', '#ec4899', '#84cc16'];
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-const DEFAULT_CATS = [
-  {name:'Food',icon:'utensils'},{name:'Transport',icon:'car'},{name:'Housing',icon:'home'},{name:'Health',icon:'heart-pulse'},
-  {name:'Entertainment',icon:'film'},{name:'Shopping',icon:'shopping-bag'},{name:'Utilities',icon:'zap'},{name:'Education',icon:'graduation-cap'},
-  {name:'Savings',icon:'piggy-bank'},{name:'Salary',icon:'wallet'},{name:'Freelance',icon:'laptop'},{name:'Debt/Installment',icon:'credit-card'},{name:'Other',icon:'layout-grid'}
-];
-const AVAILABLE_ICONS = [
-  'shopping-cart','coffee','gift','plane','bus','wrench','smartphone','monitor','headphones','book',
-  'briefcase','scissors','smile','star','music','camera','dumbbell','paw','baby','shirt','pizza',
-  'umbrella','wifi','anchor','bell','clock','cpu','gamepad-2','key','map-pin','pen','truck'
-];
-
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DB_NAME='FinanceTrackerDB',DB_VER=1,STORE='state';
 
 let S={
@@ -422,13 +614,10 @@ let S={
     {id:'elalhy',name:'El Ahly Visa',type:'Debit card',color:1,balance:0},
     {id:'fawry',name:'Fawry Visa',type:'Debit card',color:2,balance:0}
   ],
-  categories: [],
   transactions:[],walletHistory:[],sources:[],debts:[],budget:null
 };
-let txFilter='all', barChart=null, pieChart=null, timelineChart=null, walletChart=null, overviewChart=null, debtTimelineChart=null, currentPage='wallets', selectedColor=0, payingDebtId=null;
-let activeTimelineMetrics = ['Net'];
-let debtView = 'month';
-let selectedCatIcon = AVAILABLE_ICONS[0];
+let txFilter='all',catChart=null,walletChart=null,timelineChart=null,currentPage='wallets',selectedColor=0,payingDebtId=null;
+let activeTimelineMetrics = ['Income', 'Expense']; // الخطوط المعروضة حالياً في التايم لاين
 let db=null,saveTimer=null;
 
 let showBalance = true;
@@ -475,10 +664,10 @@ function scheduleSave(){
       await dbSet('data',JSON.parse(JSON.stringify(S)));
       setSaveStatus('saved');
       if (window.gapi && gapi.client && gapi.client.getToken()) {
-          document.getElementById('sync_status').innerHTML = ' Unsynced';
+          document.getElementById('sync_status').innerHTML = '<i data-lucide="alert-circle" style="color:var(--amber-mid); width:14px;"></i> Unsynced';
           lucide.createIcons();
           const btn = document.getElementById('auth_button');
-          btn.innerHTML = ' Update Drive';
+          btn.innerHTML = '<i data-lucide="cloud-upload"></i> Update Drive';
           btn.style.display = 'inline-flex';
           btn.onclick = saveToDrive;
       }
@@ -500,11 +689,6 @@ async function loadData(){
       if(raw)S={...S,...JSON.parse(raw)};
     }catch(e2){}
   }
-  
-  if(!S.categories || S.categories.length === 0) {
-      S.categories = [...DEFAULT_CATS];
-  }
-
   document.getElementById('currency-select').value=S.currency;
   if(S.budget)document.getElementById('budget-input').value=S.budget;
   document.getElementById('tx-month').value=nowMonth();
@@ -517,7 +701,6 @@ async function loadData(){
 function toggleHide() {
     showBalance = !showBalance;
     document.getElementById('eye-icon').setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off');
-    if (typeof lucide !== 'undefined') lucide.createIcons();
     render();
 }
 
@@ -534,11 +717,7 @@ function fmt(n, c){
 }
 
 function nowMonth(){return new Date().toISOString().slice(0,7);}
-function monthLabel(ym){
-    if(!ym || !ym.includes('-')) return ym || '';
-    const[y,m]=ym.split('-');
-    return MONTHS[parseInt(m)-1]+' '+y;
-}
+function monthLabel(ym){if(!ym)return'';const[y,m]=ym.split('-');return MONTHS[parseInt(m)-1]+' '+y;}
 function wById(id){return S.wallets.find(w=>w.id===id);}
 function wName(id){const w=wById(id);return w?w.name:id;}
 function wBadge(id){const w=wById(id);if(!w)return'';return`<span style="display:inline-flex;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:600;background:var(--border);color:var(--text2);">${w.name}</span>`;}
@@ -559,60 +738,7 @@ function populateWalletSelects(){
   });
 }
 
-function populateCatSelect(){
-    const sel = document.getElementById('tx-cat');
-    const cur = sel.value;
-    sel.innerHTML = S.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-    if(S.categories.find(c => c.name === cur)) sel.value = cur;
-}
-
 function changeCurrency(){S.currency=document.getElementById('currency-select').value;scheduleSave();render();}
-
-function openCatModal(){
-    document.getElementById('new-cat-name').value = '';
-    selectedCatIcon = AVAILABLE_ICONS[0];
-    renderCatIconGrid();
-    renderCatList();
-    document.getElementById('cat-modal').classList.add('open');
-    lucide.createIcons();
-}
-function closeCatModal(){
-    document.getElementById('cat-modal').classList.remove('open');
-    populateCatSelect();
-}
-function renderCatIconGrid(){
-    document.getElementById('cat-icon-grid').innerHTML = AVAILABLE_ICONS.map(ic => `<div class="icon-item ${ic===selectedCatIcon?'selected':''}" onclick="selectCatIcon('${ic}')"></div>`
-    ).join('');
-    lucide.createIcons();
-}
-function selectCatIcon(ic){ selectedCatIcon=ic; renderCatIconGrid(); }
-function addNewCategory(){
-    const name = document.getElementById('new-cat-name').value.trim();
-    if(!name){ document.getElementById('new-cat-name').focus(); return; }
-    if(S.categories.find(c => c.name.toLowerCase() === name.toLowerCase())){ alert('Category already exists!'); return; }
-    S.categories.push({name, icon: selectedCatIcon});
-    document.getElementById('new-cat-name').value = '';
-    scheduleSave();
-    renderCatList();
-    populateCatSelect();
-}
-function deleteCategory(name){
-    const inUse = S.transactions.some(t => t.cat === name);
-    if(inUse) {
-        if(!confirm(`The category "${name}" is already used in your transactions. Are you sure you want to delete it?`)) return;
-    } else {
-        if(!confirm(`Delete category "${name}"?`)) return;
-    }
-    S.categories = S.categories.filter(c => c.name !== name);
-    scheduleSave();
-    renderCatList();
-    populateCatSelect();
-}
-function renderCatList(){
-    document.getElementById('cat-list').innerHTML = S.categories.map(c => `<div class="cat-list-item"> <div style="display:flex; align-items:center; gap:8px; font-size:14px;"> ${c.name}</div> <button class="del-btn" onclick="deleteCategory('${c.name}')"></button> </div>`
-    ).join('');
-    lucide.createIcons();
-}
 
 function openWalletModal(id = null){
     editingWalletId = id;
@@ -624,19 +750,20 @@ function openWalletModal(id = null){
         document.getElementById('wm-currency').value = w.currency || 'default';
         selectedColor = w.color || 0;
         document.getElementById('wallet-modal-title').innerText = 'Edit Wallet';
-        document.getElementById('wallet-save-btn').innerHTML = ' Save Changes';
+        document.getElementById('wallet-save-btn').innerHTML = '<i data-lucide="save"></i> Save Changes';
     } else {
         selectedColor = 0;
         document.getElementById('wm-name').value = '';
         document.getElementById('wm-balance').value = '0';
         document.getElementById('wm-currency').value = 'default';
         document.getElementById('wallet-modal-title').innerText = 'Add new wallet';
-        document.getElementById('wallet-save-btn').innerHTML = ' Add wallet';
+        document.getElementById('wallet-save-btn').innerHTML = '<i data-lucide="plus"></i> Add wallet';
     }
     renderColorPicker();
     document.getElementById('wallet-modal').classList.add('open');
     lucide.createIcons();
 }
+
 function closeWalletModal(){ document.getElementById('wallet-modal').classList.remove('open'); }
 
 function renderColorPicker(){
@@ -670,7 +797,7 @@ function openDebtModal(id = null) {
         document.getElementById('dm-start').value = d.startDate || parseLegacyDate(d.date) || new Date().toISOString().split('T')[0];
         document.getElementById('dm-due').value = d.dueDate || '';
         document.getElementById('debt-modal-title').innerText = 'Edit Debt';
-        document.getElementById('debt-save-btn').innerHTML = ' Save Changes';
+        document.getElementById('debt-save-btn').innerHTML = '<i data-lucide="save"></i> Save Changes';
     } else {
         document.getElementById('dm-name').value = '';
         document.getElementById('dm-type').value = 'owe';
@@ -680,7 +807,7 @@ function openDebtModal(id = null) {
         document.getElementById('dm-start').value = new Date().toISOString().split('T')[0];
         document.getElementById('dm-due').value = '';
         document.getElementById('debt-modal-title').innerText = 'Add Debt / Installment';
-        document.getElementById('debt-save-btn').innerHTML = ' Save';
+        document.getElementById('debt-save-btn').innerHTML = '<i data-lucide="check"></i> Save';
     }
     document.getElementById('debt-modal').classList.add('open');
     lucide.createIcons();
@@ -735,36 +862,13 @@ function doTransfer(){
   document.getElementById('tf-amount').value='';document.getElementById('tf-note').value='';
   scheduleSave();render();
 }
-
 function deleteWH(id){
-  const h = S.walletHistory.find(x => x.id === id);
-  if(!h) return;
-
-  const w = wById(h.wallet),
-        tw = h.toWallet ? wById(h.toWallet) : null;
-
-  if(h.type === 'add'){
-    if(w && w.balance < h.amount){
-      alert('Cannot undo. Balance is lower than this transaction.');
-      return;
-    }
-    if(w) w.balance -= h.amount;
-  }
-  else if(h.type === 'withdraw'){
-    if(w) w.balance += h.amount;
-  }
-  else if(h.type === 'transfer'){
-    if(tw && tw.balance < h.amount){
-      alert('Cannot undo transfer. Target wallet has insufficient balance.');
-      return;
-    }
-    if(w) w.balance += h.amount;
-    if(tw) tw.balance -= h.amount;
-  }
-
-  S.walletHistory = S.walletHistory.filter(x => x.id !== id);
-  scheduleSave();
-  render();
+  const h=S.walletHistory.find(x=>x.id===id);if(!h)return;
+  const w=wById(h.wallet),tw=h.toWallet?wById(h.toWallet):null;
+  if(h.type==='add'){if(w&&w.balance<h.amount){alert('Cannot undo.');return;}if(w)w.balance-=h.amount;}
+  else if(h.type==='withdraw'){if(w)w.balance+=h.amount;}
+  else if(h.type==='transfer'){if(tw&&tw.balance<h.amount){alert('Cannot undo.');return;}if(w)w.balance+=h.amount;if(tw)tw.balance-=h.amount;}
+  S.walletHistory=S.walletHistory.filter(x=>x.id!==id);scheduleSave();render();
 }
 
 function addTx(type){
@@ -779,14 +883,12 @@ function addTx(type){
   S.transactions.unshift({id:Date.now(),type,desc,amount:amt,wallet:wid,cat,month,date:new Date().toLocaleDateString('en-GB')});
   document.getElementById('tx-desc').value='';document.getElementById('tx-amount').value='';
   scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets();
-  if(currentPage==='chart') renderCharts();
 }
 function deleteTx(id){
   const tx=S.transactions.find(t=>t.id===id);if(!tx)return;
   const w=wById(tx.wallet);if(w)w.balance+=(tx.type==='income'?-tx.amount:tx.amount);
   S.transactions=S.transactions.filter(t=>t.id!==id);
   scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets();
-  if(currentPage==='chart') renderCharts();
 }
 function filterTx(f){txFilter=f;['all','income','expense'].forEach(x=>document.getElementById('stab-'+x).className='section-tab'+(f===x?' active':''));renderTxList();}
 
@@ -808,7 +910,6 @@ function confirmPay(){
   d.paid=Math.min(d.paid+amt,d.total);
   S.transactions.unshift({id:Date.now(),type:'expense',desc:'Payment: '+d.name,amount:amt,wallet:wid,cat:'Debt/Installment',month:nowMonth(),date:new Date().toLocaleDateString('en-GB')});
   closePayModal();scheduleSave();render();
-  if(currentPage==='chart') renderCharts();
 }
 
 function addSource(){
@@ -841,7 +942,7 @@ function importData(e){
 }
 function confirmClearAll(){
   if(!confirm('Delete ALL data?'))return;
-  S={currency:S.currency,wallets:[{id:'cash',name:'Cash',type:'Cash',color:0,balance:0},{id:'elalhy',name:'El Ahly Visa',type:'Debit card',color:1,balance:0},{id:'fawry',name:'Fawry Visa',type:'Debit card',color:2,balance:0}],categories:[...DEFAULT_CATS],transactions:[],walletHistory:[],sources:[],debts:[],budget:null};
+  S={currency:S.currency,wallets:[{id:'cash',name:'Cash',type:'Cash',color:0,balance:0},{id:'elalhy',name:'El Ahly Visa',type:'Debit card',color:1,balance:0},{id:'fawry',name:'Fawry Visa',type:'Debit card',color:2,balance:0}],transactions:[],walletHistory:[],sources:[],debts:[],budget:null};
   document.getElementById('budget-input').value='';scheduleSave();render();
 }
 
@@ -855,33 +956,45 @@ function showPage(p){
 
 function updateMonthFilter(){
   const months=[...new Set(S.transactions.map(t=>t.month))].sort().reverse();
-  const sel=document.getElementById('month-filter-select');
-  if(sel){const cur=sel.value;sel.innerHTML='<option value="all">All months</option>'+months.map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');if(months.includes(cur))sel.value=cur;}
-  if(currentPage==='chart') renderCharts();
+  const sel=document.getElementById('month-filter-select');const cur=sel.value;
+  sel.innerHTML='<option value="all">All months</option>'+months.map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');
+  if(months.includes(cur))sel.value=cur;
 }
 
-// Timeline metric stubs — handled per-card now
-function addTimelineMetric() {}
-function removeTimelineMetric(val) {}
+// إضافة خيارات التايم لاين
+function addTimelineMetric() {
+    const val = document.getElementById('timeline-select').value;
+    if (val && !activeTimelineMetrics.includes(val)) {
+        activeTimelineMetrics.push(val);
+        renderCharts();
+    }
+}
 
-function safeIconRefresh(){
-  if(typeof lucide !== 'undefined') lucide.createIcons();
+// مسح خيار من التايم لاين
+function removeTimelineMetric(val) {
+    activeTimelineMetrics = activeTimelineMetrics.filter(m => m !== val);
+    renderCharts();
 }
 
 function render(){
-  populateWalletSelects();populateCatSelect();
-  renderWallets();renderWalletHistory();renderSummary();
+  populateWalletSelects();renderWallets();renderWalletHistory();renderSummary();
   updateMonthFilter();renderTxList();renderDebts();renderSources();renderBudget();
   if(currentPage==='chart')renderCharts();
-  safeIconRefresh();
+  lucide.createIcons();
 }
 
 function renderWallets(){
   document.getElementById('wallets-grid').innerHTML=
     S.wallets.map(w=>`
-      <div class="wallet-card" style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad};"> <div class="actions"> <button class="action-btn" onclick="openWalletModal('${w.id}')" title="Edit"></button> <button class="action-btn" onclick="deleteWallet('${w.id}')" title="Delete"></button> </div> <div class="w-label">Balance</div><div class="w-name">${w.name}</div> <div class="w-balance">${fmt(w.balance, w.currency)}</div><div class="w-type">${w.type}</div> </div>`).join('')+
-    `<div class="add-wallet-card" onclick="openWalletModal()"><span>Add wallet</span></div>`;
-  safeIconRefresh();
+      <div class="wallet-card" style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad};">
+        <div class="actions">
+          <button class="action-btn" onclick="openWalletModal('${w.id}')" title="Edit"><i data-lucide="pencil" style="width:14px;"></i></button>
+          <button class="action-btn" onclick="deleteWallet('${w.id}')" title="Delete"><i data-lucide="x" style="width:16px;"></i></button>
+        </div>
+        <div class="w-label">Balance</div><div class="w-name">${w.name}</div>
+        <div class="w-balance">${fmt(w.balance, w.currency)}</div><div class="w-type">${w.type}</div>
+      </div>`).join('')+
+    `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px; height:28px;"></i><span>Add wallet</span></div>`;
 }
 
 function renderWalletHistory(){
@@ -890,13 +1003,21 @@ function renderWalletHistory(){
   el.innerHTML=S.walletHistory.map(h=>{
     let icon,amtStr,amtClass;
     const wCur = wById(h.wallet)?.currency;
-    if(h.type==='add'){icon='';amtStr='+'+fmt(h.amount, wCur);amtClass='g';}
-    else if(h.type==='withdraw'){icon='';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
-    else{icon='';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
+    if(h.type==='add'){icon='<i data-lucide="arrow-up"></i>';amtStr='+'+fmt(h.amount, wCur);amtClass='g';}
+    else if(h.type==='withdraw'){icon='<i data-lucide="arrow-down"></i>';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
+    else{icon='<i data-lucide="arrow-right-left"></i>';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
     const meta=h.type==='transfer'?`${wName(h.wallet)} → ${wName(h.toWallet)}`:wName(h.wallet);
-    return`<div class="entry"> <div class="entry-left"> <div class="entry-icon transfer">${icon}</div> <div style="min-width:0;"><div class="entry-desc">${h.note}</div><div class="entry-meta">${meta} · ${h.date}</div></div> </div> <div class="entry-right"> <div class="entry-amount ${amtClass}">${amtStr}</div> <button class="del-btn" onclick="deleteWH(${h.id})"></button> </div> </div>`;
+    return`<div class="entry">
+      <div class="entry-left">
+        <div class="entry-icon transfer">${icon}</div>
+        <div style="min-width:0;"><div class="entry-desc">${h.note}</div><div class="entry-meta">${meta} · ${h.date}</div></div>
+      </div>
+      <div class="entry-right">
+        <div class="entry-amount ${amtClass}">${amtStr}</div>
+        <button class="del-btn" onclick="deleteWH(${h.id})"><i data-lucide="x"></i></button>
+      </div>
+    </div>`;
   }).join('');
-  safeIconRefresh();
 }
 
 function renderSummary(){
@@ -912,12 +1033,19 @@ function renderTxList(){
   if(!list.length){el.innerHTML='<div class="empty">No transactions found.</div>';return;}
   const groups={}; list.forEach(t=>{const m=t.month||'Unknown';if(!groups[m])groups[m]=[];groups[m].push(t);});
   const sortedMonths=Object.keys(groups).sort().reverse();
-  
   el.innerHTML=sortedMonths.map(m=>`
-    <div class="month-group">${monthLabel(m)}</div> ${groups[m].map(t=>`
-      <div class="entry"> <div class="entry-left"> <div class="entry-icon" style="background:var(--surface); border:1px solid var(--border); color:var(--text2); box-shadow: var(--shadow);"> </div> <div style="min-width:0;"> <div class="entry-desc">${t.desc}</div> <div class="entry-meta">${t.cat} · ${wBadge(t.wallet)} · ${t.date}</div> </div> </div> <div class="entry-right"> <div class="entry-amount ${t.type==='income'?'g':'r'}">${t.type==='income'?'+':'−'}${fmt(t.amount, wById(t.wallet)?.currency)}</div> <button class="del-btn" onclick="deleteTx(${t.id})"></button> </div> </div>`).join('')}`).join('');
-      
-  safeIconRefresh();
+    <div class="month-group">${monthLabel(m)}</div>
+    ${groups[m].map(t=>`
+      <div class="entry">
+        <div class="entry-left">
+          <div class="entry-icon ${t.type}">${t.type==='income'?'<i data-lucide="arrow-up"></i>':'<i data-lucide="arrow-down"></i>'}</div>
+          <div style="min-width:0;"><div class="entry-desc">${t.desc}</div><div class="entry-meta">${t.cat} · ${wBadge(t.wallet)} · ${t.date}</div></div>
+        </div>
+        <div class="entry-right">
+          <div class="entry-amount ${t.type==='income'?'g':'r'}">${t.type==='income'?'+':'−'}${fmt(t.amount, wById(t.wallet)?.currency)}</div>
+          <button class="del-btn" onclick="deleteTx(${t.id})"><i data-lucide="x"></i></button>
+        </div>
+      </div>`).join('')}`).join('');
 }
 
 function renderDebts(){
@@ -937,10 +1065,34 @@ function renderDebts(){
       const startStr = d.startDate ? new Date(d.startDate).toLocaleDateString('en-GB') : d.date;
       const dueStr = d.dueDate ? new Date(d.dueDate).toLocaleDateString('en-GB') : 'No due date';
       
-      html+=`<div class="debt-card"> <div class="debt-header"> <div style="flex:1;"> <div class="debt-name">${d.name}${done?' ':''}</div> <div class="debt-meta-row"> <div class="meta-chip"> ${startStr}  ${dueStr}</div> ${d.monthly ? `<div class="meta-chip"> ${fmt(d.monthly, wCur)} / mo</div>` : ''}
-            </div> </div> <span class="debt-type-badge ${type}">${type==='owe'?'I owe':type==='owed'?'Owed to me':'Installment'}</span> </div> <div class="debt-progress-wrap"> <div class="debt-footer-text" style="margin-bottom:6px;"> <span>Paid: <span class="main-val">${fmt(d.paid, wCur)}</span></span> <span>Total: <span class="main-val">${fmt(d.total, wCur)}</span></span> </div> <div class="debt-progress-bg"><div class="debt-progress-fill" style="width:${pct.toFixed(1)}%;background:${barColor};"></div></div> <div class="debt-footer-text"><span style="color:var(--${done?'green':'text2'});">${done?'Fully paid':'Remaining: ' + '<span class="main-val">' + fmt(remaining, wCur) + '</span>'}</span></div> </div> <div class="debt-actions"> ${!done?`<button class="btn sm p-btn" onclick="openPayModal(${d.id})" style="flex:2;"> Pay</button>`:''}
-          ${!done?`<button class="btn sm" onclick="markDebtDone(${d.id})" style="color:var(--green);"> Done</button>`:''}
-          <button class="btn sm" onclick="openDebtModal(${d.id})"> Edit</button> <button class="btn sm danger" onclick="deleteDebt(${d.id})"></button> </div> </div>`;
+      html+=`<div class="debt-card">
+        <div class="debt-header">
+          <div style="flex:1;">
+            <div class="debt-name">${d.name}${done?' <i data-lucide="check-circle-2" style="color:var(--green-mid); width:18px;"></i>':''}</div>
+            <div class="debt-meta-row">
+                <div class="meta-chip"><i data-lucide="calendar"></i> ${startStr} <i data-lucide="arrow-right" style="width:12px;"></i> ${dueStr}</div>
+                ${d.monthly ? `<div class="meta-chip"><i data-lucide="credit-card"></i> ${fmt(d.monthly, wCur)} / mo</div>` : ''}
+            </div>
+          </div>
+          <span class="debt-type-badge ${type}">${type==='owe'?'I owe':type==='owed'?'Owed to me':'Installment'}</span>
+        </div>
+        
+        <div class="debt-progress-wrap">
+            <div class="debt-footer-text" style="margin-bottom:6px;">
+              <span>Paid: <span class="main-val">${fmt(d.paid, wCur)}</span></span>
+              <span>Total: <span class="main-val">${fmt(d.total, wCur)}</span></span>
+            </div>
+            <div class="debt-progress-bg"><div class="debt-progress-fill" style="width:${pct.toFixed(1)}%;background:${barColor};"></div></div>
+            <div class="debt-footer-text"><span style="color:var(--${done?'green':'text2'});">${done?'Fully paid':'Remaining: ' + '<span class="main-val">' + fmt(remaining, wCur) + '</span>'}</span></div>
+        </div>
+
+        <div class="debt-actions">
+          ${!done?`<button class="btn sm p-btn" onclick="openPayModal(${d.id})" style="flex:2;"><i data-lucide="banknote"></i> Pay</button>`:''}
+          ${!done?`<button class="btn sm" onclick="markDebtDone(${d.id})" style="color:var(--green);"><i data-lucide="check"></i> Done</button>`:''}
+          <button class="btn sm" onclick="openDebtModal(${d.id})"><i data-lucide="pencil"></i> Edit</button>
+          <button class="btn sm danger" onclick="deleteDebt(${d.id})"><i data-lucide="trash-2"></i></button>
+        </div>
+      </div>`;
     });
   });
   el.innerHTML=html;
@@ -949,8 +1101,17 @@ function renderDebts(){
 function renderSources(){
   const el=document.getElementById('sources-list');
   if(!S.sources.length){el.innerHTML='<div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div>';return;}
-  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;"> ${S.sources.map(s=>`
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px; box-shadow: var(--shadow);"> <div style="display:flex;justify-content:space-between;margin-bottom:8px;"> <span style="font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green);padding:4px 8px;border-radius:999px;">${s.type}</span> <button class="del-btn" onclick="deleteSrc(${s.id})" style="padding: 2px;"></button> </div> <div style="font-size:14px;color:var(--text2);margin-bottom:6px; font-weight: 600;">${s.name}</div> <div style="font-size:18px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${fmt(s.amount, wById(s.wallet)?.currency)}/mo</div> <div style="margin-top:8px;">${wBadge(s.wallet)}</div> </div>`).join('')}
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+  ${S.sources.map(s=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px; box-shadow: var(--shadow);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green);padding:4px 8px;border-radius:999px;">${s.type}</span>
+        <button class="del-btn" onclick="deleteSrc(${s.id})" style="padding: 2px;"><i data-lucide="x"></i></button>
+      </div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:6px; font-weight: 600;">${s.name}</div>
+      <div style="font-size:18px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${fmt(s.amount, wById(s.wallet)?.currency)}/mo</div>
+      <div style="margin-top:8px;">${wBadge(s.wallet)}</div>
+    </div>`).join('')}
   </div>`;
 }
 
@@ -964,578 +1125,109 @@ function renderBudget(){
     document.getElementById('budget-bar-label').textContent=pct.toFixed(0)+'% used';
     document.getElementById('budget-spent-label').textContent='Spent: '+fmt(exp);
     document.getElementById('budget-remaining-label').textContent='Remaining: '+fmt(Math.max(S.budget-exp,0));
-    if(pct>=100){fill.style.background='var(--red-mid)';wb.style.display='flex';wb.className='warn-box red';wb.innerHTML=' Budget exceeded! Spent '+fmt(exp)+' of '+fmt(S.budget);}
-    else if(pct>=80){fill.style.background='var(--amber-mid)';wb.style.display='flex';wb.className='warn-box amber';wb.innerHTML=' Approaching limit — '+pct.toFixed(0)+'% used.';}
+    if(pct>=100){fill.style.background='var(--red-mid)';wb.style.display='flex';wb.className='warn-box red';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Budget exceeded! Spent '+fmt(exp)+' of '+fmt(S.budget);}
+    else if(pct>=80){fill.style.background='var(--amber-mid)';wb.style.display='flex';wb.className='warn-box amber';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Approaching limit — '+pct.toFixed(0)+'% used.';}
     else{fill.style.background='var(--green-mid)';wb.style.display='none';}
   }else{bw.style.display='none';wb.style.display='none';}
 }
 
-// ══════════════════════════════════════════════
-// CHART MANAGER — Dynamic, Sortable, Filterable
-// ══════════════════════════════════════════════
-
-// ── Default chart config state ──
-const CHART_DEFS = {
-  overview: { title: 'Income vs Expenses Overview', icon: 'trending-up' },
-  bar:      { title: 'Categories Bar Chart',         icon: 'bar-chart'   },
-  pie:      { title: 'Categories Pie Chart',         icon: 'pie-chart'   },
-  timeline: { title: 'Custom Timeline',              icon: 'activity'    },
-  wallet:   { title: 'Wallet Balances',              icon: 'wallet'      },
-  debt:     { title: 'Debts Timeline',               icon: 'landmark'    },
-};
-
-// Default filters per type
-function defaultFilters(type) {
-  if (type === 'overview') return { wallet: 'all' };
-  if (type === 'bar')      return { month: 'all', txType: 'expense', wallet: 'all' };
-  if (type === 'pie')      return { month: 'all', txType: 'expense', wallet: 'all' };
-  if (type === 'timeline') return { wallet: 'all', metrics: ['Net'] };
-  if (type === 'wallet')   return {};
-  if (type === 'debt')     return { debt: 'all', metric: 'remaining', view: 'month' };
-  return {};
-}
-
-// Persisted chart list: [{id, type, filters}]
-let chartList = [];
-let chartInstances = {}; // id -> Chart.js instance
-let editingChartId = null;
-let editMode = false;
-let dragSrcIdx = null;
-
-// ── Initialise charts from localStorage or defaults ──
-function initChartList() {
-  try {
-    const saved = localStorage.getItem('ft_chartList');
-    if (saved) { chartList = JSON.parse(saved); return; }
-  } catch(e) {}
-  // Default layout
-  chartList = [
-    { id: 'c1', type: 'overview', filters: defaultFilters('overview') },
-    { id: 'c2', type: 'bar',      filters: defaultFilters('bar')      },
-    { id: 'c3', type: 'pie',      filters: defaultFilters('pie')      },
-    { id: 'c4', type: 'timeline', filters: defaultFilters('timeline') },
-    { id: 'c5', type: 'wallet',   filters: defaultFilters('wallet')   },
-    { id: 'c6', type: 'debt',     filters: defaultFilters('debt')     },
-  ];
-}
-
-function saveChartList() {
-  localStorage.setItem('ft_chartList', JSON.stringify(chartList));
-}
-
-// ── Render all chart cards into the container ──
-function renderCharts() {
-  if (currentPage !== 'chart') return;
-  if (!chartList.length) initChartList();
-
-  const container = document.getElementById('charts-container');
-
-  // Destroy removed charts
-  const currentIds = new Set(chartList.map(c => c.id));
-  Object.keys(chartInstances).forEach(id => {
-    if (!currentIds.has(id)) { chartInstances[id]?.destroy(); delete chartInstances[id]; }
-  });
-
-  // Build / update cards
-  chartList.forEach((cfg, idx) => {
-    let card = document.getElementById('chart-card-' + cfg.id);
-    if (!card) {
-      card = buildChartCard(cfg);
-      container.appendChild(card);
-    }
-    // Always re-render the chart data
-    renderSingleChart(cfg);
-  });
-
-  // Re-order DOM to match chartList order
-  chartList.forEach(cfg => {
-    const card = document.getElementById('chart-card-' + cfg.id);
-    if (card) container.appendChild(card); // move to end in order
-  });
-
-  // Remove orphan cards
-  Array.from(container.children).forEach(el => {
-    const id = el.id?.replace('chart-card-', '');
-    if (!chartList.find(c => c.id === id)) el.remove();
-  });
-
-  updateEditModeUI();
-  lucide.createIcons();
-}
-
-// ── Build a chart card DOM element ──
-function buildChartCard(cfg) {
-  const def = CHART_DEFS[cfg.type];
-  const card = document.createElement('div');
-  card.className = 'card chart-card';
-  card.id = 'chart-card-' + cfg.id;
-  card.setAttribute('draggable', 'false');
-  card.dataset.chartId = cfg.id;
-
-  card.innerHTML = `
-    <div class="card-title" style="justify-content:space-between; margin-bottom:0.8rem;"> <span style="display:flex;align-items:center;gap:6px;"> ${def.title}
-      </span> <div style="display:flex;gap:6px;align-items:center;"> <span class="drag-handle" title="Drag to reorder" style="display:none; cursor:grab; color:var(--text3); padding:2px 4px;"> </span> <button class="del-btn edit-only" title="Edit / Filters" onclick="openEditChartModal('${cfg.id}')" style="display:none;"> </button> <button class="del-btn edit-only" title="Remove chart" onclick="removeChart('${cfg.id}')" style="display:none; color:var(--red);"> </button> </div> </div> <div class="chart-card-body"></div> `;
-
-  // Build body content per type
-  buildCardBody(card.querySelector('.chart-card-body'), cfg);
-
-  // Drag events
-  card.addEventListener('dragstart', onDragStart);
-  card.addEventListener('dragover',  onDragOver);
-  card.addEventListener('drop',      onDrop);
-  card.addEventListener('dragend',   onDragEnd);
-
-  return card;
-}
-
-function buildCardBody(body, cfg) {
-  const canvasId = 'canvas-' + cfg.id;
-  if (cfg.type === 'timeline') {
-    body.innerHTML = `
-      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;"> <div class="field" style="flex:2;min-width:140px;margin-bottom:0;"> <label style="font-size:12px;">Add metric</label> <select id="tl-select-${cfg.id}" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:13px;width:100%;outline:none;"></select> </div> <button class="btn b-btn sm" onclick="addTimelineMetricTo('${cfg.id}')"> Add</button> </div> <div id="tl-chips-${cfg.id}" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div> <div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>`;
-  } else if (cfg.type === 'debt') {
-    body.innerHTML = `
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;"> <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:3px;"> ${['day','month','year'].map(v => `<button class="section-tab${cfg.filters.view===v?' active':''}" onclick="setDebtViewOn('${cfg.id}','${v}')" style="padding:5px 12px;font-size:12px;">${v.charAt(0).toUpperCase()+v.slice(1)}s</button>`).join('')}
-        </div> <select class="ctrl" id="dbt-filter-${cfg.id}" onchange="updateDebtFilterOn('${cfg.id}')" style="font-size:13px;"> <option value="all">All Debts</option> ${S.debts.map(d=>`<option value="${d.id}" ${String(cfg.filters.debt)===String(d.id)?'selected':''}>${d.name}</option>`).join('')}
-        </select> <select class="ctrl" id="dbt-metric-${cfg.id}" onchange="updateDebtFilterOn('${cfg.id}')" style="font-size:13px;"> ${['remaining','paid','both'].map(m=>`<option value="${m}" ${cfg.filters.metric===m?'selected':''}>${m.charAt(0).toUpperCase()+m.slice(1)}</option>`).join('')}
-        </select> </div> <div class="chart-wrap" style="height:280px;"><canvas id="${canvasId}"></canvas></div> <div id="dbt-legend-${cfg.id}" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:12px;font-weight:600;color:var(--text2);"></div>`;
-  } else {
-    body.innerHTML = `<div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>`;
-  }
-}
-
-// ── Render single chart by config ──
-function renderSingleChart(cfg) {
+function renderCharts(){
+  const cats=[...new Set(S.transactions.map(t=>t.cat))];
   const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98';
   const gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
-  const canvasId = 'canvas-' + cfg.id;
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
+  
+  // 1. تحديث قائمة اختيار التايم لاين
+  const timelineSelect = document.getElementById('timeline-select');
+  const baseOptions = `<option value="Income">Total Income</option><option value="Expense">Total Expense</option><option value="Net">Net Balance</option>`;
+  const catOptions = cats.map(c => `<option value="${c}">Category: ${c}</option>`).join('');
+  timelineSelect.innerHTML = baseOptions + catOptions;
 
-  if (chartInstances[cfg.id]) { chartInstances[cfg.id].destroy(); delete chartInstances[cfg.id]; }
+  // 2. عرض الـ Chips (العناصر المختارة للتايم لاين)
+  document.getElementById('timeline-chips').innerHTML = activeTimelineMetrics.map(m => 
+    `<div class="meta-chip" style="background:var(--surface); border-color:var(--border2); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:14px; color:var(--red);" onclick="removeTimelineMetric('${m}')"></i></div>`
+  ).join('');
 
-  const f = cfg.filters;
+  // 3. رسم مخطط التايم لاين
+  let months = [...new Set(S.transactions.map(t => t.month))].filter(Boolean).sort();
+  if (!months.length) months = [nowMonth()]; // لو مفيش بيانات حط الشهر الحالي كافتراضي
 
-  if (cfg.type === 'overview') {
-    let txs = f.wallet === 'all' ? S.transactions : S.transactions.filter(t => t.wallet === f.wallet);
-    let months = [...new Set(txs.map(t => t.month))].filter(Boolean).sort();
-    if (!months.length) months = [nowMonth()];
-    const ctx = canvas.getContext('2d');
-    let gI = ctx.createLinearGradient(0,0,0,260); gI.addColorStop(0, isDark?'rgba(16,185,129,.4)':'rgba(16,185,129,.22)'); gI.addColorStop(1,'rgba(16,185,129,0)');
-    let gE = ctx.createLinearGradient(0,0,0,260); gE.addColorStop(0, isDark?'rgba(244,63,94,.4)':'rgba(244,63,94,.22)'); gE.addColorStop(1,'rgba(244,63,94,0)');
-    chartInstances[cfg.id] = new Chart(ctx, {
-      type:'line',
-      data:{ labels: months.map(m=>monthLabel(m).split(' ')[0]),
-        datasets:[
-          {label:'Income', data: months.map(m=>txs.filter(t=>(t.month||nowMonth())===m&&t.type==='income').reduce((s,t)=>s+t.amount,0)), borderColor:'#10b981', backgroundColor:gI, borderWidth:3, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:6},
-          {label:'Expense',data: months.map(m=>txs.filter(t=>(t.month||nowMonth())===m&&t.type==='expense').reduce((s,t)=>s+t.amount,0)), borderColor:'#f43f5e', backgroundColor:gE, borderWidth:3, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:6},
-        ]},
-      options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
-        plugins:{ legend:{position:'top',align:'end',labels:{usePointStyle:true,boxWidth:8,font:{family:"'DM Sans'",size:12,weight:'bold'},color:tc}} },
-        scales:{ x:{grid:{display:false},ticks:{font:{size:12,family:"'DM Sans'"},color:tc}}, y:{border:{display:false},ticks:{callback:v=>sym()+v.toLocaleString(),font:{size:12,family:"'DM Sans'"},color:tc},grid:{color:gc}} }
-      }
-    });
-
-  } else if (cfg.type === 'bar' || cfg.type === 'pie') {
-    let txs = S.transactions;
-    if (f.month  !== 'all') txs = txs.filter(t => t.month  === f.month);
-    if (f.txType !== 'all') txs = txs.filter(t => t.type   === f.txType);
-    if (f.wallet !== 'all') txs = txs.filter(t => t.wallet === f.wallet);
-    const totals = {}; txs.forEach(t => { totals[t.cat] = (totals[t.cat]||0) + t.amount; });
-    let cats = Object.keys(totals).sort((a,b) => totals[b]-totals[a]);
-    let data = cats.map(c => totals[c]);
-    let colors = cats.map((_,i) => CHART_PALETTE[i%CHART_PALETTE.length]);
-    const empty = cats.length === 0;
-    if (empty) { cats=['No Data']; data=[0]; colors=[isDark?'#2a2a2a':'#e8e6e0']; }
-
-    if (cfg.type === 'bar') {
-      chartInstances[cfg.id] = new Chart(canvas.getContext('2d'), {
-        type:'bar', data:{ labels:cats, datasets:[{label:'Amount', data, backgroundColor:colors, borderRadius:6, borderWidth:0}] },
-        options:{ responsive:true, maintainAspectRatio:false,
-          plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>empty?'No Data':' '+sym()+ctx.raw.toLocaleString()}}},
-          scales:{ x:{grid:{display:false},ticks:{font:{family:"'DM Sans'",size:11},color:tc}}, y:{border:{display:false},ticks:{callback:v=>empty?'':sym()+v.toLocaleString(),font:{family:"'DM Sans'",size:11},color:tc},grid:{color:gc}} }
-        }
-      });
-    } else {
-      chartInstances[cfg.id] = new Chart(canvas.getContext('2d'), {
-        type:'pie', data:{ labels:cats, datasets:[{data:empty?[1]:data, backgroundColor:colors, borderWidth:0}] },
-        options:{ responsive:true, maintainAspectRatio:false,
-          plugins:{ legend:{position:'right',labels:{usePointStyle:true,boxWidth:8,font:{family:"'DM Sans'",size:12,weight:'bold'},color:tc}}, tooltip:{callbacks:{label:ctx=>empty?' No data':' '+sym()+ctx.raw.toLocaleString()}} }
-        }
-      });
-    }
-
-  } else if (cfg.type === 'timeline') {
-    // Populate the select
-    const sel = document.getElementById('tl-select-' + cfg.id);
-    const cats = [...new Set(S.categories.map(c=>c.name))];
-    if (sel) sel.innerHTML = '<option value="Income">Total Income</option><option value="Expense">Total Expense</option><option value="Net">Net Balance</option>' + cats.map(c=>`<option value="${c}">Category: ${c}</option>`).join('');
-    // Chips
-    const chips = document.getElementById('tl-chips-' + cfg.id);
-    if (!f.metrics || !f.metrics.length) f.metrics = ['Net'];
-    if (chips) chips.innerHTML = f.metrics.map(m=>`<div class="meta-chip" style="background:var(--surface);border-color:var(--border2);color:var(--text);">${m} </div>`).join('');
-
-    let txs = f.wallet === 'all' ? S.transactions : S.transactions.filter(t => t.wallet === f.wallet);
-    let months = [...new Set(S.transactions.map(t=>t.month))].filter(Boolean).sort();
-    if (!months.length) months = [nowMonth()];
-    const datasets = f.metrics.map((metric,idx) => {
+  const chartColors = ['#10b981', '#f43f5e', '#3b82f6', '#f59e0b', '#8b5cf6', '#14b8a6', '#f97316'];
+  const timelineDatasets = activeTimelineMetrics.map((metric, idx) => {
       const data = months.map(m => {
-        let mt = txs.filter(t=>(t.month||nowMonth())===m);
-        if (metric==='Income')  return mt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-        if (metric==='Expense') return mt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-        if (metric==='Net')     return mt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0) - mt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-        return mt.filter(t=>t.cat===metric).reduce((s,t)=>s+t.amount,0);
+          let txs = S.transactions.filter(t => (t.month || nowMonth()) === m);
+          if (metric === 'Income') return txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+          if (metric === 'Expense') return txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+          if (metric === 'Net') {
+              const inc = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+              const exp = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+              return inc - exp;
+          }
+          // إذا كان تصنيف معين (مثلاً Debts)
+          return txs.filter(t => t.cat === metric).reduce((s, t) => s + t.amount, 0);
       });
-      const c = CHART_PALETTE[idx%CHART_PALETTE.length];
-      return {label:metric, data, borderColor:c, backgroundColor:c+'20', borderWidth:3, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:6};
-    });
-    chartInstances[cfg.id] = new Chart(canvas.getContext('2d'), {
-      type:'line', data:{labels:months.map(m=>monthLabel(m).split(' ')[0]||m), datasets},
-      options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
-        plugins:{legend:{display:false}},
-        scales:{ x:{grid:{display:false},ticks:{font:{size:11,family:"'DM Sans'"},color:tc}}, y:{border:{display:false},ticks:{callback:v=>sym()+v.toLocaleString(),font:{size:11,family:"'DM Sans'"},color:tc},grid:{color:gc}} }
+      return {
+          label: metric,
+          data: data,
+          borderColor: chartColors[idx % chartColors.length],
+          backgroundColor: chartColors[idx % chartColors.length] + '20',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4 // لعمل منحنى انسيابي للخطوط
+      };
+  });
+
+  if (timelineChart) timelineChart.destroy();
+  timelineChart = new Chart(document.getElementById('timeline-chart').getContext('2d'), {
+      type: 'line',
+      data: { labels: months.map(m => monthLabel(m)), datasets: timelineDatasets },
+      options: { 
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+              x: { grid: { display: false }, ticks: { font: { size: 11 }, color: tc } },
+              y: { ticks: { callback: v => sym() + v.toLocaleString(), font: { size: 11 }, color: tc }, grid: { color: gc } }
+          }
       }
+  });
+
+  // المخططات الأساسية
+  if(catChart)catChart.destroy();
+  if(cats.length){
+    catChart=new Chart(document.getElementById('cat-chart').getContext('2d'),{
+      type:'bar',data:{labels:cats,datasets:[
+        {label:'Income',data:cats.map(c=>S.transactions.filter(t=>t.type==='income'&&t.cat===c).reduce((s,t)=>s+t.amount,0)),backgroundColor:'#10b981',borderRadius:4},
+        {label:'Expense',data:cats.map(c=>S.transactions.filter(t=>t.type==='expense'&&t.cat===c).reduce((s,t)=>s+t.amount,0)),backgroundColor:'#f43f5e',borderRadius:4}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{x:{grid:{display:false},ticks:{font:{size:11},color:tc}},
+          y:{ticks:{callback:v=>sym()+v.toLocaleString(),font:{size:11},color:tc},grid:{color:gc}}}}
     });
+  }
+  
+  if(walletChart)walletChart.destroy();
+  const total=S.wallets.reduce((s,w)=>s+w.balance,0);
+  walletChart=new Chart(document.getElementById('wallet-chart').getContext('2d'),{
+    type:'doughnut',
+    data:{labels:S.wallets.map(w=>w.name),datasets:[{
+      data:total>0?S.wallets.map(w=>Math.max(w.balance,0)):S.wallets.map(()=>1),
+      backgroundColor:total>0?S.wallets.map(w=>WALLET_COLORS[w.color]?.hex||'#888'):S.wallets.map(()=>isDark?'#333':'#eee'),
+      borderWidth:0,borderRadius:4
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:13,family:"'DM Sans'",weight: 'bold'},color:tc,padding:20}}}}
+  });
+
+  lucide.createIcons();
+}
+
+window.onload = async () => {
+    await loadData();
     lucide.createIcons();
+};
+</script>
 
-  } else if (cfg.type === 'wallet') {
-    const total = S.wallets.reduce((s,w)=>s+w.balance,0);
-    chartInstances[cfg.id] = new Chart(canvas.getContext('2d'), {
-      type:'doughnut',
-      data:{labels:S.wallets.map(w=>w.name), datasets:[{
-        data: total>0 ? S.wallets.map(w=>Math.max(w.balance,0)) : S.wallets.map(()=>1),
-        backgroundColor: total>0 ? S.wallets.map(w=>WALLET_COLORS[w.color]?.hex||'#888') : S.wallets.map(()=>isDark?'#333':'#eee'),
-        borderWidth:0, borderRadius:4
-      }]},
-      options:{ responsive:true, maintainAspectRatio:false, cutout:'65%',
-        plugins:{ legend:{position:'bottom',labels:{font:{size:13,family:"'DM Sans'",weight:'bold'},color:tc,padding:20}}, tooltip:{callbacks:{label:ctx=>total>0?' '+sym()+ctx.raw.toLocaleString():' No balance'}} }
-      }
-    });
-
-  } else if (cfg.type === 'debt') {
-    renderDebtChartInstance(cfg, tc, gc);
-  }
-}
-
-function renderDebtChartInstance(cfg, tc, gc) {
-  const canvasId = 'canvas-' + cfg.id;
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  if (chartInstances[cfg.id]) { chartInstances[cfg.id].destroy(); delete chartInstances[cfg.id]; }
-  tc = tc || getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98';
-  gc = gc || (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)');
-
-  const f = cfg.filters;
-  const debts = f.debt === 'all' ? S.debts : S.debts.filter(d => String(d.id) === String(f.debt));
-  const legend = document.getElementById('dbt-legend-' + cfg.id);
-
-  if (!debts.length) {
-    if (legend) legend.innerHTML = '<span style="color:var(--text3);">No debts available.</span>';
-    return;
-  }
-
-  const allDates = [];
-  debts.forEach(d => {
-    allDates.push(d.startDate ? new Date(d.startDate) : new Date());
-    allDates.push(d.dueDate   ? new Date(d.dueDate)   : new Date());
-  });
-  if (new Date() > new Date(Math.max(...allDates))) allDates.push(new Date());
-  const minDate = new Date(Math.min(...allDates.map(d=>d.getTime())));
-  const maxDate = new Date(Math.max(...allDates.map(d=>d.getTime())));
-
-  const view = f.view || 'month';
-  function bKey(d) {
-    const dt = new Date(d);
-    if (view==='day')   return dt.toISOString().slice(0,10);
-    if (view==='month') return dt.toISOString().slice(0,7);
-    return String(dt.getFullYear());
-  }
-  function bLabel(k) {
-    if (view==='day') { const[y,m,d]=k.split('-'); return `${MONTHS[parseInt(m)-1]} ${parseInt(d)}`; }
-    if (view==='month') { const[y,m]=k.split('-'); return `${MONTHS[parseInt(m)-1]} ${y}`; }
-    return k;
-  }
-  const buckets=[], cur=new Date(minDate);
-  if (view==='day')   { while(cur<=maxDate){buckets.push(bKey(cur));cur.setDate(cur.getDate()+1);} }
-  else if(view==='month'){cur.setDate(1); while(cur<=maxDate){buckets.push(bKey(cur));cur.setMonth(cur.getMonth()+1);}}
-  else { cur.setMonth(0,1); while(cur<=maxDate){buckets.push(bKey(cur));cur.setFullYear(cur.getFullYear()+1);} }
-  const labels = [...new Set(buckets)];
-
-  function valAt(d, key) {
-    const start = d.startDate?new Date(d.startDate):new Date();
-    const due   = d.dueDate  ?new Date(d.dueDate)  :new Date();
-    const pt    = new Date(view==='day'?key:view==='month'?key+'-01':key+'-01-01');
-    const span  = due-start||1;
-    const prog  = Math.min(Math.max(pt-start,0),span)/span;
-    const paid  = d.paid+(d.total-d.paid)*prog;
-    return { remaining: Math.max(d.total-paid,0), paid: Math.min(paid,d.total) };
-  }
-
-  const pal = ['#3b82f6','#f59e0b','#8b5cf6','#f43f5e','#14b8a6','#f97316','#0ea5e9','#ec4899','#84cc16','#10b981'];
-  const datasets = [];
-  debts.forEach((d,idx) => {
-    const col = pal[idx%pal.length];
-    const metric = f.metric||'remaining';
-    if (metric==='remaining'||metric==='both')
-      datasets.push({label:d.name+(metric==='both'?' (Rem)':''), data:labels.map(k=>Math.round(valAt(d,k).remaining*100)/100), borderColor:col, backgroundColor:col+'18', borderWidth:2.5, fill:true, tension:0.4, pointRadius:0, pointHoverRadius:5, borderDash:[]});
-    if (metric==='paid'||metric==='both')
-      datasets.push({label:d.name+(metric==='both'?' (Paid)':''), data:labels.map(k=>Math.round(valAt(d,k).paid*100)/100), borderColor:col+'aa', backgroundColor:col+'10', borderWidth:2, fill:false, tension:0.4, pointRadius:0, pointHoverRadius:5, borderDash:[5,4]});
-  });
-
-  chartInstances[cfg.id] = new Chart(canvas.getContext('2d'), {
-    type:'line', data:{labels:labels.map(bLabel), datasets},
-    options:{ responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${sym()}${ctx.raw.toLocaleString()}`}}},
-      scales:{ x:{grid:{display:false},ticks:{font:{size:11,family:"'DM Sans'"},color:tc,maxRotation:45,autoSkip:true,maxTicksLimit:view==='day'?14:12}}, y:{border:{display:false},min:0,ticks:{callback:v=>sym()+v.toLocaleString(),font:{size:11,family:"'DM Sans'"},color:tc},grid:{color:gc}} }
-    }
-  });
-  if (legend) legend.innerHTML = debts.map((d,idx)=>`<div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:18px;height:3px;border-radius:2px;background:${pal[idx%pal.length]};"></span><span>${d.name}</span></div>`).join('');
-}
-
-// ── Timeline per-card actions ──
-function addTimelineMetricTo(id) {
-  const sel = document.getElementById('tl-select-' + id);
-  if (!sel) return;
-  const val = sel.value;
-  const cfg = chartList.find(c => c.id === id);
-  if (!cfg) return;
-  if (!cfg.filters.metrics) cfg.filters.metrics = ['Net'];
-  if (val && !cfg.filters.metrics.includes(val)) {
-    cfg.filters.metrics.push(val);
-    saveChartList();
-    renderSingleChart(cfg);
-    lucide.createIcons();
-  }
-}
-function removeTimelineMetricFrom(id, val) {
-  const cfg = chartList.find(c => c.id === id);
-  if (!cfg) return;
-  cfg.filters.metrics = (cfg.filters.metrics || []).filter(m => m !== val);
-  if (!cfg.filters.metrics.length) cfg.filters.metrics = ['Net'];
-  saveChartList();
-  renderSingleChart(cfg);
-  lucide.createIcons();
-}
-
-// ── Debt filter inline actions ──
-function setDebtViewOn(id, view) {
-  const cfg = chartList.find(c => c.id === id);
-  if (!cfg) return;
-  cfg.filters.view = view;
-  saveChartList();
-  // update button states
-  const card = document.getElementById('chart-card-' + id);
-  if (card) card.querySelectorAll('.section-tab').forEach(b => { b.classList.toggle('active', b.textContent.toLowerCase().startsWith(view)); });
-  renderSingleChart(cfg);
-}
-function updateDebtFilterOn(id) {
-  const cfg = chartList.find(c => c.id === id);
-  if (!cfg) return;
-  const dEl = document.getElementById('dbt-filter-' + id);
-  const mEl = document.getElementById('dbt-metric-' + id);
-  if (dEl) cfg.filters.debt   = dEl.value;
-  if (mEl) cfg.filters.metric = mEl.value;
-  saveChartList();
-  renderSingleChart(cfg);
-}
-
-// ── Remove chart ──
-function removeChart(id) {
-  if (!confirm('Remove this chart?')) return;
-  chartList = chartList.filter(c => c.id !== id);
-  if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
-  const card = document.getElementById('chart-card-' + id);
-  if (card) card.remove();
-  saveChartList();
-}
-
-// ── Edit mode ──
-function toggleEditMode() {
-  editMode = !editMode;
-  updateEditModeUI();
-}
-function updateEditModeUI() {
-  const btn  = document.getElementById('edit-mode-btn');
-  const hint = document.getElementById('edit-mode-hint');
-  if (!btn) return;
-  if (editMode) {
-    btn.innerHTML = ' Done';
-    btn.className = 'btn g-btn';
-    if (hint) hint.textContent = 'Drag cards to reorder · Click ✕ to remove · Click filter icon to edit';
-  } else {
-    btn.innerHTML = ' Edit Layout';
-    btn.className = 'btn';
-    if (hint) hint.textContent = '';
-  }
-  document.querySelectorAll('.chart-card').forEach(card => {
-    card.setAttribute('draggable', editMode ? 'true' : 'false');
-    card.style.cursor = editMode ? 'grab' : 'default';
-    card.querySelectorAll('.edit-only').forEach(el => el.style.display = editMode ? 'flex' : 'none');
-    card.querySelectorAll('.drag-handle').forEach(el => el.style.display = editMode ? 'inline-flex' : 'none');
-    if (editMode) card.classList.add('edit-mode-card');
-    else          card.classList.remove('edit-mode-card');
-  });
-  lucide.createIcons();
-}
-
-// ── Drag and drop ──
-function onDragStart(e) {
-  if (!editMode) { e.preventDefault(); return; }
-  dragSrcIdx = chartList.findIndex(c => c.id === this.dataset.chartId);
-  e.dataTransfer.effectAllowed = 'move';
-  this.style.opacity = '0.5';
-}
-function onDragOver(e) {
-  if (!editMode) return;
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  document.querySelectorAll('.chart-card').forEach(c => c.classList.remove('drag-over'));
-  this.classList.add('drag-over');
-}
-function onDrop(e) {
-  if (!editMode) return;
-  e.preventDefault();
-  const targetId  = this.dataset.chartId;
-  const targetIdx = chartList.findIndex(c => c.id === targetId);
-  if (dragSrcIdx !== null && dragSrcIdx !== targetIdx) {
-    const [moved] = chartList.splice(dragSrcIdx, 1);
-    chartList.splice(targetIdx, 0, moved);
-    saveChartList();
-    renderCharts();
-  }
-  document.querySelectorAll('.chart-card').forEach(c => c.classList.remove('drag-over'));
-}
-function onDragEnd(e) {
-  this.style.opacity = '1';
-  document.querySelectorAll('.chart-card').forEach(c => c.classList.remove('drag-over'));
-  dragSrcIdx = null;
-}
-
-// ── Add Chart Modal ──
-function openAddChartModal() {
-  document.getElementById('new-chart-type').value = 'overview';
-  updateAddChartFilters();
-  document.getElementById('add-chart-modal').classList.add('open');
-  lucide.createIcons();
-}
-function closeAddChartModal() { document.getElementById('add-chart-modal').classList.remove('open'); }
-function updateAddChartFilters() {
-  const type = document.getElementById('new-chart-type').value;
-  document.getElementById('add-chart-filters').innerHTML = buildFilterHTML(type, defaultFilters(type), 'add');
-  lucide.createIcons();
-}
-function confirmAddChart() {
-  const type = document.getElementById('new-chart-type').value;
-  const filters = readFilterValues(type, 'add');
-  const id = 'c' + Date.now();
-  chartList.push({ id, type, filters });
-  saveChartList();
-  closeAddChartModal();
-  renderCharts();
-}
-
-// ── Edit Chart Modal ──
-function openEditChartModal(id) {
-  editingChartId = id;
-  const cfg = chartList.find(c => c.id === id);
-  if (!cfg) return;
-  const def = CHART_DEFS[cfg.type];
-  document.querySelector('#edit-chart-modal .modal-title').innerHTML = ` Edit: ${def.title}`;
-  document.getElementById('edit-chart-filters').innerHTML = buildFilterHTML(cfg.type, cfg.filters, 'edit');
-  document.getElementById('edit-chart-modal').classList.add('open');
-  lucide.createIcons();
-}
-function closeEditChartModal() { document.getElementById('edit-chart-modal').classList.remove('open'); editingChartId = null; }
-function saveEditChart() {
-  const cfg = chartList.find(c => c.id === editingChartId);
-  if (!cfg) return;
-  cfg.filters = readFilterValues(cfg.type, 'edit');
-  saveChartList();
-  closeEditChartModal();
-  // Rebuild card body (filters may have changed the DOM structure needs)
-  const card = document.getElementById('chart-card-' + cfg.id);
-  if (card) { card.querySelector('.chart-card-body').innerHTML = ''; buildCardBody(card.querySelector('.chart-card-body'), cfg); }
-  renderSingleChart(cfg);
-  lucide.createIcons();
-}
-function deleteChartFromModal() {
-  if (!editingChartId) return;
-  removeChart(editingChartId);
-  closeEditChartModal();
-}
-
-// ── Filter HTML builder ──
-function buildFilterHTML(type, f, prefix) {
-  const months = [...new Set(S.transactions.map(t=>t.month))].filter(Boolean).sort().reverse();
-  const monthOpts = '<option value="all">All Months</option>' + months.map(m=>`<option value="${m}" ${f.month===m?'selected':''}>${monthLabel(m)}</option>`).join('');
-  const walletOpts = '<option value="all">All Wallets</option>' + S.wallets.map(w=>`<option value="${w.id}" ${f.wallet===w.id?'selected':''}>${w.name}</option>`).join('');
-  const txTypeOpts = ['all','expense','income'].map(v=>`<option value="${v}" ${(f.txType||'all')===v?'selected':''}>${v==='all'?'All Types':v.charAt(0).toUpperCase()+v.slice(1)}</option>`).join('');
-
-  if (type === 'overview') return `
-    <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div>`;
-
-  if (type === 'bar' || type === 'pie') return `
-    <div class="field" style="margin-bottom:10px;"><label>Month</label><select id="${prefix}-f-month">${monthOpts}</select></div> <div class="field" style="margin-bottom:10px;"><label>Transaction Type</label><select id="${prefix}-f-txType">${txTypeOpts}</select></div> <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div>`;
-
-  if (type === 'timeline') return `
-    <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div> <p style="font-size:12px;color:var(--text3);margin-top:10px;">Add/remove metrics directly on the chart card.</p>`;
-
-  if (type === 'wallet') return `<p style="font-size:13px;color:var(--text2);">No filters for this chart — it always shows all wallet balances.</p>`;
-
-  if (type === 'debt') {
-    const debtOpts = '<option value="all">All Debts</option>' + S.debts.map(d=>`<option value="${d.id}" ${String(f.debt)===String(d.id)?'selected':''}>${d.name}</option>`).join('');
-    const metricOpts = ['remaining','paid','both'].map(m=>`<option value="${m}" ${(f.metric||'remaining')===m?'selected':''}>${m.charAt(0).toUpperCase()+m.slice(1)}</option>`).join('');
-    const viewOpts   = ['day','month','year'].map(v=>`<option value="${v}" ${(f.view||'month')===v?'selected':''}>${v.charAt(0).toUpperCase()+v.slice(1)}s</option>`).join('');
-    return `
-      <div class="field" style="margin-bottom:10px;"><label>Debt</label><select id="${prefix}-f-debt">${debtOpts}</select></div> <div class="field" style="margin-bottom:10px;"><label>Metric</label><select id="${prefix}-f-metric">${metricOpts}</select></div> <div class="field"><label>Time Granularity</label><select id="${prefix}-f-view">${viewOpts}</select></div>`;
-  }
-  return '';
-}
-
-function readFilterValues(type, prefix) {
-  const g = id => { const el = document.getElementById(prefix+'-f-'+id); return el ? el.value : null; };
-  if (type === 'overview') return { wallet: g('wallet')||'all' };
-  if (type === 'bar' || type === 'pie') return { month: g('month')||'all', txType: g('txType')||'all', wallet: g('wallet')||'all' };
-  if (type === 'timeline') {
-    const cfg = chartList.find(c => c.type === 'timeline' && c.id === editingChartId);
-    return { wallet: g('wallet')||'all', metrics: cfg?.filters?.metrics || ['Net'] };
-  }
-  if (type === 'wallet') return {};
-  if (type === 'debt') return { debt: g('debt')||'all', metric: g('metric')||'remaining', view: g('view')||'month' };
-  return {};
-}
-
-// Legacy stubs (called from old code paths — now no-ops)
-function renderDebtTimeline() {}
-function setDebtView() {}
-function addTimelineMetric() {}
-function removeTimelineMetric() {}
-function updateMonthFilter() {
-  const months=[...new Set(S.transactions.map(t=>t.month))].sort().reverse();
-  const sel=document.getElementById('month-filter-select');
-  if(sel){const cur=sel.value;sel.innerHTML='<option value="all">All months</option>'+months.map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');if(months.includes(cur))sel.value=cur;}
-  if(currentPage==='chart') renderCharts();
-}
-
-function startApp() {
-    initChartList();
-    loadData().then(() => {
-        lucide.createIcons();
-    });
-}
-
-// Poll until both lucide and Chart.js are loaded, then start
-function _pollDeps() {
-    if (typeof lucide !== 'undefined' && typeof Chart !== 'undefined') {
-        startApp();
-    } else {
-        setTimeout(_pollDeps, 30);
-    }
-}
-
-window.addEventListener('load', _pollDeps);
-</script> <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script> </body>
+
+</body>
 </html>
