@@ -7,13 +7,7 @@
 <title>Finance Tracker</title>
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%231c1b18&quot;}">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
-
-
-
-<style>
-
-/* إصلاح تداخل خيارات الـ Metrics في نافذة إضافة الرسوم البيانية */
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript> <style> /* إصلاح تداخل خيارات الـ Metrics في نافذة إضافة الرسوم البيانية */
 label:has(> input[type="checkbox"]),
 label:has(> input[type="radio"]) {
     display: inline-flex;
@@ -268,303 +262,12 @@ body.dark-mode { --calendar-filter: invert(1); }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="top-bar">
-    <div class="app-title">Finance Tracker</div>
-    <div class="top-right">
-      <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i id="theme-icon" data-lucide="moon"></i></button>
-      <button class="icon-btn" onclick="toggleHide()" title="Hide/Show Balance"><i id="eye-icon" data-lucide="eye"></i></button>
-      <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()"><i data-lucide="cloud"></i> Sync</button>
-      <span id="sync_status" style="font-size: 12px; font-weight:600; color: var(--text3); margin-right: 4px;">Not Synced</span>
-      <div class="save-indicator"><div class="save-dot" id="save-dot"></div><span id="save-label">Saved</span></div>
-      <select class="ctrl" id="currency-select" onchange="changeCurrency()">
-        <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option>
-        <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option>
-        <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('wallets')"><i data-lucide="wallet"></i> Wallets</button>
-    <button class="nav-tab" onclick="showPage('transactions')"><i data-lucide="list"></i> Transactions</button>
-    <button class="nav-tab" onclick="showPage('debts')"><i data-lucide="banknote"></i> Debts</button>
-    <button class="nav-tab" onclick="showPage('budget')"><i data-lucide="pie-chart"></i> Budget</button>
-    <button class="nav-tab" onclick="showPage('chart')"><i data-lucide="bar-chart-2"></i> Charts</button>
-    <button class="nav-tab" onclick="showPage('data')"><i data-lucide="database"></i> Data</button>
-  </div>
-
-  <div id="page-wallets">
-    <div class="wallets-grid" id="wallets-grid"></div>
-    <div class="card">
-      <div class="card-title"><i data-lucide="plus-circle"></i> Add or withdraw money</div>
-      <div class="form-row">
-        <div class="field"><label>Wallet</label><select id="aw-wallet"></select></div>
-        <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="aw-amount" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field"><label>Note (optional)</label><input type="text" id="aw-note" placeholder="e.g. ATM..."/></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn g-btn" onclick="walletOp('add')"><i data-lucide="plus"></i> Add money</button>
-        <button class="btn r-btn" onclick="walletOp('withdraw')"><i data-lucide="minus"></i> Withdraw</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><i data-lucide="arrow-right-left"></i> Transfer between wallets</div>
-      <div class="form-row">
-        <div class="field"><label>From</label><select id="tf-from"></select></div>
-        <div class="transfer-arrow"><i data-lucide="arrow-right"></i></div>
-        <div class="field"><label>To</label><select id="tf-to"></select></div>
-        <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="tf-amount" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field"><label>Note</label><input type="text" id="tf-note" placeholder="Transfer note..."/></div>
-      </div>
-      <div class="btn-row"><button class="btn b-btn" onclick="doTransfer()"><i data-lucide="arrow-right"></i> Transfer</button></div>
-    </div>
-    <div class="card">
-      <div class="card-title"><i data-lucide="history"></i> Wallet history</div>
-      <div class="entries-wrap" id="wallet-history"><div class="empty">No wallet transactions yet.</div></div>
-    </div>
-  </div>
-
-  <div id="page-transactions" style="display:none;">
-    <div class="summary-grid">
-      <div class="metric"><div class="metric-label">Total income</div><div class="metric-value g" id="total-income">0</div></div>
-      <div class="metric"><div class="metric-label">Total expenses</div><div class="metric-value r" id="total-expense">0</div></div>
-      <div class="metric"><div class="metric-label">Net</div><div class="metric-value" id="net-balance">0</div></div>
-    </div>
-    <div class="card">
-      <div class="card-title"><i data-lucide="plus-circle"></i> Add transaction</div>
-      <div class="form-row">
-        <div class="field"><label>Description</label><input type="text" id="tx-desc" placeholder="e.g. Groceries..."/></div>
-        <div class="field" style="max-width:150px;"><label>Amount</label><input type="number" id="tx-amount" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field" style="max-width:150px;"><label>Wallet</label><select id="tx-wallet"></select></div>
-        <div class="field" style="max-width:150px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-             <label>Category</label>
-             <i data-lucide="settings" style="width:14px; cursor:pointer; color:var(--text3);" onclick="openCatModal()" title="Manage Categories"></i>
-          </div>
-          <select id="tx-cat"></select>
-        </div>
-        <div class="field" style="max-width:160px;"><label>Month</label><input type="month" id="tx-month"/></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn g-btn" onclick="addTx('income')"><i data-lucide="arrow-up"></i> Income</button>
-        <button class="btn r-btn" onclick="addTx('expense')"><i data-lucide="arrow-down"></i> Expense</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="month-filter">
-        <label>Filter:</label>
-        <select class="ctrl" id="month-filter-select" onchange="renderTxList()"><option value="all">All months</option></select>
-      </div>
-      <div class="section-tabs">
-        <button class="section-tab active" id="stab-all" onclick="filterTx('all')">All</button>
-        <button class="section-tab" id="stab-income" onclick="filterTx('income')">Income</button>
-        <button class="section-tab" id="stab-expense" onclick="filterTx('expense')">Expenses</button>
-      </div>
-      <div class="entries-wrap" id="tx-list"><div class="empty">No transactions yet.</div></div>
-    </div>
-  </div>
-
-  <div id="page-debts" style="display:none;">
-    <div class="summary-grid">
-      <div class="metric"><div class="metric-label">I owe</div><div class="metric-value r" id="total-owe">0</div></div>
-      <div class="metric"><div class="metric-label">Owed to me</div><div class="metric-value g" id="total-owed">0</div></div>
-      <div class="metric"><div class="metric-label">Installments</div><div class="metric-value" style="color:var(--purple);" id="total-install">0</div></div>
-    </div>
-    <button class="btn p-btn" style="width:100%; margin-bottom:1.5rem; font-size:15px; padding:12px;" onclick="openDebtModal()"><i data-lucide="plus"></i> Add Debt or Installment</button>
-    <div id="debts-list"><div class="empty">No debts or installments yet.</div></div>
-  </div>
-
-  <div id="page-budget" style="display:none;">
-    <div id="warn-box" class="warn-box"></div>
-    <div id="budget-bar-wrap" style="display:none;" class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-weight:600;font-size:14px;"><i data-lucide="target" style="width:16px; margin-right:4px;"></i> Monthly expense budget</span>
-        <span id="budget-bar-label" style="font-weight:600;font-family:'DM Mono',monospace;font-size:14px;"></span>
-      </div>
-      <div style="background:var(--border);border-radius:999px;height:8px;overflow:hidden;"><div id="budget-bar-fill" style="height:100%;border-radius:999px;transition:width .4s;background:var(--green-mid);width:0%;"></div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:var(--text3); font-weight: 500;">
-        <span id="budget-spent-label"></span><span id="budget-remaining-label"></span>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><i data-lucide="settings"></i> Set budget</div>
-      <div class="form-row">
-        <div class="field"><label>Monthly limit</label><input type="number" id="budget-input" placeholder="Enter amount..." min="0" step="1"/></div>
-        <button class="btn b-btn" style="align-self:flex-end;" onclick="setBudget()">Set Budget</button>
-        <button class="btn sm" style="align-self:flex-end;color:var(--text3);" onclick="clearBudget()"><i data-lucide="x"></i> Clear</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title"><i data-lucide="briefcase"></i> Income sources</div>
-      <div class="form-row" style="margin-bottom:12px;">
-        <div class="field"><label>Source name</label><input type="text" id="src-name" placeholder="e.g. Main job..."/></div>
-        <div class="field" style="max-width:140px;"><label>Type</label>
-          <select id="src-type"><option>Salary</option><option>Freelance</option><option>Business</option><option>Rental</option><option>Investment</option><option>Pension</option><option>Gift</option><option>Other</option></select>
-        </div>
-        <div class="field" style="max-width:150px;"><label>Monthly amount</label><input type="number" id="src-amount" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field" style="max-width:150px;"><label>Into wallet</label><select id="src-wallet"></select></div>
-        <button class="btn g-btn" style="align-self:flex-end;" onclick="addSource()"><i data-lucide="plus"></i> Add Source</button>
-      </div>
-      <div id="sources-list"><div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div></div>
-    </div>
-  </div>
-
-  <div id="page-chart" style="display:none;">
-
-    <!-- Toolbar -->
-    <div style="display:flex; gap:10px; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;">
-      <button class="btn b-btn" onclick="openAddChartModal()" style="gap:6px;"><i data-lucide="plus"></i> Add Chart</button>
-      <button class="btn" onclick="toggleEditMode()" id="edit-mode-btn" style="gap:6px;"><i data-lucide="pencil"></i> Edit Layout</button>
-      <span style="margin-left:auto; font-size:12px; color:var(--text3); font-weight:600;" id="edit-mode-hint"></span>
-    </div>
-
-    <!-- Dynamic Chart Container -->
-    <div id="charts-container"></div>
-
-    <!-- Add Chart Modal -->
-    <div class="modal-overlay" id="add-chart-modal">
-      <div class="modal" style="max-width:500px;">
-        <div class="modal-title">Add Chart</div>
-        <div class="field" style="margin-bottom:14px;">
-          <label>Chart Type</label>
-          <select id="new-chart-type" onchange="updateAddChartFilters()">
-            <option value="overview">Income vs Expenses Overview</option>
-            <option value="bar">Categories Bar Chart</option>
-            <option value="pie">Categories Pie Chart</option>
-            <option value="timeline">Custom Timeline</option>
-            <option value="wallet">Wallet Balances</option>
-            <option value="debt">Debts Timeline</option>
-          </select>
-        </div>
-        <div id="add-chart-filters"></div>
-        <div class="modal-footer">
-          <button class="btn sm" onclick="closeAddChartModal()">Cancel</button>
-          <button class="btn b-btn" onclick="confirmAddChart()"><i data-lucide="plus"></i> Add</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Edit Chart Modal -->
-    <div class="modal-overlay" id="edit-chart-modal">
-      <div class="modal" style="max-width:500px;">
-        <div class="modal-title">Edit Chart</div>
-        <div id="edit-chart-filters"></div>
-        <div class="modal-footer">
-          <button class="btn danger sm" onclick="deleteChartFromModal()"><i data-lucide="trash-2"></i> Remove Chart</button>
-          <button class="btn sm" onclick="closeEditChartModal()">Cancel</button>
-          <button class="btn b-btn" onclick="saveEditChart()"><i data-lucide="check"></i> Save</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div id="page-data" style="display:none;">
-    <div class="card">
-      <div class="card-title"><i data-lucide="save"></i> Backup data</div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">احفظ نسخة احتياطية من بياناتك في ملف خارجي.</p>
-      <button class="btn g-btn" onclick="exportData()"><i data-lucide="download"></i> Export backup</button>
-    </div>
-    <div class="card">
-      <div class="card-title"><i data-lucide="upload-cloud"></i> Restore data</div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">استرجع بياناتك من ملف قمت بحفظه مسبقاً.</p>
-      <button class="btn b-btn" onclick="document.getElementById('import-input').click()"><i data-lucide="upload"></i> Import backup</button>
-      <input type="file" id="import-input" accept=".json" style="display:none;" onchange="importData(event)"/>
-    </div>
-    <div class="card">
-      <div class="card-title" style="color:var(--red);"><i data-lucide="alert-triangle"></i> Danger zone</div>
-      <button class="btn danger" onclick="confirmClearAll()"><i data-lucide="trash-2"></i> Clear all data</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="wallet-modal">
-  <div class="modal">
-    <div class="modal-title" id="wallet-modal-title">Add new wallet</div>
-    <div class="form-row" style="flex-direction:column; align-items:stretch;">
-      <div class="field"><label>Wallet name</label><input type="text" id="wm-name" placeholder="e.g. Cash, CIB Visa..."/></div>
-      <div class="field"><label>Type</label>
-        <select id="wm-type"><option value="Cash">Cash</option><option value="Debit card">Debit card</option><option value="Credit card">Credit card</option><option value="Savings">Savings</option><option value="E-wallet">E-wallet</option><option value="Other">Other</option></select>
-      </div>
-      <div class="field"><label>Currency</label>
-        <select id="wm-currency">
-          <option value="default">Default (Global)</option>
-          <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option>
-          <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option>
-          <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option>
-        </select>
-      </div>
-      <div class="field"><label>Balance</label><input type="number" id="wm-balance" placeholder="0.00" step="0.01" value="0"/></div>
-      <div class="field"><label>Color</label><div class="color-picker-row" id="color-picker"></div></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn sm" onclick="closeWalletModal()">Cancel</button>
-      <button class="btn g-btn" id="wallet-save-btn" onclick="saveWallet()">Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="cat-modal">
-  <div class="modal">
-    <div class="modal-title">Manage Categories</div>
-    <div class="form-row" style="flex-direction:column; align-items:stretch; margin-bottom:1rem;">
-      <div class="field"><label>New Category Name</label><input type="text" id="new-cat-name" placeholder="e.g. Pets, Subscriptions..."/></div>
-    </div>
-    <label style="font-size:13px;color:var(--text2);font-weight:600;display:block;margin-bottom:8px;">Select Icon</label>
-    <div class="icon-grid" id="cat-icon-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(38px,1fr)); gap:8px; margin-bottom:14px; max-height:120px; overflow-y:auto; padding-right:4px;"></div>
-    <button class="btn b-btn" style="width:100%; margin-bottom:1.5rem;" onclick="addNewCategory()"><i data-lucide="plus"></i> Add Category</button>
-    <label style="font-size:13px;color:var(--text2);font-weight:600;display:block;margin-bottom:8px;">Current Categories</label>
-    <div id="cat-list" style="max-height:160px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius); padding:8px;"></div>
-    <div class="modal-footer">
-      <button class="btn sm" onclick="closeCatModal()">Done</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="debt-modal">
-  <div class="modal">
-    <div class="modal-title" id="debt-modal-title">Add Debt / Installment</div>
-    <div class="form-row" style="flex-direction:column; align-items:stretch;">
-      <div class="field"><label>Name</label><input type="text" id="dm-name" placeholder="e.g. Car loan, Ahmed..."/></div>
-      <div class="field"><label>Type</label>
-        <select id="dm-type"><option value="owe">I owe</option><option value="owed">Owed to me</option><option value="install">Installment</option></select>
-      </div>
-      <div class="form-row" style="margin:0; gap:12px;">
-        <div class="field"><label>Total Amount</label><input type="number" id="dm-total" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field"><label>Paid So Far</label><input type="number" id="dm-paid" placeholder="0.00" min="0" step="0.01" value="0"/></div>
-      </div>
-      <div class="form-row" style="margin:0; gap:12px;">
-        <div class="field"><label>Monthly Payment</label><input type="number" id="dm-monthly" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field"><label>Wallet</label><select id="dm-wallet"></select></div>
-      </div>
-      <div class="form-row" style="margin:0; gap:12px;">
-        <div class="field"><label>Start Date</label><input type="date" id="dm-start"/></div>
-        <div class="field"><label>Due Date</label><input type="date" id="dm-due"/></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn sm" onclick="closeDebtModal()">Cancel</button>
-      <button class="btn p-btn" id="debt-save-btn" onclick="saveDebt()">Save</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="pay-modal">
-  <div class="modal">
-    <div class="modal-title" id="pay-modal-title">Make a payment</div>
-    <div class="form-row" style="flex-direction:column; align-items:stretch;">
-      <div class="field"><label>Payment amount</label><input type="number" id="pm-amount" placeholder="0.00" min="0" step="0.01"/></div>
-      <div class="field"><label>From wallet</label><select id="pm-wallet"></select></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn sm" onclick="closePayModal()">Cancel</button>
-      <button class="btn g-btn" onclick="confirmPay()">Confirm Pay</button>
-    </div>
-  </div>
-</div>
-
-<script>
+<div class="app"> <div class="top-bar"> <div class="app-title">Finance Tracker</div> <div class="top-right"> <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i id="theme-icon" data-lucide="moon"></i></button> <button class="icon-btn" onclick="toggleHide()" title="Hide/Show Balance"><i id="eye-icon" data-lucide="eye"></i></button> <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()"> Sync</button> <span id="sync_status" style="font-size: 12px; font-weight:600; color: var(--text3); margin-right: 4px;">Not Synced</span> <div class="save-indicator"><div class="save-dot" id="save-dot"></div><span id="save-label">Saved</span></div> <select class="ctrl" id="currency-select" onchange="changeCurrency()"> <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option> <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option> <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option> </select> </div> </div> <div class="nav-tabs"> <button class="nav-tab active" onclick="showPage('wallets')"> Wallets</button> <button class="nav-tab" onclick="showPage('transactions')"> Transactions</button> <button class="nav-tab" onclick="showPage('debts')"> Debts</button> <button class="nav-tab" onclick="showPage('budget')"> Budget</button> <button class="nav-tab" onclick="showPage('chart')"> Charts</button> <button class="nav-tab" onclick="showPage('data')"> Data</button> </div> <div id="page-wallets"> <div class="wallets-grid" id="wallets-grid"></div> <div class="card"> <div class="card-title"> Add or withdraw money</div> <div class="form-row"> <div class="field"><label>Wallet</label><select id="aw-wallet"></select></div> <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="aw-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Note (optional)</label><input type="text" id="aw-note" placeholder="e.g. ATM..."/></div> </div> <div class="btn-row"> <button class="btn g-btn" onclick="walletOp('add')"> Add money</button> <button class="btn r-btn" onclick="walletOp('withdraw')"> Withdraw</button> </div> </div> <div class="card"> <div class="card-title"> Transfer between wallets</div> <div class="form-row"> <div class="field"><label>From</label><select id="tf-from"></select></div> <div class="transfer-arrow"></div> <div class="field"><label>To</label><select id="tf-to"></select></div> <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="tf-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Note</label><input type="text" id="tf-note" placeholder="Transfer note..."/></div> </div> <div class="btn-row"><button class="btn b-btn" onclick="doTransfer()"> Transfer</button></div> </div> <div class="card"> <div class="card-title"> Wallet history</div> <div class="entries-wrap" id="wallet-history"><div class="empty">No wallet transactions yet.</div></div> </div> </div> <div id="page-transactions" style="display:none;"> <div class="summary-grid"> <div class="metric"><div class="metric-label">Total income</div><div class="metric-value g" id="total-income">0</div></div> <div class="metric"><div class="metric-label">Total expenses</div><div class="metric-value r" id="total-expense">0</div></div> <div class="metric"><div class="metric-label">Net</div><div class="metric-value" id="net-balance">0</div></div> </div> <div class="card"> <div class="card-title"> Add transaction</div> <div class="form-row"> <div class="field"><label>Description</label><input type="text" id="tx-desc" placeholder="e.g. Groceries..."/></div> <div class="field" style="max-width:150px;"><label>Amount</label><input type="number" id="tx-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field" style="max-width:150px;"><label>Wallet</label><select id="tx-wallet"></select></div> <div class="field" style="max-width:150px;"> <div style="display:flex; justify-content:space-between; align-items:center;"> <label>Category</label> </div> <select id="tx-cat"></select> </div> <div class="field" style="max-width:160px;"><label>Month</label><input type="month" id="tx-month"/></div> </div> <div class="btn-row"> <button class="btn g-btn" onclick="addTx('income')"> Income</button> <button class="btn r-btn" onclick="addTx('expense')"> Expense</button> </div> </div> <div class="card"> <div class="month-filter"> <label>Filter:</label> <select class="ctrl" id="month-filter-select" onchange="renderTxList()"><option value="all">All months</option></select> </div> <div class="section-tabs"> <button class="section-tab active" id="stab-all" onclick="filterTx('all')">All</button> <button class="section-tab" id="stab-income" onclick="filterTx('income')">Income</button> <button class="section-tab" id="stab-expense" onclick="filterTx('expense')">Expenses</button> </div> <div class="entries-wrap" id="tx-list"><div class="empty">No transactions yet.</div></div> </div> </div> <div id="page-debts" style="display:none;"> <div class="summary-grid"> <div class="metric"><div class="metric-label">I owe</div><div class="metric-value r" id="total-owe">0</div></div> <div class="metric"><div class="metric-label">Owed to me</div><div class="metric-value g" id="total-owed">0</div></div> <div class="metric"><div class="metric-label">Installments</div><div class="metric-value" style="color:var(--purple);" id="total-install">0</div></div> </div> <button class="btn p-btn" style="width:100%; margin-bottom:1.5rem; font-size:15px; padding:12px;" onclick="openDebtModal()"> Add Debt or Installment</button> <div id="debts-list"><div class="empty">No debts or installments yet.</div></div> </div> <div id="page-budget" style="display:none;"> <div id="warn-box" class="warn-box"></div> <div id="budget-bar-wrap" style="display:none;" class="card"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"> <span style="font-weight:600;font-size:14px;"> Monthly expense budget</span> <span id="budget-bar-label" style="font-weight:600;font-family:'DM Mono',monospace;font-size:14px;"></span> </div> <div style="background:var(--border);border-radius:999px;height:8px;overflow:hidden;"><div id="budget-bar-fill" style="height:100%;border-radius:999px;transition:width .4s;background:var(--green-mid);width:0%;"></div></div> <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:var(--text3); font-weight: 500;"> <span id="budget-spent-label"></span><span id="budget-remaining-label"></span> </div> </div> <div class="card"> <div class="card-title"> Set budget</div> <div class="form-row"> <div class="field"><label>Monthly limit</label><input type="number" id="budget-input" placeholder="Enter amount..." min="0" step="1"/></div> <button class="btn b-btn" style="align-self:flex-end;" onclick="setBudget()">Set Budget</button> <button class="btn sm" style="align-self:flex-end;color:var(--text3);" onclick="clearBudget()"> Clear</button> </div> </div> <div class="card"> <div class="card-title"> Income sources</div> <div class="form-row" style="margin-bottom:12px;"> <div class="field"><label>Source name</label><input type="text" id="src-name" placeholder="e.g. Main job..."/></div> <div class="field" style="max-width:140px;"><label>Type</label> <select id="src-type"><option>Salary</option><option>Freelance</option><option>Business</option><option>Rental</option><option>Investment</option><option>Pension</option><option>Gift</option><option>Other</option></select> </div> <div class="field" style="max-width:150px;"><label>Monthly amount</label><input type="number" id="src-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field" style="max-width:150px;"><label>Into wallet</label><select id="src-wallet"></select></div> <button class="btn g-btn" style="align-self:flex-end;" onclick="addSource()"> Add Source</button> </div> <div id="sources-list"><div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div></div> </div> </div> <div id="page-chart" style="display:none;"> <!-- Toolbar --> <div style="display:flex; gap:10px; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;"> <button class="btn b-btn" onclick="openAddChartModal()" style="gap:6px;"> Add Chart</button> <button class="btn" onclick="toggleEditMode()" id="edit-mode-btn" style="gap:6px;"> Edit Layout</button> <span style="margin-left:auto; font-size:12px; color:var(--text3); font-weight:600;" id="edit-mode-hint"></span> </div> <!-- Dynamic Chart Container --> <div id="charts-container"></div> <!-- Add Chart Modal --> <div class="modal-overlay" id="add-chart-modal"> <div class="modal" style="max-width:500px;"> <div class="modal-title">Add Chart</div> <div class="field" style="margin-bottom:14px;"> <label>Chart Type</label> <select id="new-chart-type" onchange="updateAddChartFilters()"> <option value="overview">Income vs Expenses Overview</option> <option value="bar">Categories Bar Chart</option> <option value="pie">Categories Pie Chart</option> <option value="timeline">Custom Timeline</option> <option value="wallet">Wallet Balances</option> <option value="debt">Debts Timeline</option> </select> </div> <div id="add-chart-filters"></div> <div class="modal-footer"> <button class="btn sm" onclick="closeAddChartModal()">Cancel</button> <button class="btn b-btn" onclick="confirmAddChart()"> Add</button> </div> </div> </div> <!-- Edit Chart Modal --> <div class="modal-overlay" id="edit-chart-modal"> <div class="modal" style="max-width:500px;"> <div class="modal-title">Edit Chart</div> <div id="edit-chart-filters"></div> <div class="modal-footer"> <button class="btn danger sm" onclick="deleteChartFromModal()"> Remove Chart</button> <button class="btn sm" onclick="closeEditChartModal()">Cancel</button> <button class="btn b-btn" onclick="saveEditChart()"> Save</button> </div> </div> </div> </div> <div id="page-data" style="display:none;"> <div class="card"> <div class="card-title"> Backup data</div> <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">احفظ نسخة احتياطية من بياناتك في ملف خارجي.</p> <button class="btn g-btn" onclick="exportData()"> Export backup</button> </div> <div class="card"> <div class="card-title"> Restore data</div> <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">استرجع بياناتك من ملف قمت بحفظه مسبقاً.</p> <button class="btn b-btn" onclick="document.getElementById('import-input').click()"> Import backup</button> <input type="file" id="import-input" accept=".json" style="display:none;" onchange="importData(event)"/> </div> <div class="card"> <div class="card-title" style="color:var(--red);"> Danger zone</div> <button class="btn danger" onclick="confirmClearAll()"> Clear all data</button> </div> </div>
+</div> <div class="modal-overlay" id="wallet-modal"> <div class="modal"> <div class="modal-title" id="wallet-modal-title">Add new wallet</div> <div class="form-row" style="flex-direction:column; align-items:stretch;"> <div class="field"><label>Wallet name</label><input type="text" id="wm-name" placeholder="e.g. Cash, CIB Visa..."/></div> <div class="field"><label>Type</label> <select id="wm-type"><option value="Cash">Cash</option><option value="Debit card">Debit card</option><option value="Credit card">Credit card</option><option value="Savings">Savings</option><option value="E-wallet">E-wallet</option><option value="Other">Other</option></select> </div> <div class="field"><label>Currency</label> <select id="wm-currency"> <option value="default">Default (Global)</option> <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option> <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option> <option value="JPY">¥ JPY</option><option value="INR">₹ INR</option><option value="CAD">C$ CAD</option><option value="AUD">A$ AUD</option> </select> </div> <div class="field"><label>Balance</label><input type="number" id="wm-balance" placeholder="0.00" step="0.01" value="0"/></div> <div class="field"><label>Color</label><div class="color-picker-row" id="color-picker"></div></div> </div> <div class="modal-footer"> <button class="btn sm" onclick="closeWalletModal()">Cancel</button> <button class="btn g-btn" id="wallet-save-btn" onclick="saveWallet()">Save</button> </div> </div>
+</div> <div class="modal-overlay" id="cat-modal"> <div class="modal"> <div class="modal-title">Manage Categories</div> <div class="form-row" style="flex-direction:column; align-items:stretch; margin-bottom:1rem;"> <div class="field"><label>New Category Name</label><input type="text" id="new-cat-name" placeholder="e.g. Pets, Subscriptions..."/></div> </div> <label style="font-size:13px;color:var(--text2);font-weight:600;display:block;margin-bottom:8px;">Select Icon</label> <div class="icon-grid" id="cat-icon-grid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(38px,1fr)); gap:8px; margin-bottom:14px; max-height:120px; overflow-y:auto; padding-right:4px;"></div> <button class="btn b-btn" style="width:100%; margin-bottom:1.5rem;" onclick="addNewCategory()"> Add Category</button> <label style="font-size:13px;color:var(--text2);font-weight:600;display:block;margin-bottom:8px;">Current Categories</label> <div id="cat-list" style="max-height:160px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius); padding:8px;"></div> <div class="modal-footer"> <button class="btn sm" onclick="closeCatModal()">Done</button> </div> </div>
+</div> <div class="modal-overlay" id="debt-modal"> <div class="modal"> <div class="modal-title" id="debt-modal-title">Add Debt / Installment</div> <div class="form-row" style="flex-direction:column; align-items:stretch;"> <div class="field"><label>Name</label><input type="text" id="dm-name" placeholder="e.g. Car loan, Ahmed..."/></div> <div class="field"><label>Type</label> <select id="dm-type"><option value="owe">I owe</option><option value="owed">Owed to me</option><option value="install">Installment</option></select> </div> <div class="form-row" style="margin:0; gap:12px;"> <div class="field"><label>Total Amount</label><input type="number" id="dm-total" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Paid So Far</label><input type="number" id="dm-paid" placeholder="0.00" min="0" step="0.01" value="0"/></div> </div> <div class="form-row" style="margin:0; gap:12px;"> <div class="field"><label>Monthly Payment</label><input type="number" id="dm-monthly" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>Wallet</label><select id="dm-wallet"></select></div> </div> <div class="form-row" style="margin:0; gap:12px;"> <div class="field"><label>Start Date</label><input type="date" id="dm-start"/></div> <div class="field"><label>Due Date</label><input type="date" id="dm-due"/></div> </div> </div> <div class="modal-footer"> <button class="btn sm" onclick="closeDebtModal()">Cancel</button> <button class="btn p-btn" id="debt-save-btn" onclick="saveDebt()">Save</button> </div> </div>
+</div> <div class="modal-overlay" id="pay-modal"> <div class="modal"> <div class="modal-title" id="pay-modal-title">Make a payment</div> <div class="form-row" style="flex-direction:column; align-items:stretch;"> <div class="field"><label>Payment amount</label><input type="number" id="pm-amount" placeholder="0.00" min="0" step="0.01"/></div> <div class="field"><label>From wallet</label><select id="pm-wallet"></select></div> </div> <div class="modal-footer"> <button class="btn sm" onclick="closePayModal()">Cancel</button> <button class="btn g-btn" onclick="confirmPay()">Confirm Pay</button> </div> </div>
+</div> <script>
 // --- Dark Mode Logic ---
 let isDark = localStorage.getItem('theme') === 'dark';
 if (isDark) document.body.classList.add('dark-mode');
@@ -772,10 +475,10 @@ function scheduleSave(){
       await dbSet('data',JSON.parse(JSON.stringify(S)));
       setSaveStatus('saved');
       if (window.gapi && gapi.client && gapi.client.getToken()) {
-          document.getElementById('sync_status').innerHTML = '<i data-lucide="alert-circle" style="color:var(--amber-mid); width:14px;"></i> Unsynced';
+          document.getElementById('sync_status').innerHTML = ' Unsynced';
           lucide.createIcons();
           const btn = document.getElementById('auth_button');
-          btn.innerHTML = '<i data-lucide="cloud-upload"></i> Update Drive';
+          btn.innerHTML = ' Update Drive';
           btn.style.display = 'inline-flex';
           btn.onclick = saveToDrive;
       }
@@ -878,8 +581,7 @@ function closeCatModal(){
     populateCatSelect();
 }
 function renderCatIconGrid(){
-    document.getElementById('cat-icon-grid').innerHTML = AVAILABLE_ICONS.map(ic => 
-        `<div class="icon-item ${ic===selectedCatIcon?'selected':''}" onclick="selectCatIcon('${ic}')"><i data-lucide="${ic}" style="width:18px;"></i></div>`
+    document.getElementById('cat-icon-grid').innerHTML = AVAILABLE_ICONS.map(ic => `<div class="icon-item ${ic===selectedCatIcon?'selected':''}" onclick="selectCatIcon('${ic}')"></div>`
     ).join('');
     lucide.createIcons();
 }
@@ -907,11 +609,7 @@ function deleteCategory(name){
     populateCatSelect();
 }
 function renderCatList(){
-    document.getElementById('cat-list').innerHTML = S.categories.map(c => 
-        `<div class="cat-list-item">
-            <div style="display:flex; align-items:center; gap:8px; font-size:14px;"><i data-lucide="${c.icon}" style="width:16px; color:var(--text2);"></i> ${c.name}</div>
-            <button class="del-btn" onclick="deleteCategory('${c.name}')"><i data-lucide="trash-2" style="width:14px;"></i></button>
-        </div>`
+    document.getElementById('cat-list').innerHTML = S.categories.map(c => `<div class="cat-list-item"> <div style="display:flex; align-items:center; gap:8px; font-size:14px;"> ${c.name}</div> <button class="del-btn" onclick="deleteCategory('${c.name}')"></button> </div>`
     ).join('');
     lucide.createIcons();
 }
@@ -926,14 +624,14 @@ function openWalletModal(id = null){
         document.getElementById('wm-currency').value = w.currency || 'default';
         selectedColor = w.color || 0;
         document.getElementById('wallet-modal-title').innerText = 'Edit Wallet';
-        document.getElementById('wallet-save-btn').innerHTML = '<i data-lucide="save"></i> Save Changes';
+        document.getElementById('wallet-save-btn').innerHTML = ' Save Changes';
     } else {
         selectedColor = 0;
         document.getElementById('wm-name').value = '';
         document.getElementById('wm-balance').value = '0';
         document.getElementById('wm-currency').value = 'default';
         document.getElementById('wallet-modal-title').innerText = 'Add new wallet';
-        document.getElementById('wallet-save-btn').innerHTML = '<i data-lucide="plus"></i> Add wallet';
+        document.getElementById('wallet-save-btn').innerHTML = ' Add wallet';
     }
     renderColorPicker();
     document.getElementById('wallet-modal').classList.add('open');
@@ -972,7 +670,7 @@ function openDebtModal(id = null) {
         document.getElementById('dm-start').value = d.startDate || parseLegacyDate(d.date) || new Date().toISOString().split('T')[0];
         document.getElementById('dm-due').value = d.dueDate || '';
         document.getElementById('debt-modal-title').innerText = 'Edit Debt';
-        document.getElementById('debt-save-btn').innerHTML = '<i data-lucide="save"></i> Save Changes';
+        document.getElementById('debt-save-btn').innerHTML = ' Save Changes';
     } else {
         document.getElementById('dm-name').value = '';
         document.getElementById('dm-type').value = 'owe';
@@ -982,7 +680,7 @@ function openDebtModal(id = null) {
         document.getElementById('dm-start').value = new Date().toISOString().split('T')[0];
         document.getElementById('dm-due').value = '';
         document.getElementById('debt-modal-title').innerText = 'Add Debt / Installment';
-        document.getElementById('debt-save-btn').innerHTML = '<i data-lucide="check"></i> Save';
+        document.getElementById('debt-save-btn').innerHTML = ' Save';
     }
     document.getElementById('debt-modal').classList.add('open');
     lucide.createIcons();
@@ -1181,15 +879,8 @@ function render(){
 function renderWallets(){
   document.getElementById('wallets-grid').innerHTML=
     S.wallets.map(w=>`
-      <div class="wallet-card" style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad};">
-        <div class="actions">
-          <button class="action-btn" onclick="openWalletModal('${w.id}')" title="Edit"><i data-lucide="pencil" style="width:14px;"></i></button>
-          <button class="action-btn" onclick="deleteWallet('${w.id}')" title="Delete"><i data-lucide="x" style="width:16px;"></i></button>
-        </div>
-        <div class="w-label">Balance</div><div class="w-name">${w.name}</div>
-        <div class="w-balance">${fmt(w.balance, w.currency)}</div><div class="w-type">${w.type}</div>
-      </div>`).join('')+
-    `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px; height:28px;"></i><span>Add wallet</span></div>`;
+      <div class="wallet-card" style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad};"> <div class="actions"> <button class="action-btn" onclick="openWalletModal('${w.id}')" title="Edit"></button> <button class="action-btn" onclick="deleteWallet('${w.id}')" title="Delete"></button> </div> <div class="w-label">Balance</div><div class="w-name">${w.name}</div> <div class="w-balance">${fmt(w.balance, w.currency)}</div><div class="w-type">${w.type}</div> </div>`).join('')+
+    `<div class="add-wallet-card" onclick="openWalletModal()"><span>Add wallet</span></div>`;
   safeIconRefresh();
 }
 
@@ -1199,20 +890,11 @@ function renderWalletHistory(){
   el.innerHTML=S.walletHistory.map(h=>{
     let icon,amtStr,amtClass;
     const wCur = wById(h.wallet)?.currency;
-    if(h.type==='add'){icon='<i data-lucide="arrow-up"></i>';amtStr='+'+fmt(h.amount, wCur);amtClass='g';}
-    else if(h.type==='withdraw'){icon='<i data-lucide="arrow-down"></i>';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
-    else{icon='<i data-lucide="arrow-right-left"></i>';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
+    if(h.type==='add'){icon='';amtStr='+'+fmt(h.amount, wCur);amtClass='g';}
+    else if(h.type==='withdraw'){icon='';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
+    else{icon='';amtStr='−'+fmt(h.amount, wCur);amtClass='r';}
     const meta=h.type==='transfer'?`${wName(h.wallet)} → ${wName(h.toWallet)}`:wName(h.wallet);
-    return`<div class="entry">
-      <div class="entry-left">
-        <div class="entry-icon transfer">${icon}</div>
-        <div style="min-width:0;"><div class="entry-desc">${h.note}</div><div class="entry-meta">${meta} · ${h.date}</div></div>
-      </div>
-      <div class="entry-right">
-        <div class="entry-amount ${amtClass}">${amtStr}</div>
-        <button class="del-btn" onclick="deleteWH(${h.id})"><i data-lucide="x"></i></button>
-      </div>
-    </div>`;
+    return`<div class="entry"> <div class="entry-left"> <div class="entry-icon transfer">${icon}</div> <div style="min-width:0;"><div class="entry-desc">${h.note}</div><div class="entry-meta">${meta} · ${h.date}</div></div> </div> <div class="entry-right"> <div class="entry-amount ${amtClass}">${amtStr}</div> <button class="del-btn" onclick="deleteWH(${h.id})"></button> </div> </div>`;
   }).join('');
   safeIconRefresh();
 }
@@ -1232,23 +914,8 @@ function renderTxList(){
   const sortedMonths=Object.keys(groups).sort().reverse();
   
   el.innerHTML=sortedMonths.map(m=>`
-    <div class="month-group">${monthLabel(m)}</div>
-    ${groups[m].map(t=>`
-      <div class="entry">
-        <div class="entry-left">
-          <div class="entry-icon" style="background:var(--surface); border:1px solid var(--border); color:var(--text2); box-shadow: var(--shadow);">
-            <i data-lucide="${(S.categories.find(c => c.name === t.cat) || {}).icon || 'circle'}" style="width:18px;"></i>
-          </div>
-          <div style="min-width:0;">
-            <div class="entry-desc">${t.desc}</div>
-            <div class="entry-meta">${t.cat} · ${wBadge(t.wallet)} · ${t.date}</div>
-          </div>
-        </div>
-        <div class="entry-right">
-          <div class="entry-amount ${t.type==='income'?'g':'r'}">${t.type==='income'?'+':'−'}${fmt(t.amount, wById(t.wallet)?.currency)}</div>
-          <button class="del-btn" onclick="deleteTx(${t.id})"><i data-lucide="x"></i></button>
-        </div>
-      </div>`).join('')}`).join('');
+    <div class="month-group">${monthLabel(m)}</div> ${groups[m].map(t=>`
+      <div class="entry"> <div class="entry-left"> <div class="entry-icon" style="background:var(--surface); border:1px solid var(--border); color:var(--text2); box-shadow: var(--shadow);"> </div> <div style="min-width:0;"> <div class="entry-desc">${t.desc}</div> <div class="entry-meta">${t.cat} · ${wBadge(t.wallet)} · ${t.date}</div> </div> </div> <div class="entry-right"> <div class="entry-amount ${t.type==='income'?'g':'r'}">${t.type==='income'?'+':'−'}${fmt(t.amount, wById(t.wallet)?.currency)}</div> <button class="del-btn" onclick="deleteTx(${t.id})"></button> </div> </div>`).join('')}`).join('');
       
   safeIconRefresh();
 }
@@ -1270,34 +937,10 @@ function renderDebts(){
       const startStr = d.startDate ? new Date(d.startDate).toLocaleDateString('en-GB') : d.date;
       const dueStr = d.dueDate ? new Date(d.dueDate).toLocaleDateString('en-GB') : 'No due date';
       
-      html+=`<div class="debt-card">
-        <div class="debt-header">
-          <div style="flex:1;">
-            <div class="debt-name">${d.name}${done?' <i data-lucide="check-circle-2" style="color:var(--green-mid); width:18px;"></i>':''}</div>
-            <div class="debt-meta-row">
-                <div class="meta-chip"><i data-lucide="calendar"></i> ${startStr} <i data-lucide="arrow-right" style="width:12px;"></i> ${dueStr}</div>
-                ${d.monthly ? `<div class="meta-chip"><i data-lucide="credit-card"></i> ${fmt(d.monthly, wCur)} / mo</div>` : ''}
-            </div>
-          </div>
-          <span class="debt-type-badge ${type}">${type==='owe'?'I owe':type==='owed'?'Owed to me':'Installment'}</span>
-        </div>
-        
-        <div class="debt-progress-wrap">
-            <div class="debt-footer-text" style="margin-bottom:6px;">
-              <span>Paid: <span class="main-val">${fmt(d.paid, wCur)}</span></span>
-              <span>Total: <span class="main-val">${fmt(d.total, wCur)}</span></span>
-            </div>
-            <div class="debt-progress-bg"><div class="debt-progress-fill" style="width:${pct.toFixed(1)}%;background:${barColor};"></div></div>
-            <div class="debt-footer-text"><span style="color:var(--${done?'green':'text2'});">${done?'Fully paid':'Remaining: ' + '<span class="main-val">' + fmt(remaining, wCur) + '</span>'}</span></div>
-        </div>
-
-        <div class="debt-actions">
-          ${!done?`<button class="btn sm p-btn" onclick="openPayModal(${d.id})" style="flex:2;"><i data-lucide="banknote"></i> Pay</button>`:''}
-          ${!done?`<button class="btn sm" onclick="markDebtDone(${d.id})" style="color:var(--green);"><i data-lucide="check"></i> Done</button>`:''}
-          <button class="btn sm" onclick="openDebtModal(${d.id})"><i data-lucide="pencil"></i> Edit</button>
-          <button class="btn sm danger" onclick="deleteDebt(${d.id})"><i data-lucide="trash-2"></i></button>
-        </div>
-      </div>`;
+      html+=`<div class="debt-card"> <div class="debt-header"> <div style="flex:1;"> <div class="debt-name">${d.name}${done?' ':''}</div> <div class="debt-meta-row"> <div class="meta-chip"> ${startStr}  ${dueStr}</div> ${d.monthly ? `<div class="meta-chip"> ${fmt(d.monthly, wCur)} / mo</div>` : ''}
+            </div> </div> <span class="debt-type-badge ${type}">${type==='owe'?'I owe':type==='owed'?'Owed to me':'Installment'}</span> </div> <div class="debt-progress-wrap"> <div class="debt-footer-text" style="margin-bottom:6px;"> <span>Paid: <span class="main-val">${fmt(d.paid, wCur)}</span></span> <span>Total: <span class="main-val">${fmt(d.total, wCur)}</span></span> </div> <div class="debt-progress-bg"><div class="debt-progress-fill" style="width:${pct.toFixed(1)}%;background:${barColor};"></div></div> <div class="debt-footer-text"><span style="color:var(--${done?'green':'text2'});">${done?'Fully paid':'Remaining: ' + '<span class="main-val">' + fmt(remaining, wCur) + '</span>'}</span></div> </div> <div class="debt-actions"> ${!done?`<button class="btn sm p-btn" onclick="openPayModal(${d.id})" style="flex:2;"> Pay</button>`:''}
+          ${!done?`<button class="btn sm" onclick="markDebtDone(${d.id})" style="color:var(--green);"> Done</button>`:''}
+          <button class="btn sm" onclick="openDebtModal(${d.id})"> Edit</button> <button class="btn sm danger" onclick="deleteDebt(${d.id})"></button> </div> </div>`;
     });
   });
   el.innerHTML=html;
@@ -1306,17 +949,8 @@ function renderDebts(){
 function renderSources(){
   const el=document.getElementById('sources-list');
   if(!S.sources.length){el.innerHTML='<div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div>';return;}
-  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
-  ${S.sources.map(s=>`
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px; box-shadow: var(--shadow);">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-        <span style="font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green);padding:4px 8px;border-radius:999px;">${s.type}</span>
-        <button class="del-btn" onclick="deleteSrc(${s.id})" style="padding: 2px;"><i data-lucide="x"></i></button>
-      </div>
-      <div style="font-size:14px;color:var(--text2);margin-bottom:6px; font-weight: 600;">${s.name}</div>
-      <div style="font-size:18px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${fmt(s.amount, wById(s.wallet)?.currency)}/mo</div>
-      <div style="margin-top:8px;">${wBadge(s.wallet)}</div>
-    </div>`).join('')}
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;"> ${S.sources.map(s=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px; box-shadow: var(--shadow);"> <div style="display:flex;justify-content:space-between;margin-bottom:8px;"> <span style="font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green);padding:4px 8px;border-radius:999px;">${s.type}</span> <button class="del-btn" onclick="deleteSrc(${s.id})" style="padding: 2px;"></button> </div> <div style="font-size:14px;color:var(--text2);margin-bottom:6px; font-weight: 600;">${s.name}</div> <div style="font-size:18px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${fmt(s.amount, wById(s.wallet)?.currency)}/mo</div> <div style="margin-top:8px;">${wBadge(s.wallet)}</div> </div>`).join('')}
   </div>`;
 }
 
@@ -1330,8 +964,8 @@ function renderBudget(){
     document.getElementById('budget-bar-label').textContent=pct.toFixed(0)+'% used';
     document.getElementById('budget-spent-label').textContent='Spent: '+fmt(exp);
     document.getElementById('budget-remaining-label').textContent='Remaining: '+fmt(Math.max(S.budget-exp,0));
-    if(pct>=100){fill.style.background='var(--red-mid)';wb.style.display='flex';wb.className='warn-box red';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Budget exceeded! Spent '+fmt(exp)+' of '+fmt(S.budget);}
-    else if(pct>=80){fill.style.background='var(--amber-mid)';wb.style.display='flex';wb.className='warn-box amber';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Approaching limit — '+pct.toFixed(0)+'% used.';}
+    if(pct>=100){fill.style.background='var(--red-mid)';wb.style.display='flex';wb.className='warn-box red';wb.innerHTML=' Budget exceeded! Spent '+fmt(exp)+' of '+fmt(S.budget);}
+    else if(pct>=80){fill.style.background='var(--amber-mid)';wb.style.display='flex';wb.className='warn-box amber';wb.innerHTML=' Approaching limit — '+pct.toFixed(0)+'% used.';}
     else{fill.style.background='var(--green-mid)';wb.style.display='none';}
   }else{bw.style.display='none';wb.style.display='none';}
 }
@@ -1439,24 +1073,8 @@ function buildChartCard(cfg) {
   card.dataset.chartId = cfg.id;
 
   card.innerHTML = `
-    <div class="card-title" style="justify-content:space-between; margin-bottom:0.8rem;">
-      <span style="display:flex;align-items:center;gap:6px;">
-        <i data-lucide="${def.icon}"></i> ${def.title}
-      </span>
-      <div style="display:flex;gap:6px;align-items:center;">
-        <span class="drag-handle" title="Drag to reorder" style="display:none; cursor:grab; color:var(--text3); padding:2px 4px;">
-          <i data-lucide="grip-vertical" style="width:16px;height:16px;"></i>
-        </span>
-        <button class="del-btn edit-only" title="Edit / Filters" onclick="openEditChartModal('${cfg.id}')" style="display:none;">
-          <i data-lucide="sliders-horizontal" style="width:15px;"></i>
-        </button>
-        <button class="del-btn edit-only" title="Remove chart" onclick="removeChart('${cfg.id}')" style="display:none; color:var(--red);">
-          <i data-lucide="x" style="width:15px;"></i>
-        </button>
-      </div>
-    </div>
-    <div class="chart-card-body"></div>
-  `;
+    <div class="card-title" style="justify-content:space-between; margin-bottom:0.8rem;"> <span style="display:flex;align-items:center;gap:6px;"> ${def.title}
+      </span> <div style="display:flex;gap:6px;align-items:center;"> <span class="drag-handle" title="Drag to reorder" style="display:none; cursor:grab; color:var(--text3); padding:2px 4px;"> </span> <button class="del-btn edit-only" title="Edit / Filters" onclick="openEditChartModal('${cfg.id}')" style="display:none;"> </button> <button class="del-btn edit-only" title="Remove chart" onclick="removeChart('${cfg.id}')" style="display:none; color:var(--red);"> </button> </div> </div> <div class="chart-card-body"></div> `;
 
   // Build body content per type
   buildCardBody(card.querySelector('.chart-card-body'), cfg);
@@ -1474,31 +1092,13 @@ function buildCardBody(body, cfg) {
   const canvasId = 'canvas-' + cfg.id;
   if (cfg.type === 'timeline') {
     body.innerHTML = `
-      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;">
-        <div class="field" style="flex:2;min-width:140px;margin-bottom:0;">
-          <label style="font-size:12px;">Add metric</label>
-          <select id="tl-select-${cfg.id}" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:13px;width:100%;outline:none;"></select>
-        </div>
-        <button class="btn b-btn sm" onclick="addTimelineMetricTo('${cfg.id}')"><i data-lucide="plus"></i> Add</button>
-      </div>
-      <div id="tl-chips-${cfg.id}" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
-      <div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>`;
+      <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px;"> <div class="field" style="flex:2;min-width:140px;margin-bottom:0;"> <label style="font-size:12px;">Add metric</label> <select id="tl-select-${cfg.id}" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:13px;width:100%;outline:none;"></select> </div> <button class="btn b-btn sm" onclick="addTimelineMetricTo('${cfg.id}')"> Add</button> </div> <div id="tl-chips-${cfg.id}" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div> <div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>`;
   } else if (cfg.type === 'debt') {
     body.innerHTML = `
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;">
-        <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:3px;">
-          ${['day','month','year'].map(v => `<button class="section-tab${cfg.filters.view===v?' active':''}" onclick="setDebtViewOn('${cfg.id}','${v}')" style="padding:5px 12px;font-size:12px;">${v.charAt(0).toUpperCase()+v.slice(1)}s</button>`).join('')}
-        </div>
-        <select class="ctrl" id="dbt-filter-${cfg.id}" onchange="updateDebtFilterOn('${cfg.id}')" style="font-size:13px;">
-          <option value="all">All Debts</option>
-          ${S.debts.map(d=>`<option value="${d.id}" ${String(cfg.filters.debt)===String(d.id)?'selected':''}>${d.name}</option>`).join('')}
-        </select>
-        <select class="ctrl" id="dbt-metric-${cfg.id}" onchange="updateDebtFilterOn('${cfg.id}')" style="font-size:13px;">
-          ${['remaining','paid','both'].map(m=>`<option value="${m}" ${cfg.filters.metric===m?'selected':''}>${m.charAt(0).toUpperCase()+m.slice(1)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="chart-wrap" style="height:280px;"><canvas id="${canvasId}"></canvas></div>
-      <div id="dbt-legend-${cfg.id}" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:12px;font-weight:600;color:var(--text2);"></div>`;
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;"> <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:3px;"> ${['day','month','year'].map(v => `<button class="section-tab${cfg.filters.view===v?' active':''}" onclick="setDebtViewOn('${cfg.id}','${v}')" style="padding:5px 12px;font-size:12px;">${v.charAt(0).toUpperCase()+v.slice(1)}s</button>`).join('')}
+        </div> <select class="ctrl" id="dbt-filter-${cfg.id}" onchange="updateDebtFilterOn('${cfg.id}')" style="font-size:13px;"> <option value="all">All Debts</option> ${S.debts.map(d=>`<option value="${d.id}" ${String(cfg.filters.debt)===String(d.id)?'selected':''}>${d.name}</option>`).join('')}
+        </select> <select class="ctrl" id="dbt-metric-${cfg.id}" onchange="updateDebtFilterOn('${cfg.id}')" style="font-size:13px;"> ${['remaining','paid','both'].map(m=>`<option value="${m}" ${cfg.filters.metric===m?'selected':''}>${m.charAt(0).toUpperCase()+m.slice(1)}</option>`).join('')}
+        </select> </div> <div class="chart-wrap" style="height:280px;"><canvas id="${canvasId}"></canvas></div> <div id="dbt-legend-${cfg.id}" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:12px;font-weight:600;color:var(--text2);"></div>`;
   } else {
     body.innerHTML = `<div class="chart-wrap"><canvas id="${canvasId}"></canvas></div>`;
   }
@@ -1573,7 +1173,7 @@ function renderSingleChart(cfg) {
     // Chips
     const chips = document.getElementById('tl-chips-' + cfg.id);
     if (!f.metrics || !f.metrics.length) f.metrics = ['Net'];
-    if (chips) chips.innerHTML = f.metrics.map(m=>`<div class="meta-chip" style="background:var(--surface);border-color:var(--border2);color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer;width:14px;color:var(--red);" onclick="removeTimelineMetricFrom('${cfg.id}','${m}')"></i></div>`).join('');
+    if (chips) chips.innerHTML = f.metrics.map(m=>`<div class="meta-chip" style="background:var(--surface);border-color:var(--border2);color:var(--text);">${m} </div>`).join('');
 
     let txs = f.wallet === 'all' ? S.transactions : S.transactions.filter(t => t.wallet === f.wallet);
     let months = [...new Set(S.transactions.map(t=>t.month))].filter(Boolean).sort();
@@ -1759,11 +1359,11 @@ function updateEditModeUI() {
   const hint = document.getElementById('edit-mode-hint');
   if (!btn) return;
   if (editMode) {
-    btn.innerHTML = '<i data-lucide="check"></i> Done';
+    btn.innerHTML = ' Done';
     btn.className = 'btn g-btn';
     if (hint) hint.textContent = 'Drag cards to reorder · Click ✕ to remove · Click filter icon to edit';
   } else {
-    btn.innerHTML = '<i data-lucide="pencil"></i> Edit Layout';
+    btn.innerHTML = ' Edit Layout';
     btn.className = 'btn';
     if (hint) hint.textContent = '';
   }
@@ -1840,7 +1440,7 @@ function openEditChartModal(id) {
   const cfg = chartList.find(c => c.id === id);
   if (!cfg) return;
   const def = CHART_DEFS[cfg.type];
-  document.querySelector('#edit-chart-modal .modal-title').innerHTML = `<i data-lucide="${def.icon}"></i> Edit: ${def.title}`;
+  document.querySelector('#edit-chart-modal .modal-title').innerHTML = ` Edit: ${def.title}`;
   document.getElementById('edit-chart-filters').innerHTML = buildFilterHTML(cfg.type, cfg.filters, 'edit');
   document.getElementById('edit-chart-modal').classList.add('open');
   lucide.createIcons();
@@ -1875,13 +1475,10 @@ function buildFilterHTML(type, f, prefix) {
     <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div>`;
 
   if (type === 'bar' || type === 'pie') return `
-    <div class="field" style="margin-bottom:10px;"><label>Month</label><select id="${prefix}-f-month">${monthOpts}</select></div>
-    <div class="field" style="margin-bottom:10px;"><label>Transaction Type</label><select id="${prefix}-f-txType">${txTypeOpts}</select></div>
-    <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div>`;
+    <div class="field" style="margin-bottom:10px;"><label>Month</label><select id="${prefix}-f-month">${monthOpts}</select></div> <div class="field" style="margin-bottom:10px;"><label>Transaction Type</label><select id="${prefix}-f-txType">${txTypeOpts}</select></div> <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div>`;
 
   if (type === 'timeline') return `
-    <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div>
-    <p style="font-size:12px;color:var(--text3);margin-top:10px;">Add/remove metrics directly on the chart card.</p>`;
+    <div class="field"><label>Wallet</label><select id="${prefix}-f-wallet">${walletOpts}</select></div> <p style="font-size:12px;color:var(--text3);margin-top:10px;">Add/remove metrics directly on the chart card.</p>`;
 
   if (type === 'wallet') return `<p style="font-size:13px;color:var(--text2);">No filters for this chart — it always shows all wallet balances.</p>`;
 
@@ -1890,9 +1487,7 @@ function buildFilterHTML(type, f, prefix) {
     const metricOpts = ['remaining','paid','both'].map(m=>`<option value="${m}" ${(f.metric||'remaining')===m?'selected':''}>${m.charAt(0).toUpperCase()+m.slice(1)}</option>`).join('');
     const viewOpts   = ['day','month','year'].map(v=>`<option value="${v}" ${(f.view||'month')===v?'selected':''}>${v.charAt(0).toUpperCase()+v.slice(1)}s</option>`).join('');
     return `
-      <div class="field" style="margin-bottom:10px;"><label>Debt</label><select id="${prefix}-f-debt">${debtOpts}</select></div>
-      <div class="field" style="margin-bottom:10px;"><label>Metric</label><select id="${prefix}-f-metric">${metricOpts}</select></div>
-      <div class="field"><label>Time Granularity</label><select id="${prefix}-f-view">${viewOpts}</select></div>`;
+      <div class="field" style="margin-bottom:10px;"><label>Debt</label><select id="${prefix}-f-debt">${debtOpts}</select></div> <div class="field" style="margin-bottom:10px;"><label>Metric</label><select id="${prefix}-f-metric">${metricOpts}</select></div> <div class="field"><label>Time Granularity</label><select id="${prefix}-f-view">${viewOpts}</select></div>`;
   }
   return '';
 }
@@ -1939,13 +1534,8 @@ function _pollDeps() {
 }
 
 window.addEventListener('load', _pollDeps);
-</script>
-
-<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+</script> <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-
-
-</body>
+<script src="https://unpkg.com/lucide@latest"></script> </body>
 </html>
