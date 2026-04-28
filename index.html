@@ -8,8 +8,6 @@
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%231c1b18&quot;}">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" defer></script>
-<script src="https://unpkg.com/lucide@latest" defer></script>
 
 
 
@@ -1168,12 +1166,16 @@ function updateMonthFilter(){
 function addTimelineMetric() {}
 function removeTimelineMetric(val) {}
 
+function safeIconRefresh(){
+  if(typeof lucide !== 'undefined') lucide.createIcons();
+}
+
 function render(){
   populateWalletSelects();populateCatSelect();
   renderWallets();renderWalletHistory();renderSummary();
   updateMonthFilter();renderTxList();renderDebts();renderSources();renderBudget();
   if(currentPage==='chart')renderCharts();
-  if(typeof lucide !== 'undefined') lucide.createIcons();
+  safeIconRefresh();
 }
 
 function renderWallets(){
@@ -1188,6 +1190,7 @@ function renderWallets(){
         <div class="w-balance">${fmt(w.balance, w.currency)}</div><div class="w-type">${w.type}</div>
       </div>`).join('')+
     `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px; height:28px;"></i><span>Add wallet</span></div>`;
+  safeIconRefresh();
 }
 
 function renderWalletHistory(){
@@ -1211,6 +1214,7 @@ function renderWalletHistory(){
       </div>
     </div>`;
   }).join('');
+  safeIconRefresh();
 }
 
 function renderSummary(){
@@ -1246,7 +1250,7 @@ function renderTxList(){
         </div>
       </div>`).join('')}`).join('');
       
-  lucide.createIcons();
+  safeIconRefresh();
 }
 
 function renderDebts(){
@@ -1921,21 +1925,26 @@ function updateMonthFilter() {
 function startApp() {
     initChartList();
     loadData().then(() => {
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        lucide.createIcons();
     });
 }
 
-// Wait for deferred scripts to be ready
-if (document.readyState === 'complete') {
-    startApp();
-} else {
-    window.addEventListener('load', startApp);
+// Poll until both lucide and Chart.js are loaded, then start
+function _pollDeps() {
+    if (typeof lucide !== 'undefined' && typeof Chart !== 'undefined') {
+        startApp();
+    } else {
+        setTimeout(_pollDeps, 30);
+    }
 }
+
+window.addEventListener('load', _pollDeps);
 </script>
 
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 
 
 </body>
