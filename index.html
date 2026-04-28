@@ -212,13 +212,122 @@ body.dark-mode { --calendar-filter: invert(1); }
   .top-bar { flex-direction: column; align-items: flex-start; }
   .top-right { width: 100%; justify-content: flex-start; }
   .summary-grid { grid-template-columns: 1fr 1fr; }
-  .wallets-grid { grid-template-columns: 1fr; }
+
+  /* ── Sleek Mobile Wallet Cards ── */
+  .wallets-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 10px; 
+  }
+  .wallet-card { 
+    padding: 14px 12px; 
+    border-radius: 12px; 
+  }
+  .w-name { 
+    font-size: 14px; 
+    margin-bottom: 4px; 
+    padding-right: 28px; /* leaves room for the action buttons */
+  }
+  .w-balance { 
+    font-size: 18px; 
+  }
+  .w-type { 
+    font-size: 10px; 
+    margin-top: 6px; 
+  }
+  .wallet-card .actions { 
+    top: 8px; 
+    right: 8px; 
+  }
+  .action-btn { 
+    width: 24px; 
+    height: 24px; 
+  }
+  .action-btn i {
+    width: 14px;
+    height: 14px;
+  }
+
   .form-row { flex-direction: column; align-items: stretch; }
   .transfer-arrow { transform: rotate(90deg); align-self: center; padding: 10px 0; color: var(--text2); font-size: 24px; }
   .field { min-width: 100%; }
   .btn-row { flex-direction: column; }
   .btn-row .btn { width: 100%; justify-content: center; }
 }
+
+/* ── Mobile UI Optimization ── */
+@media (max-width: 600px) {
+  /* 1. Bottom Navigation for better thumb reach */
+  .nav-tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 12px 8px;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 100;
+    gap: 8px;
+    border-radius: 0;
+    margin: 0;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+  }
+  .nav-tabs::-webkit-scrollbar { 
+    display: none; /* Hide scrollbar Chrome/Safari */
+  }
+  .nav-tab { 
+    flex: 0 0 auto; 
+    padding: 10px 16px; 
+    border-radius: 20px; 
+    font-size: 14px;
+  }
+  
+  /* Add padding to the body so the new bottom nav doesn't hide content */
+  body { 
+    padding-bottom: 80px; 
+  }
+
+  /* 2. Optimize form rows for vertical scanning and typing */
+  .form-row { 
+    flex-direction: column; 
+    gap: 16px; 
+  }
+  .field { 
+    max-width: 100% !important; 
+    width: 100%; 
+  }
+
+  /* 3. Improve Touch Targets & prevent iOS auto-zoom */
+  input, select, button { 
+    min-height: 44px; 
+    font-size: 16px !important; 
+  }
+
+  /* 4. Streamline cards and top bar for smaller screens */
+  .card { 
+    padding: 16px; 
+    border-radius: 12px; 
+    margin-bottom: 16px; 
+  }
+  .top-bar { 
+    padding: 12px 16px; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+  }
+  .app-title { 
+    font-size: 18px; 
+    width: 100%; 
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .top-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
 </style>
 </head>
 <body>
