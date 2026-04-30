@@ -445,6 +445,12 @@ body.dark-mode { --calendar-filter: invert(1); }
   <div id="page-chart" style="display:none;">
     <div class="card">
       <div class="card-title"><i data-lucide="trending-up"></i> Custom Timeline</div>
+      <div class="section-tabs" id="timeline-scale-tabs" style="margin-bottom: 1rem;">
+        <button class="section-tab" onclick="changeTimelineScale('day')">Day</button>
+        <button class="section-tab" onclick="changeTimelineScale('week')">Week</button>
+        <button class="section-tab active" onclick="changeTimelineScale('month')">Month</button>
+        <button class="section-tab" onclick="changeTimelineScale('year')">Year</button>
+      </div>
       <div class="form-row" style="margin-bottom: 14px; align-items: flex-end;">
         <div class="field" style="flex:2;">
           <label>Select metric to track</label>
@@ -453,14 +459,7 @@ body.dark-mode { --calendar-filter: invert(1); }
         <button class="btn b-btn" onclick="addTimelineMetric()"><i data-lucide="plus"></i> Add to Chart</button>
       </div>
       <div id="timeline-chips" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;"></div>
-      <div class="chart-wrap">
-      <div class="section-tabs" id="timeline-scale-tabs" style="margin-bottom: 1.5rem; justify-content: center; display: flex; gap: 8px;">
-        <button class="section-tab" onclick="changeTimelineScale('day')">يومي</button>
-        <button class="section-tab" onclick="changeTimelineScale('week')">أسبوعي</button>
-        <button class="section-tab active" onclick="changeTimelineScale('month')">شهري</button>
-        <button class="section-tab" onclick="changeTimelineScale('year')">سنوي</button>
-      </div>
-<canvas id="timeline-chart" role="img"></canvas></div>
+      <div class="chart-wrap"><canvas id="timeline-chart" role="img"></canvas></div>
     </div>
 
     <div class="card">
@@ -1377,7 +1376,20 @@ function renderBudget(){
   }else{bw.style.display='none';wb.style.display='none';}
 }
 
+
+let timelineScale = 'month';
+function changeTimelineScale(scale) {
+    timelineScale = scale;
+    const scales = ['day', 'week', 'month', 'year'];
+    const tabs = document.querySelectorAll('#timeline-scale-tabs .section-tab');
+    if(tabs.length === 4) {
+        tabs.forEach((tab, i) => tab.className = 'section-tab' + (scales[i] === scale ? ' active' : ''));
+    }
+    renderCharts();
+}
+
 function renderCharts(){
+
   const cats=[...new Set(S.transactions.map(t=>t.cat))];
   const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98';
   const gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
@@ -1391,13 +1403,43 @@ function renderCharts(){
     `<div class="meta-chip" style="background:var(--surface); border-color:var(--border2); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:14px; color:var(--red);" onclick="removeTimelineMetric('${m}')"></i></div>`
   ).join('');
 
-  let months = [...new Set(S.transactions.map(t => t.month))].filter(Boolean).sort();
-  if (!months.length) months = [nowMonth()]; 
+  // --- Timeline Dynamic Grouping Logic ---
+  const groupedData = {};
+  
+  // Sort transactions by date oldest to newest
+  const sortedTxs = [...S.transactions].sort((a,b) => {
+      const da = new Date(parseLegacyDate(a.date) || (a.month + "-01"));
+      const db = new Date(parseLegacyDate(b.date) || (b.month + "-01"));
+      return da - db;
+  });
+
+  sortedTxs.forEach(t => {
+      let key;
+      const dateObj = new Date(parseLegacyDate(t.date) || (t.month + "-01"));
+      
+      if (timelineScale === 'day') {
+          key = dateObj.toLocaleDateString('en-GB'); // DD/MM/YYYY
+      } else if (timelineScale === 'week') {
+          const firstDay = new Date(dateObj);
+          firstDay.setDate(dateObj.getDate() - dateObj.getDay());
+          key = "Wk " + firstDay.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'});
+      } else if (timelineScale === 'month') {
+          key = monthLabel(t.month);
+      } else if (timelineScale === 'year') {
+          key = dateObj.getFullYear().toString();
+      }
+      
+      if (!groupedData[key]) groupedData[key] = [];
+      groupedData[key].push(t);
+  });
+
+  const chartLabels = Object.keys(groupedData);
+  if (chartLabels.length === 0) chartLabels.push(timelineScale === 'month' ? monthLabel(nowMonth()) : 'No Data');
 
   const chartColors = ['#10b981', '#f43f5e', '#3b82f6', '#f59e0b', '#8b5cf6', '#14b8a6', '#f97316'];
   const timelineDatasets = activeTimelineMetrics.map((metric, idx) => {
-      const data = months.map(m => {
-          let txs = S.transactions.filter(t => (t.month || nowMonth()) === m);
+      const data = chartLabels.map(label => {
+          let txs = groupedData[label] || [];
           if (metric === 'Income') return txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
           if (metric === 'Expense') return txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
           if (metric === 'Net') {
@@ -1415,10 +1457,10 @@ function renderCharts(){
 
   if (timelineChart) timelineChart.destroy();
   timelineChart = new Chart(document.getElementById('timeline-chart').getContext('2d'), {
-      type: 'line', data: { labels: months.map(m => monthLabel(m)), datasets: timelineDatasets },
+      type: 'line', data: { labels: chartLabels, datasets: timelineDatasets },
       options: { 
           responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-          scales: { x: { grid: { display: false }, ticks: { font: { size: 11 }, color: tc } },
+          scales: { x: { grid: { display: false }, ticks: { font: { size: 10 }, color: tc } },
                     y: { ticks: { callback: v => sym() + v.toLocaleString(), font: { size: 11 }, color: tc }, grid: { color: gc } } }
       }
   });
