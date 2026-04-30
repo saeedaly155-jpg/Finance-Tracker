@@ -1452,5 +1452,65 @@ window.onload = async () => {
 <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
+<script>
+// ── Inline expression evaluator for all number inputs ──
+(function () {
+  function evalExpr(str) {
+    const safe = str.replace(/\s/g,'').replace(/x/gi,'*').replace(/÷/g,'/').replace(/,/g,'');
+    if (!/^[\d+\-*/().%]+$/.test(safe)) return null;
+    try {
+      const v = Function('"use strict"; return (' + safe + ')')();
+      return isFinite(v) ? parseFloat(v.toFixed(10)) : null;
+    } catch(e) { return null; }
+  }
+
+  function tryEval(input) {
+    const raw = input.value;
+    if (!/[+\-*\/x÷%]/.test(raw)) return;
+    const result = evalExpr(raw);
+    if (result !== null) {
+      input.value = result;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+      input.style.transition = 'background 0.3s';
+      input.style.background = 'var(--green-bg)';
+      setTimeout(() => { input.style.background = ''; }, 700);
+    }
+  }
+
+  function attachTo(input) {
+    if (input.dataset.exprAttached) return;
+    input.dataset.exprAttached = '1';
+
+    // Switch to text on focus so operators can be typed freely
+    input.addEventListener('focus', () => {
+      input.type = 'text';
+      input.inputMode = 'decimal';
+    });
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); finalize(input); }
+    });
+
+    input.addEventListener('blur', () => finalize(input));
+
+    function finalize(inp) {
+      tryEval(inp);
+      // Restore to number type (keep the numeric value)
+      const v = inp.value;
+      inp.type = 'number';
+      inp.value = v;
+    }
+  }
+
+  function attachAll() {
+    document.querySelectorAll('input[type=number]:not([data-expr-attached])').forEach(attachTo);
+  }
+
+  attachAll();
+  new MutationObserver(attachAll).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
 </body>
 </html>
