@@ -1454,56 +1454,74 @@ window.onload = async () => {
 
 <script>
 // ── Inline expression evaluator for all number inputs ──
+// On focus: switches to type=text so operators (+−×÷%) can be typed.
+// On Enter or blur: evaluates the expression and restores type=number.
 (function () {
   function evalExpr(str) {
-    const safe = str.replace(/\s/g,'').replace(/x/gi,'*').replace(/÷/g,'/').replace(/,/g,'');
+    const safe = str.trim()
+      .replace(/x/gi, '*').replace(/÷/g, '/').replace(/,/g, '').replace(/\s/g, '');
+    if (!safe) return null;
     if (!/^[\d+\-*/().%]+$/.test(safe)) return null;
     try {
       const v = Function('"use strict"; return (' + safe + ')')();
       return isFinite(v) ? parseFloat(v.toFixed(10)) : null;
-    } catch(e) { return null; }
-  }
-
-  function tryEval(input) {
-    const raw = input.value;
-    if (!/[+\-*\/x÷%]/.test(raw)) return;
-    const result = evalExpr(raw);
-    if (result !== null) {
-      input.value = result;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      input.dispatchEvent(new Event('change', { bubbles: true }));
-      input.style.transition = 'background 0.3s';
-      input.style.background = 'var(--green-bg)';
-      setTimeout(() => { input.style.background = ''; }, 700);
-    }
+    } catch (e) { return null; }
   }
 
   function attachTo(input) {
     if (input.dataset.exprAttached) return;
     input.dataset.exprAttached = '1';
 
-    // Switch to text on focus so operators can be typed freely
+    // Remember original attributes
+    const originalMin  = input.min;
+    const originalStep = input.step;
+
     input.addEventListener('focus', () => {
-      input.type = 'text';
-      input.inputMode = 'decimal';
+      input.setAttribute('type', 'text');
+      input.setAttribute('inputmode', 'decimal');
+      // Move cursor to end
+      const v = input.value;
+      input.value = '';
+      input.value = v;
     });
+
+    function finalize() {
+      const raw = input.value;
+      // Has an operator? Try to evaluate
+      if (/[+\-*\/x÷%]/.test(raw)) {
+        const result = evalExpr(raw);
+        if (result !== null) {
+          // Restore to number type first, then set numeric value
+          input.setAttribute('type', 'number');
+          if (originalMin)  input.min  = originalMin;
+          if (originalStep) input.step = originalStep;
+          input.value = result;
+          input.dispatchEvent(new Event('input',  { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+          // Green flash feedback
+          input.style.transition = 'background 0.2s';
+          input.style.background = 'var(--green-bg)';
+          setTimeout(() => { input.style.background = ''; }, 800);
+          return;
+        }
+      }
+      // No operator or invalid — just restore type keeping current value
+      const numVal = parseFloat(raw);
+      input.setAttribute('type', 'number');
+      if (originalMin)  input.min  = originalMin;
+      if (originalStep) input.step = originalStep;
+      if (!isNaN(numVal)) input.value = numVal;
+    }
 
     input.addEventListener('keydown', e => {
-      if (e.key === 'Enter') { e.preventDefault(); finalize(input); }
+      if (e.key === 'Enter') { e.preventDefault(); finalize(); input.blur(); }
     });
 
-    input.addEventListener('blur', () => finalize(input));
-
-    function finalize(inp) {
-      tryEval(inp);
-      // Restore to number type (keep the numeric value)
-      const v = inp.value;
-      inp.type = 'number';
-      inp.value = v;
-    }
+    input.addEventListener('blur', finalize);
   }
 
   function attachAll() {
+    // Query both type=number (un-focused) and type=text with our marker (focused)
     document.querySelectorAll('input[type=number]:not([data-expr-attached])').forEach(attachTo);
   }
 
