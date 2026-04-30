@@ -453,7 +453,14 @@ body.dark-mode { --calendar-filter: invert(1); }
         <button class="btn b-btn" onclick="addTimelineMetric()"><i data-lucide="plus"></i> Add to Chart</button>
       </div>
       <div id="timeline-chips" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;"></div>
-      <div class="chart-wrap"><canvas id="timeline-chart" role="img"></canvas></div>
+      <div class="chart-wrap">
+      <div class="section-tabs" id="timeline-scale-tabs" style="margin-bottom: 1.5rem; justify-content: center; display: flex; gap: 8px;">
+        <button class="section-tab" onclick="changeTimelineScale('day')">يومي</button>
+        <button class="section-tab" onclick="changeTimelineScale('week')">أسبوعي</button>
+        <button class="section-tab active" onclick="changeTimelineScale('month')">شهري</button>
+        <button class="section-tab" onclick="changeTimelineScale('year')">سنوي</button>
+      </div>
+<canvas id="timeline-chart" role="img"></canvas></div>
     </div>
 
     <div class="card">
