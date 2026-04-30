@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<!-- Updated Viewport for iOS / iPhone Notches & Safe Areas -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#1c1b18"/>
 <title>Finance Tracker</title>
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%231c1b18&quot;}">
@@ -13,6 +14,17 @@
 <style>
 /* ── التصميم الأساسي والألوان ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+/* iOS Safe Area Padding */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+  .nav-tabs {
+    padding-bottom: max(50px, env(safe-area-inset-bottom)) !important;
+  }
+}
 
 :root{
   --bg: #f7f6f3; --surface: #fff; --border: #e8e6e0; --border2: #d4d1c8;
@@ -207,6 +219,8 @@ body.dark-mode { --calendar-filter: invert(1); }
 @media(max-width:768px){
   .wallet-card .actions { opacity: 1; }
   .action-btn { background: rgba(0,0,0,0.25); backdrop-filter: none; }
+  /* Prevent iOS input zoom by forcing 16px font size */
+  input, select, textarea { font-size: 16px !important; }
 }
 @media(max-width:520px){
   .top-bar { flex-direction: column; align-items: flex-start; }
@@ -214,37 +228,21 @@ body.dark-mode { --calendar-filter: invert(1); }
   .summary-grid { grid-template-columns: 1fr 1fr; }
 
   /* ── Sleek Mobile Wallet Cards ── */
-  .wallets-grid { 
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 10px; 
-  }
-  .wallet-card { 
-    padding: 14px 12px; 
-    border-radius: 12px; 
-  }
-  .w-name { 
-    font-size: 14px; 
-    margin-bottom: 4px; 
-    padding-right: 28px; /* leaves room for the action buttons */
-  }
-  .w-balance { 
-    font-size: 18px; 
-  }
-  .w-type { 
-    font-size: 10px; 
-    margin-top: 6px; 
-  }
-  .wallet-card .actions { 
-    top: 8px; 
-    right: 8px; 
-  }
+  .wallets-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .wallet-card { padding: 14px 12px; border-radius: 12px; }
+  .w-name { font-size: 14px; margin-bottom: 4px; padding-right: 0px; }
+  .w-balance { font-size: 18px; }
+  .w-type { font-size: 10px; margin-top: 6px; }
+  .wallet-card .actions { top: 4px; right: 8px; }
   .action-btn { 
-    width: 24px; 
-    height: 24px; 
+    width: 32px; 
+    height: 32px; 
+    min-height: 32px !important; /* السطر ده هيمنع الموبايل إنه يمط الزرار بالطول */
+    padding: 0;
   }
-  .action-btn i {
-    width: 14px;
-    height: 14px;
+  .action-btn i { 
+    width: 16px; 
+    height: 16px; /* السطر ده هيظبط حجم الأيقونة عشان متكونش مضغوطة */
   }
 
   .form-row { flex-direction: column; align-items: stretch; }
@@ -264,7 +262,7 @@ body.dark-mode { --calendar-filter: invert(1); }
     right: 0;
     background: var(--surface);
     border-top: 1px solid var(--border);
-    padding: 12px 40px;
+    padding: 12px 16px;
     padding-bottom: 50px;
     display: flex;
     overflow-x: auto;
@@ -273,62 +271,18 @@ body.dark-mode { --calendar-filter: invert(1); }
     gap: 8px;
     border-radius: 0;
     margin: 0;
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    scrollbar-width: none;
   }
-  .nav-tabs::-webkit-scrollbar { 
-    display: none; /* Hide scrollbar Chrome/Safari */
-  }
-  .nav-tab { 
-    flex: 0 0 auto; 
-    padding: 10px 16px; 
-    border-radius: 20px; 
-    font-size: 14px;
-  }
-  
-  /* Add padding to the body so the new bottom nav doesn't hide content */
-  body { 
-    padding-bottom: 80px; 
-  }
-
-  /* 2. Optimize form rows for vertical scanning and typing */
-  .form-row { 
-    flex-direction: column; 
-    gap: 16px; 
-  }
-  .field { 
-    max-width: 100% !important; 
-    width: 100%; 
-  }
-
-  /* 3. Improve Touch Targets & prevent iOS auto-zoom */
-  input, select, button { 
-    min-height: 44px; 
-    font-size: 16px !important; 
-  }
-
-  /* 4. Streamline cards and top bar for smaller screens */
-  .card { 
-    padding: 16px; 
-    border-radius: 12px; 
-    margin-bottom: 16px; 
-  }
-  .top-bar { 
-    padding: 12px 16px; 
-    flex-wrap: wrap; 
-    gap: 10px; 
-  }
-  .app-title { 
-    font-size: 18px; 
-    width: 100%; 
-    text-align: center;
-    margin-bottom: 4px;
-  }
-  .top-right {
-    width: 100%;
-    justify-content: space-between;
-  }
+  .nav-tab { flex: 0 0 auto; padding: 10px 16px; border-radius: 20px; font-size: 14px; }
+  body { padding-bottom: 80px; }
+  .form-row { flex-direction: column; gap: 16px; }
+  .field { max-width: 100% !important; width: 100%; }
+  input, select, button { min-height: 44px; font-size: 16px !important; }
+  .card { padding: 16px; border-radius: 12px; margin-bottom: 16px; width: 100%; }
+  .top-bar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+  .app-title { font-size: 18px; width: 100%; text-align: center; margin-bottom: 4px; }
+  .top-right { width: 100%; justify-content: space-between; }
 }
-
 </style>
 </head>
 <body>
@@ -336,11 +290,16 @@ body.dark-mode { --calendar-filter: invert(1); }
   <div class="top-bar">
     <div class="app-title">Finance Tracker</div>
     <div class="top-right">
-      <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i id="theme-icon" data-lucide="moon"></i></button>
-      <button class="icon-btn" onclick="toggleHide()" title="Hide/Show Balance"><i id="eye-icon" data-lucide="eye"></i></button>
-      <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()"><i data-lucide="cloud"></i> Sync</button>
-      <span id="sync_status" style="font-size: 12px; font-weight:600; color: var(--text3); margin-right: 4px;">Not Synced</span>
+
+      <!-- ضفنا الديف ده عشان نجمعهم مع بعض بمسافة صغيرة -->
+      <div style="display: flex; gap: 6px;">
+        <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i id="theme-icon" data-lucide="moon"></i></button>
+        <button class="icon-btn" onclick="toggleHide()" title="Hide/Show Balance"><i id="eye-icon" data-lucide="eye"></i></button>
+      </div>
+
+      <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()" style="min-width: 125px;"><i data-lucide="cloud"></i> Not Synced</button>
       <div class="save-indicator"><div class="save-dot" id="save-dot"></div><span id="save-label">Saved</span></div>
+
       <select class="ctrl" id="currency-select" onchange="changeCurrency()">
         <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option>
         <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option>
@@ -437,9 +396,19 @@ body.dark-mode { --calendar-filter: invert(1); }
 
   <div id="page-budget" style="display:none;">
     <div id="warn-box" class="warn-box"></div>
+    
+    <!-- Multi-Goal Tracker Widget -->
+    <div class="card" style="margin-bottom: 1rem;">
+      <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="target"></i> Financial Goals</span>
+        <button class="btn sm b-btn" onclick="openGoalModal()" style="padding: 4px 10px;"><i data-lucide="plus" style="width: 14px;"></i> Add Goal</button>
+      </div>
+      <div id="goals-list"><div class="empty">No goals set yet. Click Add to create one.</div></div>
+    </div>
+
     <div id="budget-bar-wrap" style="display:none;" class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-weight:600;font-size:14px;"><i data-lucide="target" style="width:16px; margin-right:4px;"></i> Monthly expense budget</span>
+        <span style="font-weight:600;font-size:14px;"><i data-lucide="pie-chart" style="width:16px; margin-right:4px;"></i> Monthly expense budget</span>
         <span id="budget-bar-label" style="font-weight:600;font-family:'DM Mono',monospace;font-size:14px;"></span>
       </div>
       <div style="background:var(--border);border-radius:999px;height:8px;overflow:hidden;"><div id="budget-bar-fill" style="height:100%;border-radius:999px;transition:width .4s;background:var(--green-mid);width:0%;"></div></div>
@@ -447,14 +416,16 @@ body.dark-mode { --calendar-filter: invert(1); }
         <span id="budget-spent-label"></span><span id="budget-remaining-label"></span>
       </div>
     </div>
+    
     <div class="card">
-      <div class="card-title"><i data-lucide="settings"></i> Set budget</div>
+      <div class="card-title"><i data-lucide="settings"></i> Set Expense Budget</div>
       <div class="form-row">
         <div class="field"><label>Monthly limit</label><input type="number" id="budget-input" placeholder="Enter amount..." min="0" step="1"/></div>
         <button class="btn b-btn" style="align-self:flex-end;" onclick="setBudget()">Set Budget</button>
         <button class="btn sm" style="align-self:flex-end;color:var(--text3);" onclick="clearBudget()"><i data-lucide="x"></i> Clear</button>
       </div>
     </div>
+    
     <div class="card">
       <div class="card-title"><i data-lucide="briefcase"></i> Income sources</div>
       <div class="form-row" style="margin-bottom:12px;">
@@ -471,7 +442,6 @@ body.dark-mode { --calendar-filter: invert(1); }
   </div>
 
   <div id="page-chart" style="display:none;">
-    
     <div class="card">
       <div class="card-title"><i data-lucide="trending-up"></i> Custom Timeline</div>
       <div class="form-row" style="margin-bottom: 14px; align-items: flex-end;">
@@ -514,6 +484,7 @@ body.dark-mode { --calendar-filter: invert(1); }
   </div>
 </div>
 
+<!-- Modals -->
 <div class="modal-overlay" id="wallet-modal">
   <div class="modal">
     <div class="modal-title" id="wallet-modal-title">Add new wallet</div>
@@ -582,6 +553,24 @@ body.dark-mode { --calendar-filter: invert(1); }
   </div>
 </div>
 
+<div class="modal-overlay" id="goal-modal">
+  <div class="modal">
+    <div class="modal-title" id="goal-modal-title">Add Goal</div>
+    <div class="form-row" style="flex-direction:column; align-items:stretch;">
+      <div class="field"><label>Goal Name</label><input type="text" id="gm-name" placeholder="e.g. New Laptop, Vacation..."/></div>
+      <div class="form-row" style="margin:0; gap:12px;">
+        <div class="field"><label>Target Amount</label><input type="number" id="gm-target" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Saved So Far</label><input type="number" id="gm-saved" placeholder="0.00" min="0" step="0.01" value="0"/></div>
+      </div>
+      <div class="field"><label>Color</label><div class="color-picker-row" id="goal-color-picker"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn sm" onclick="closeGoalModal()">Cancel</button>
+      <button class="btn b-btn" id="goal-save-btn" onclick="saveGoal()">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // --- Dark Mode Logic ---
 let isDark = localStorage.getItem('theme') === 'dark';
@@ -642,35 +631,20 @@ function handleAuthClick() {
     }
 }
 
-async function initializeDriveFile() {
-    try {
-        const response = await gapi.client.drive.files.list({
-            q: "name = 'finance_tracker_data.json' and trashed = false",
-            fields: 'files(id, name)'
-        });
-        const files = response.result.files;
-        if (files.length > 0) {
-            driveFileId = files[0].id;
-            await loadFromDrive();
-        } else {
-            await saveToDrive(); 
-        }
-        document.getElementById('sync_status').innerText = 'Synced';
-        document.getElementById('auth_button').style.display = 'none';
-    } catch (e) {
-        console.error("Init Error:", e);
-    }
-}
-
 async function saveToDrive() {
     if (!gapi.client.getToken()) return;
+    const btn = document.getElementById('auth_button');
     try {
         if (!driveFileId) {
             const resp = await gapi.client.drive.files.list({ q: "name = 'finance_tracker_data.json' and trashed = false", fields: 'files(id)' });
             if (resp.result.files.length > 0) driveFileId = resp.result.files[0].id;
         }
-        document.getElementById('sync_status').innerText = 'Saving...';
-        document.getElementById('auth_button').style.display = 'none';
+        
+        // حالة جاري الحفظ
+        btn.innerHTML = '<i data-lucide="loader" style="width:16px;"></i> Saving...';
+        btn.className = 'btn sm';
+        lucide.createIcons();
+        
         const fileContent = JSON.stringify(S);
 
         if (driveFileId) {
@@ -690,10 +664,62 @@ async function saveToDrive() {
             const result = await response.json();
             driveFileId = result.id;
         }
-        document.getElementById('sync_status').innerText = 'Synced';
+        
+        // حالة تم الحفظ بنجاح
+        btn.innerHTML = '<i data-lucide="check-circle" style="width:16px;"></i> Synced';
+        btn.className = 'btn g-btn sm';
+        lucide.createIcons();
     } catch (error) {
-        document.getElementById('sync_status').innerText = 'Error';
-        document.getElementById('auth_button').style.display = 'inline-flex';
+        // حالة الخطأ
+        btn.innerHTML = '<i data-lucide="alert-circle" style="width:16px;"></i> Error';
+        btn.className = 'btn r-btn sm'; // لون أحمر للخطأ
+        lucide.createIcons();
+    }
+}
+
+async function saveToDrive() {
+    if (!gapi.client.getToken()) return;
+    const btn = document.getElementById('auth_button');
+    try {
+        if (!driveFileId) {
+            const resp = await gapi.client.drive.files.list({ q: "name = 'finance_tracker_data.json' and trashed = false", fields: 'files(id)' });
+            if (resp.result.files.length > 0) driveFileId = resp.result.files[0].id;
+        }
+        
+        // حالة جاري الحفظ
+        btn.innerHTML = '<i data-lucide="loader" style="width:16px;"></i> Saving...';
+        btn.className = 'btn sm';
+        lucide.createIcons();
+        
+        const fileContent = JSON.stringify(S);
+
+        if (driveFileId) {
+            await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+                method: 'PATCH',
+                headers: { 'Authorization': 'Bearer ' + gapi.client.getToken().access_token, 'Content-Type': 'application/json' },
+                body: fileContent
+            });
+        } else {
+            const metadata = { name: 'finance_tracker_data.json', mimeType: 'application/json' };
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', new Blob([fileContent], { type: 'application/json' }));
+            const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method: 'POST', headers: { 'Authorization': 'Bearer ' + gapi.client.getToken().access_token }, body: form
+            });
+            const result = await response.json();
+            driveFileId = result.id;
+        }
+        
+        // حالة تم الحفظ بنجاح
+        btn.innerHTML = '<i data-lucide="check-circle" style="width:16px;"></i> Synced';
+        btn.className = 'btn g-btn sm';
+        lucide.createIcons();
+    } catch (error) {
+        // حالة الخطأ
+        btn.innerHTML = '<i data-lucide="alert-circle" style="width:16px;"></i> Error';
+        btn.className = 'btn r-btn sm'; // لون أحمر للخطأ
+        lucide.createIcons();
     }
 }
 
@@ -704,6 +730,8 @@ async function loadFromDrive() {
 
 // --- App Logic ---
 const SYMS={EGP:'E£',USD:'$',EUR:'€',GBP:'£',SAR:'﷼',AED:'د.إ',JPY:'¥',INR:'₹',CAD:'C$',AUD:'A$'};
+
+// Updated WALLET_COLORS
 const WALLET_COLORS=[
   {name:'Forest',grad:'linear-gradient(135deg,#1a6b4a,#0f4a33)',hex:'#1a6b4a'},
   {name:'Navy',grad:'linear-gradient(135deg,#1a3a8a,#0d2460)',hex:'#1a3a8a'},
@@ -713,7 +741,11 @@ const WALLET_COLORS=[
   {name:'Indigo',grad:'linear-gradient(135deg,#4338ca,#312e81)',hex:'#4338ca'},
   {name:'Rose',grad:'linear-gradient(135deg,#be185d,#881337)',hex:'#be185d'},
   {name:'Amber',grad:'linear-gradient(135deg,#b45309,#78350f)',hex:'#b45309'},
+  {name:'Dark Slate',grad:'linear-gradient(135deg,#2A3B4C,#1a2b3c)',hex:'#2A3B4C'},
+  {name:'Gold',grad:'linear-gradient(135deg,#E5A93C,#c5891c)',hex:'#E5A93C'},
+  {name:'Custom Teal',grad:'linear-gradient(135deg,#4CA1A3,#2c8183)',hex:'#4CA1A3'}
 ];
+
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DB_NAME='FinanceTrackerDB',DB_VER=1,STORE='state';
 
@@ -724,10 +756,10 @@ let S={
     {id:'elalhy',name:'El Ahly Visa',type:'Debit card',color:1,balance:0},
     {id:'fawry',name:'Fawry Visa',type:'Debit card',color:2,balance:0}
   ],
-  transactions:[],walletHistory:[],sources:[],debts:[],budget:null
+  transactions:[],walletHistory:[],sources:[],debts:[],budget:null, goals:[]
 };
 let txFilter='all',catChart=null,walletChart=null,timelineChart=null,currentPage='wallets',selectedColor=0,payingDebtId=null;
-let activeTimelineMetrics = ['Income', 'Expense']; // الخطوط المعروضة حالياً في التايم لاين
+let activeTimelineMetrics = ['Income', 'Expense']; 
 let db=null,saveTimer=null;
 
 let showBalance = true;
@@ -774,12 +806,11 @@ function scheduleSave(){
       await dbSet('data',JSON.parse(JSON.stringify(S)));
       setSaveStatus('saved');
       if (window.gapi && gapi.client && gapi.client.getToken()) {
-          document.getElementById('sync_status').innerHTML = '<i data-lucide="alert-circle" style="color:var(--amber-mid); width:14px;"></i> Unsynced';
-          lucide.createIcons();
           const btn = document.getElementById('auth_button');
-          btn.innerHTML = '<i data-lucide="cloud-upload"></i> Update Drive';
-          btn.style.display = 'inline-flex';
+          btn.innerHTML = '<i data-lucide="cloud-upload" style="width:16px;"></i> Update Drive';
+          btn.className = 'btn b-btn sm'; // يرجع الزرار لونه أزرق يطلب التحديث
           btn.onclick = saveToDrive;
+          lucide.createIcons();
       }
     }catch(e){
       try{localStorage.setItem('ft_data',JSON.stringify(S));setSaveStatus('saved');}
@@ -801,6 +832,7 @@ async function loadData(){
   }
   document.getElementById('currency-select').value=S.currency;
   if(S.budget)document.getElementById('budget-input').value=S.budget;
+  S.goals = S.goals || []; 
   document.getElementById('tx-month').value=nowMonth();
   
   if(isDark) document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
@@ -877,7 +909,7 @@ function openWalletModal(id = null){
 function closeWalletModal(){ document.getElementById('wallet-modal').classList.remove('open'); }
 
 function renderColorPicker(){
-  document.getElementById('color-picker').innerHTML=WALLET_COLORS.map((c,i)=>`<div class="color-dot${i===selectedColor?' selected':''}" style="background:${c.grad};" onclick="selectColor(${i})"></div>`).join('');
+  document.getElementById('color-picker').innerHTML=WALLET_COLORS.map((c,i)=>`<div class="color-dot${i===selectedColor?' selected':''}" style="background:${c.grad};" onclick="selectColor(${i})" title="${c.name}"></div>`).join('');
 }
 function selectColor(i){selectedColor=i;renderColorPicker();}
 
@@ -992,13 +1024,13 @@ function addTx(type){
   w.balance+=(type==='income'?amt:-amt);
   S.transactions.unshift({id:Date.now(),type,desc,amount:amt,wallet:wid,cat,month,date:new Date().toLocaleDateString('en-GB')});
   document.getElementById('tx-desc').value='';document.getElementById('tx-amount').value='';
-  scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets();
+  scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets(); 
 }
 function deleteTx(id){
   const tx=S.transactions.find(t=>t.id===id);if(!tx)return;
   const w=wById(tx.wallet);if(w)w.balance+=(tx.type==='income'?-tx.amount:tx.amount);
   S.transactions=S.transactions.filter(t=>t.id!==id);
-  scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets();
+  scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets(); 
 }
 function filterTx(f){txFilter=f;['all','income','expense'].forEach(x=>document.getElementById('stab-'+x).className='section-tab'+(f===x?' active':''));renderTxList();}
 
@@ -1032,6 +1064,131 @@ function addSource(){
 }
 function deleteSrc(id){S.sources=S.sources.filter(s=>s.id!==id);scheduleSave();renderSources();}
 
+function addIncomeFromSource(sourceName, amount, walletId) {
+  const w = wById(walletId);
+  if(w) w.balance += amount;
+  
+  S.transactions.unshift({
+    id: Date.now(),
+    type: 'income',
+    desc: sourceName + ' (Added)',
+    amount: parseFloat(amount),
+    wallet: walletId,
+    cat: 'Salary', 
+    month: nowMonth(),
+    date: new Date().toLocaleDateString('en-GB')
+  });
+  
+  scheduleSave();
+  render();
+  alert(`Added ${fmt(amount, w?.currency)} from ${sourceName} into your wallet!`);
+}
+
+// --- Multi-Goals Logic ---
+let editingGoalId = null;
+let selectedGoalColor = 0;
+
+function renderGoalColorPicker(){
+  document.getElementById('goal-color-picker').innerHTML=WALLET_COLORS.map((c,i)=>`<div class="color-dot${i===selectedGoalColor?' selected':''}" style="background:${c.grad};" onclick="selectGoalColor(${i})" title="${c.name}"></div>`).join('');
+}
+function selectGoalColor(i){selectedGoalColor=i;renderGoalColorPicker();}
+
+function openGoalModal(id = null) {
+    editingGoalId = id;
+    if(id) {
+        const g = S.goals.find(x => x.id === id);
+        document.getElementById('gm-name').value = g.name;
+        document.getElementById('gm-target').value = g.target;
+        document.getElementById('gm-saved').value = g.saved;
+        selectedGoalColor = g.color || 0;
+        document.getElementById('goal-modal-title').innerText = 'Edit Goal';
+        document.getElementById('goal-save-btn').innerHTML = '<i data-lucide="save"></i> Save';
+    } else {
+        document.getElementById('gm-name').value = '';
+        document.getElementById('gm-target').value = '';
+        document.getElementById('gm-saved').value = '0';
+        selectedGoalColor = 0;
+        document.getElementById('goal-modal-title').innerText = 'Add Goal';
+        document.getElementById('goal-save-btn').innerHTML = '<i data-lucide="plus"></i> Add';
+    }
+    renderGoalColorPicker();
+    document.getElementById('goal-modal').classList.add('open');
+    lucide.createIcons();
+}
+
+function closeGoalModal() { document.getElementById('goal-modal').classList.remove('open'); }
+
+function saveGoal() {
+    const name = document.getElementById('gm-name').value.trim();
+    const target = parseFloat(document.getElementById('gm-target').value);
+    const saved = parseFloat(document.getElementById('gm-saved').value) || 0;
+    if(!name) return;
+    if(!target || target <= 0) return;
+
+    if(!S.goals) S.goals = [];
+
+    if(editingGoalId) {
+        const g = S.goals.find(x => x.id === editingGoalId);
+        if(g) { g.name = name; g.target = target; g.saved = saved; g.color = selectedGoalColor; }
+    } else {
+        S.goals.push({ id: Date.now(), name, target, saved, color: selectedGoalColor });
+    }
+    closeGoalModal(); scheduleSave(); renderGoals();
+}
+
+function deleteGoal(id) {
+    if(!confirm('Are you sure you want to delete this goal?')) return;
+    S.goals = S.goals.filter(x => x.id !== id);
+    scheduleSave(); renderGoals();
+}
+
+function fundGoal(id) {
+    const g = S.goals.find(x => x.id === id);
+    if(!g) return;
+    const amt = prompt(`Add funds to ${g.name}\nCurrently saved: ${fmt(g.saved)}\nTarget: ${fmt(g.target)}\n\nEnter amount to add:`);
+    const val = parseFloat(amt);
+    if(val && val > 0) {
+        g.saved += val;
+        scheduleSave();
+        renderGoals();
+    }
+}
+
+function renderGoals() {
+    if(!S.goals) S.goals = [];
+    const el = document.getElementById('goals-list');
+    if(!S.goals.length) {
+        el.innerHTML = '<div class="empty">No goals set yet. Click Add Goal to start saving.</div>';
+        return;
+    }
+    el.innerHTML = S.goals.map(g => {
+        let pct = Math.min((g.saved / g.target) * 100, 100);
+        let done = g.saved >= g.target;
+        let c = WALLET_COLORS[g.color] || WALLET_COLORS[0];
+        return `
+        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--border);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span style="font-weight:700; font-size:15px; display:flex; align-items:center; gap:6px;">
+                    ${g.name} ${done ? '<i data-lucide="check-circle-2" style="color:var(--green-mid); width:18px;"></i>' : ''}
+                </span>
+                <div style="display:flex; gap:6px;">
+                    <button class="btn sm g-btn" onclick="fundGoal(${g.id})" style="padding:4px 8px; font-size:12px;" title="Add Money"><i data-lucide="plus" style="width:14px;"></i></button>
+                    <button class="btn sm" onclick="openGoalModal(${g.id})" style="padding:4px 8px; font-size:12px;" title="Edit"><i data-lucide="pencil" style="width:14px;"></i></button>
+                    <button class="btn sm danger" onclick="deleteGoal(${g.id})" style="padding:4px 8px; font-size:12px;" title="Delete"><i data-lucide="trash-2" style="width:14px;"></i></button>
+                </div>
+            </div>
+            <div style="width: 100%; background-color: var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 8px;">
+                <div style="width: ${pct}%; height: 100%; background: ${c.grad}; transition: width 0.4s ease; border-radius: 999px;"></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text2); font-weight:600;">
+                <span>Saved: <span style="color:var(--text); font-family:'DM Mono',monospace;">${fmt(g.saved)}</span></span>
+                <span>Target: <span style="color:var(--text); font-family:'DM Mono',monospace;">${fmt(g.target)}</span></span>
+            </div>
+        </div>`;
+    }).join('');
+    lucide.createIcons();
+}
+
 function setBudget(){const val=parseFloat(document.getElementById('budget-input').value);if(!val||val<=0)return;S.budget=val;scheduleSave();renderBudget();}
 function clearBudget(){S.budget=null;document.getElementById('budget-input').value='';scheduleSave();renderBudget();}
 
@@ -1052,8 +1209,9 @@ function importData(e){
 }
 function confirmClearAll(){
   if(!confirm('Delete ALL data?'))return;
-  S={currency:S.currency,wallets:[{id:'cash',name:'Cash',type:'Cash',color:0,balance:0},{id:'elalhy',name:'El Ahly Visa',type:'Debit card',color:1,balance:0},{id:'fawry',name:'Fawry Visa',type:'Debit card',color:2,balance:0}],transactions:[],walletHistory:[],sources:[],debts:[],budget:null};
-  document.getElementById('budget-input').value='';scheduleSave();render();
+  S={currency:S.currency,wallets:[{id:'cash',name:'Cash',type:'Cash',color:0,balance:0},{id:'elalhy',name:'El Ahly Visa',type:'Debit card',color:1,balance:0},{id:'fawry',name:'Fawry Visa',type:'Debit card',color:2,balance:0}],transactions:[],walletHistory:[],sources:[],debts:[],budget:null,goals:[]};
+  document.getElementById('budget-input').value='';
+  scheduleSave();render();
 }
 
 function showPage(p){
@@ -1071,24 +1229,17 @@ function updateMonthFilter(){
   if(months.includes(cur))sel.value=cur;
 }
 
-// إضافة خيارات التايم لاين
 function addTimelineMetric() {
     const val = document.getElementById('timeline-select').value;
-    if (val && !activeTimelineMetrics.includes(val)) {
-        activeTimelineMetrics.push(val);
-        renderCharts();
-    }
+    if (val && !activeTimelineMetrics.includes(val)) { activeTimelineMetrics.push(val); renderCharts(); }
 }
-
-// مسح خيار من التايم لاين
 function removeTimelineMetric(val) {
-    activeTimelineMetrics = activeTimelineMetrics.filter(m => m !== val);
-    renderCharts();
+    activeTimelineMetrics = activeTimelineMetrics.filter(m => m !== val); renderCharts();
 }
 
 function render(){
   populateWalletSelects();renderWallets();renderWalletHistory();renderSummary();
-  updateMonthFilter();renderTxList();renderDebts();renderSources();renderBudget();
+  updateMonthFilter();renderTxList();renderDebts();renderSources();renderBudget(); renderGoals();
   if(currentPage==='chart')renderCharts();
   lucide.createIcons();
 }
@@ -1220,7 +1371,11 @@ function renderSources(){
       </div>
       <div style="font-size:14px;color:var(--text2);margin-bottom:6px; font-weight: 600;">${s.name}</div>
       <div style="font-size:18px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${fmt(s.amount, wById(s.wallet)?.currency)}/mo</div>
-      <div style="margin-top:8px;">${wBadge(s.wallet)}</div>
+      
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:12px; padding-top:12px; border-top: 1px dashed var(--border);">
+        <div>${wBadge(s.wallet)}</div>
+        <button onclick="addIncomeFromSource('${s.name}', ${s.amount}, '${s.wallet}')" class="btn g-btn sm" style="padding: 4px 8px; font-size: 12px; border-radius: 6px;"><i data-lucide="plus" style="width:14px;"></i> To Wallet</button>
+      </div>
     </div>`).join('')}
   </div>`;
 }
@@ -1246,20 +1401,17 @@ function renderCharts(){
   const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98';
   const gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
   
-  // 1. تحديث قائمة اختيار التايم لاين
   const timelineSelect = document.getElementById('timeline-select');
   const baseOptions = `<option value="Income">Total Income</option><option value="Expense">Total Expense</option><option value="Net">Net Balance</option>`;
   const catOptions = cats.map(c => `<option value="${c}">Category: ${c}</option>`).join('');
   timelineSelect.innerHTML = baseOptions + catOptions;
 
-  // 2. عرض الـ Chips (العناصر المختارة للتايم لاين)
   document.getElementById('timeline-chips').innerHTML = activeTimelineMetrics.map(m => 
     `<div class="meta-chip" style="background:var(--surface); border-color:var(--border2); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:14px; color:var(--red);" onclick="removeTimelineMetric('${m}')"></i></div>`
   ).join('');
 
-  // 3. رسم مخطط التايم لاين
   let months = [...new Set(S.transactions.map(t => t.month))].filter(Boolean).sort();
-  if (!months.length) months = [nowMonth()]; // لو مفيش بيانات حط الشهر الحالي كافتراضي
+  if (!months.length) months = [nowMonth()]; 
 
   const chartColors = ['#10b981', '#f43f5e', '#3b82f6', '#f59e0b', '#8b5cf6', '#14b8a6', '#f97316'];
   const timelineDatasets = activeTimelineMetrics.map((metric, idx) => {
@@ -1272,35 +1424,24 @@ function renderCharts(){
               const exp = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
               return inc - exp;
           }
-          // إذا كان تصنيف معين (مثلاً Debts)
           return txs.filter(t => t.cat === metric).reduce((s, t) => s + t.amount, 0);
       });
       return {
-          label: metric,
-          data: data,
-          borderColor: chartColors[idx % chartColors.length],
-          backgroundColor: chartColors[idx % chartColors.length] + '20',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4 // لعمل منحنى انسيابي للخطوط
+          label: metric, data: data, borderColor: chartColors[idx % chartColors.length],
+          backgroundColor: chartColors[idx % chartColors.length] + '20', borderWidth: 2, fill: true, tension: 0.4
       };
   });
 
   if (timelineChart) timelineChart.destroy();
   timelineChart = new Chart(document.getElementById('timeline-chart').getContext('2d'), {
-      type: 'line',
-      data: { labels: months.map(m => monthLabel(m)), datasets: timelineDatasets },
+      type: 'line', data: { labels: months.map(m => monthLabel(m)), datasets: timelineDatasets },
       options: { 
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-              x: { grid: { display: false }, ticks: { font: { size: 11 }, color: tc } },
-              y: { ticks: { callback: v => sym() + v.toLocaleString(), font: { size: 11 }, color: tc }, grid: { color: gc } }
-          }
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+          scales: { x: { grid: { display: false }, ticks: { font: { size: 11 }, color: tc } },
+                    y: { ticks: { callback: v => sym() + v.toLocaleString(), font: { size: 11 }, color: tc }, grid: { color: gc } } }
       }
   });
 
-  // المخططات الأساسية
   if(catChart)catChart.destroy();
   if(cats.length){
     catChart=new Chart(document.getElementById('cat-chart').getContext('2d'),{
@@ -1326,8 +1467,6 @@ function renderCharts(){
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
       plugins:{legend:{position:'bottom',labels:{font:{size:13,family:"'DM Sans'",weight: 'bold'},color:tc,padding:20}}}}
   });
-
-  lucide.createIcons();
 }
 
 window.onload = async () => {
