@@ -21,8 +21,8 @@
     padding-left: max(0px, env(safe-area-inset-left));
     padding-right: max(0px, env(safe-area-inset-right));
   }
-  .nav-tabs {
-    padding-bottom: max(50px, env(safe-area-inset-bottom)) !important;
+  .nav-wrapper {
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
   }
 }
 
@@ -69,28 +69,38 @@ select.ctrl, .icon-btn {padding:8px 12px;border:1px solid var(--border);border-r
 .save-dot.error{background:var(--red-mid);}
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
 
-/* ── القوائم ── */
+/* ── القوائم - Apple News Style ── */
+.nav-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
 .nav-tabs {
   display: flex;
-  gap: 6px;
-  margin-bottom: 1.5rem;
+  gap: 2px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 6px;
+  border-radius: 999px;
+  padding: 5px;
   overflow-x: auto;
   scrollbar-width: none;
+  box-shadow: var(--shadow-md);
+  flex: 1;
+  min-width: 0;
 }
 .nav-tabs::-webkit-scrollbar { display: none; }
 
 .nav-tab {
-  flex: 0 0 auto; 
-  padding: 10px 18px; 
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 10px;
   border: none;
-  border-radius: var(--radius);
+  border-radius: 999px;
   background: transparent;
   color: var(--text2);
-  font-size: 14px; 
+  font-size: 11px;
   font-weight: 600;
   font-family: 'DM Sans', sans-serif;
   cursor: pointer;
@@ -98,13 +108,48 @@ select.ctrl, .icon-btn {padding:8px 12px;border:1px solid var(--border);border-r
   white-space: nowrap;
   text-align: center;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px; 
+  gap: 3px;
 }
-.nav-tab i[data-lucide] { width: 20px; height: 20px; stroke-width: 2.2; }
+.nav-tab i[data-lucide] { width: 22px; height: 22px; stroke-width: 2; flex-shrink: 0; }
 .nav-tab:hover { background: var(--bg); color: var(--text); }
-.nav-tab.active { background: var(--text); color: var(--surface); }
+.nav-tab.active {
+  background: var(--bg);
+  color: var(--blue);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08), inset 0 1px 2px rgba(0,0,0,0.04);
+}
+.nav-tab.active i[data-lucide] { color: var(--blue-mid); }
+
+/* Search button — same pill style, same inner padding as a tab */
+.nav-extra-btn {
+  flex-shrink: 0;
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all .2s;
+}
+/* Inner icon wrapper matches tab inner size: 22px icon + 8px top + 8px bottom + 3px gap + 11px text-line ≈ same height */
+.nav-extra-btn .search-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 999px;
+  gap: 3px;
+}
+.nav-extra-btn i[data-lucide] { width: 22px; height: 22px; stroke-width: 2; }
+.nav-extra-btn:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-bg); }
+.nav-extra-btn.active { color: var(--blue); border-color: var(--blue-mid); background: var(--blue-bg); }
 
 /* ── الكروت ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow); transition: background 0.3s, border-color 0.3s;}
@@ -217,72 +262,289 @@ body.dark-mode { --calendar-filter: invert(1); }
 
 .chart-wrap{position:relative;width:100%;height:240px;}
 
+/* ══════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════ */
+
+/* ── Tablet (≤768px) ── */
 @media(max-width:768px){
   .wallet-card .actions { opacity: 1; }
   .action-btn { background: rgba(0,0,0,0.25); backdrop-filter: none; }
-  /* Prevent iOS input zoom by forcing 16px font size */
-  input, select, textarea { font-size: 16px !important; }
+  input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom */
+  .app { padding: 1rem 0.75rem 7rem; }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media(max-width:520px){
-  .top-bar { flex-direction: column; align-items: stretch; gap: 10px; }
-  .top-right { width: 100%; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
-  .summary-grid { grid-template-columns: 1fr 1fr; }
 
-  /* ── Sleek Mobile Wallet Cards ── */
-  .wallets-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .wallet-card { padding: 14px 12px; border-radius: 12px; }
-  .w-name { font-size: 14px; margin-bottom: 4px; padding-right: 0px; }
-  .w-balance { font-size: 18px; }
-  .w-type { font-size: 10px; margin-top: 6px; }
-  .wallet-card .actions { top: 4px; right: 8px; }
-  .action-btn { 
-    width: 32px; 
-    height: 32px; 
-    min-height: 32px !important; /* السطر ده هيمنع الموبايل إنه يمط الزرار بالطول */
+/* ── Mobile (≤600px) — full responsive overhaul ── */
+@media (max-width: 600px) {
+
+  /* Body & layout */
+  body { font-size: 14px; padding-bottom: 110px; }
+  .app { padding: 0.75rem 0.75rem 7rem; }
+
+  /* ── Top bar: compact single row ── */
+  .top-bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0.75rem;
     padding: 0;
   }
-  .action-btn i { 
-    width: 16px; 
-    height: 16px; /* السطر ده هيظبط حجم الأيقونة عشان متكونش مضغوطة */
+  .app-title { font-size: 17px; flex: 1; }
+  .top-right {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  select.ctrl { font-size: 13px !important; padding: 6px 8px; flex: 1; min-width: 90px; }
+  .icon-btn { padding: 6px 8px; }
+  #auth_button { font-size: 12px !important; padding: 6px 10px; min-width: unset; }
+  .save-indicator { font-size: 11px; padding: 4px 8px; }
+
+  /* ── Floating pill nav ── */
+  .nav-wrapper {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 480px;
+    padding: 0;
+    margin: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-tabs {
+    flex: 1;
+    border-radius: 999px;
+    padding: 4px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.7);
+    margin: 0;
+    display: flex;
+    gap: 2px;
+  }
+  body.dark-mode .nav-tabs {
+    background: rgba(28,28,28,0.92);
+    border-color: rgba(255,255,255,0.1);
+  }
+  .nav-tab {
+    flex: 1 1 0;
+    padding: 7px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    gap: 3px;
+    letter-spacing: 0;
+  }
+  .nav-tab i[data-lucide] {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.8;
   }
 
-  .form-row { flex-direction: column; align-items: stretch; }
-  .transfer-arrow { transform: rotate(90deg); align-self: center; padding: 10px 0; color: var(--text2); font-size: 24px; }
-  .field { min-width: 100%; }
-  .btn-row { flex-direction: column; }
-  .btn-row .btn { width: 100%; justify-content: center; }
+  /* Search button — same padding as mobile nav pill */
+  .nav-extra-btn {
+    padding: 4px;
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+    border: 1px solid rgba(255,255,255,0.7);
+  }
+  .nav-extra-btn .search-icon-wrap {
+    padding: 7px 8px;
+  }
+  .nav-extra-btn i[data-lucide] { width: 20px; height: 20px; }
+  body.dark-mode .nav-extra-btn {
+    background: rgba(28,28,28,0.92);
+    border-color: rgba(255,255,255,0.1);
+  }
+
+  /* ── Cards ── */
+  .card { padding: 14px; border-radius: 14px; margin-bottom: 12px; }
+  .card-title { font-size: 11px; margin-bottom: 1rem; }
+
+  /* ── Wallet grid ── */
+  .wallets-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .wallet-card { padding: 12px 10px; border-radius: 12px; }
+  .w-label { font-size: 10px; }
+  .w-name { font-size: 13px; margin-bottom: 4px; padding-right: 0; }
+  .w-balance { font-size: 17px; }
+  .w-type { font-size: 10px; margin-top: 4px; }
+  .wallet-card .actions { top: 6px; right: 6px; opacity: 1; }
+  .action-btn { width: 28px; height: 28px; min-height: 28px !important; padding: 0; }
+  .action-btn i { width: 14px; height: 14px; }
+
+  /* ── Summary metrics ── */
+  .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+  .metric { padding: 12px; border-radius: 12px; }
+  .metric-label { font-size: 10px; }
+  .metric-value { font-size: 17px; }
+
+  /* ── Forms ── */
+  .form-row { flex-direction: column; gap: 10px; }
+  .field { min-width: 100% !important; max-width: 100% !important; }
+  .field label { font-size: 12px; }
+  .field input, .field select { padding: 10px 12px; border-radius: 10px; }
+  .transfer-arrow { transform: rotate(90deg); align-self: center; padding: 6px 0; color: var(--text2); }
+
+  /* ── Buttons ── */
+  .btn-row { flex-direction: column; gap: 8px; }
+  .btn-row .btn { width: 100%; justify-content: center; padding: 12px 16px; font-size: 14px; }
+  .btn { font-size: 13px; }
+
+  /* ── Transactions list ── */
+  .entry { padding: 10px 0; gap: 8px; }
+  .entry-icon { width: 34px; height: 34px; font-size: 14px; border-radius: 10px; }
+  .entry-desc { font-size: 14px; }
+  .entry-meta { font-size: 11px; }
+  .entry-amount { font-size: 14px; }
+
+  /* ── Section sub-tabs ── */
+  .section-tabs { gap: 4px; margin-bottom: 1rem; }
+  .section-tab { padding: 6px 12px; font-size: 12px; }
+
+  /* ── Modals ── */
+  .modal { padding: 1.25rem; border-radius: 16px; }
+  .modal-title { font-size: 16px; margin-bottom: 1rem; }
+
+  /* ── Debt cards ── */
+  .debt-card { padding: 12px; gap: 10px; }
+  .debt-name { font-size: 14px; }
+  .debt-type-badge { font-size: 10px; padding: 3px 8px; }
+  .meta-chip { font-size: 11px; padding: 4px 8px; }
+
+  /* ── Charts ── */
+  .chart-wrap { height: 200px; }
 }
 
-/* ── Mobile UI Optimization ── */
+/* ── Small phones (≤390px) ── */
+@media (max-width: 390px) {
+  .nav-tab { font-size: 9px; padding: 6px 2px; }
+  .nav-tab i[data-lucide] { width: 19px; height: 19px; }
+  .w-balance { font-size: 15px; }
+  .metric-value { font-size: 15px; }
+  .app-title { font-size: 15px; }
+}
+
+/* ── Search Modal ── */
+.search-modal-box {
+  background: var(--surface);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 82vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  animation: slideUp 0.25s ease;
+}
+.search-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+#search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  outline: none;
+  min-width: 0;
+}
+#search-input::placeholder { color: var(--text3); }
+.search-close-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text2); flex-shrink: 0;
+  transition: 0.2s;
+}
+.search-close-btn i { width: 15px; height: 15px; }
+.search-close-btn:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-mid); }
+.search-filters {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.search-filters::-webkit-scrollbar { display: none; }
+.search-filter {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 5px;
+  transition: 0.2s;
+}
+.search-filter i { width: 14px; height: 14px; }
+.search-filter:hover { background: var(--bg); color: var(--text); }
+.search-filter.active { background: var(--text); color: var(--surface); border-color: var(--text); }
+.search-results { overflow-y: auto; flex: 1; padding: 8px 0; }
+.search-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 48px 20px; color: var(--text3); font-size: 14px;
+}
+.search-section-label {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .08em; padding: 10px 18px 4px;
+}
+.search-result-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 18px; cursor: pointer; transition: background 0.15s;
+  border-radius: 10px; margin: 0 6px;
+}
+.search-result-item:hover { background: var(--bg); }
+.search-result-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.search-result-icon i { width: 18px; height: 18px; }
+.sri-income { background: var(--green-bg); color: var(--green); }
+.sri-expense { background: var(--red-bg); color: var(--red); }
+.sri-transfer { background: var(--blue-bg); color: var(--blue); }
+.sri-wallet { background: var(--purple-bg); color: var(--purple); }
+.sri-debt { background: var(--amber-bg); color: var(--amber); }
+.search-result-body { flex: 1; min-width: 0; }
+.search-result-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.search-result-title mark { background: var(--amber-bg); color: var(--amber); border-radius: 3px; padding: 0 2px; font-style: normal; }
+.search-result-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.search-result-amount { font-size: 14px; font-weight: 700; font-family: 'DM Mono', monospace; white-space: nowrap; flex-shrink: 0; }
+.amt-income { color: var(--green); }
+.amt-expense { color: var(--red); }
+.search-no-results { text-align: center; padding: 32px; color: var(--text3); font-size: 14px; }
 @media (max-width: 600px) {
-  /* 1. Bottom Navigation for better thumb reach */
-  .nav-tabs {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 12px 16px;
-    padding-bottom: 50px;
-    display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    z-index: 100;
-    gap: 8px;
-    border-radius: 0;
-    margin: 0;
-    scrollbar-width: none;
-  }
-  .nav-tab { flex: 0 0 auto; padding: 10px 16px; border-radius: 20px; font-size: 14px; }
-  body { padding-bottom: 80px; }
-  .form-row { flex-direction: column; gap: 16px; }
-  .field { max-width: 100% !important; width: 100%; }
-  input, select, button { min-height: 44px; font-size: 16px !important; }
-  .card { padding: 16px; border-radius: 12px; margin-bottom: 16px; width: 100%; }
-  .top-bar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
-  .app-title { font-size: 18px; width: 100%; text-align: center; margin-bottom: 4px; }
-  .top-right { width: 100%; justify-content: space-between; }
+  .search-modal-box { border-radius: 16px; max-height: 88vh; }
+  #search-input { font-size: 15px; }
 }
 </style>
 </head>
@@ -309,13 +571,16 @@ body.dark-mode { --calendar-filter: invert(1); }
     </div>
   </div>
 
-  <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('wallets')"><i data-lucide="wallet"></i> Wallets</button>
-    <button class="nav-tab" onclick="showPage('transactions')"><i data-lucide="list"></i> Transactions</button>
-    <button class="nav-tab" onclick="showPage('debts')"><i data-lucide="banknote"></i> Debts</button>
-    <button class="nav-tab" onclick="showPage('budget')"><i data-lucide="pie-chart"></i> Budget</button>
-    <button class="nav-tab" onclick="showPage('chart')"><i data-lucide="bar-chart-2"></i> Chart</button>
-    <button class="nav-tab" onclick="showPage('data')"><i data-lucide="database"></i> Data</button>
+  <div class="nav-wrapper">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('wallets')"><i data-lucide="wallet"></i> Wallets</button>
+      <button class="nav-tab" onclick="showPage('transactions')"><i data-lucide="list"></i> Txns</button>
+      <button class="nav-tab" onclick="showPage('debts')"><i data-lucide="banknote"></i> Debts</button>
+      <button class="nav-tab" onclick="showPage('budget')"><i data-lucide="pie-chart"></i> Budget</button>
+      <button class="nav-tab" onclick="showPage('chart')"><i data-lucide="bar-chart-2"></i> Chart</button>
+      <button class="nav-tab" onclick="showPage('data')" id="nav-data-btn"><i data-lucide="database"></i> Data</button>
+    </div>
+    <button class="nav-extra-btn" onclick="openSearch()" id="nav-search-btn" title="Search"><div class="search-icon-wrap"><i data-lucide="search"></i></div></button>
   </div>
 
   <div id="page-wallets">
@@ -487,6 +752,26 @@ body.dark-mode { --calendar-filter: invert(1); }
     <div class="card">
       <div class="card-title" style="color:var(--red);"><i data-lucide="alert-triangle"></i> Danger zone</div>
       <button class="btn danger" onclick="confirmClearAll()"><i data-lucide="trash-2"></i> Clear all data</button>
+    </div>
+  </div>
+</div>
+
+<!-- Search Modal -->
+<div class="modal-overlay" id="search-modal" onclick="handleSearchOverlayClick(event)">
+  <div class="search-modal-box">
+    <div class="search-input-row">
+      <i data-lucide="search" style="width:20px;height:20px;color:var(--text3);flex-shrink:0;"></i>
+      <input type="text" id="search-input" placeholder="Search transactions, wallets, debts…" oninput="runSearch()" autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button class="search-close-btn" onclick="closeSearch()"><i data-lucide="x"></i></button>
+    </div>
+    <div id="search-filters" class="search-filters">
+      <button class="search-filter active" data-filter="all" onclick="setSearchFilter('all')">All</button>
+      <button class="search-filter" data-filter="transactions" onclick="setSearchFilter('transactions')"><i data-lucide="list"></i> Transactions</button>
+      <button class="search-filter" data-filter="wallets" onclick="setSearchFilter('wallets')"><i data-lucide="wallet"></i> Wallets</button>
+      <button class="search-filter" data-filter="debts" onclick="setSearchFilter('debts')"><i data-lucide="banknote"></i> Debts</button>
+    </div>
+    <div id="search-results" class="search-results">
+      <div class="search-empty"><i data-lucide="search" style="width:36px;height:36px;opacity:.2;"></i><p>Start typing to search…</p></div>
     </div>
   </div>
 </div>
@@ -1195,9 +1480,12 @@ function confirmClearAll(){
 }
 
 function showPage(p){
-  ['wallets','transactions','debts','budget','chart','data'].forEach((x,i)=>{
+  const allTabs=['wallets','transactions','debts','budget','chart','data'];
+  allTabs.forEach((x)=>{
     document.getElementById('page-'+x).style.display=x===p?'block':'none';
-    document.querySelectorAll('.nav-tab')[i].className='nav-tab'+(x===p?' active':'');
+  });
+  document.querySelectorAll('.nav-tab').forEach((btn,i)=>{
+    btn.className='nav-tab'+(allTabs[i]===p?' active':'');
   });
   currentPage=p;if(p==='chart')renderCharts();
 }
@@ -1491,6 +1779,148 @@ function renderCharts(){
       plugins:{legend:{position:'bottom',labels:{font:{size:13,family:"'DM Sans'",weight: 'bold'},color:tc,padding:20}}}}
   });
 }
+
+/* ── Search System ── */
+let searchFilter = 'all';
+
+function openSearch() {
+  const modal = document.getElementById('search-modal');
+  modal.classList.add('open');
+  setTimeout(() => document.getElementById('search-input').focus(), 100);
+  runSearch();
+  lucide.createIcons();
+}
+
+function closeSearch() {
+  document.getElementById('search-modal').classList.remove('open');
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = `<div class="search-empty"><i data-lucide="search" style="width:36px;height:36px;opacity:.2;"></i><p>Start typing to search…</p></div>`;
+  lucide.createIcons();
+}
+
+function handleSearchOverlayClick(e) {
+  if (e.target === document.getElementById('search-modal')) closeSearch();
+}
+
+function setSearchFilter(f) {
+  searchFilter = f;
+  document.querySelectorAll('.search-filter').forEach(btn => {
+    btn.className = 'search-filter' + (btn.dataset.filter === f ? ' active' : '');
+  });
+  runSearch();
+}
+
+function highlight(text, query) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return String(text).replace(new RegExp(`(${escaped})`, 'gi'), '<mark>$1</mark>');
+}
+
+function runSearch() {
+  const q = document.getElementById('search-input').value.trim().toLowerCase();
+  const container = document.getElementById('search-results');
+
+  if (!q) {
+    container.innerHTML = `<div class="search-empty"><i data-lucide="search" style="width:36px;height:36px;opacity:.2;"></i><p>Start typing to search…</p></div>`;
+    lucide.createIcons();
+    return;
+  }
+
+  let html = '';
+  let totalCount = 0;
+
+  // ── Transactions ──
+  if (searchFilter === 'all' || searchFilter === 'transactions') {
+    const hits = S.transactions.filter(t =>
+      (t.desc && t.desc.toLowerCase().includes(q)) ||
+      (t.cat && t.cat.toLowerCase().includes(q)) ||
+      (t.note && t.note.toLowerCase().includes(q)) ||
+      (t.month && t.month.includes(q)) ||
+      String(t.amount).includes(q)
+    );
+    if (hits.length) {
+      html += `<div class="search-section-label">Transactions (${hits.length})</div>`;
+      hits.slice(0, 20).forEach(t => {
+        const iconClass = t.type === 'income' ? 'sri-income' : t.type === 'expense' ? 'sri-expense' : 'sri-transfer';
+        const iconName = t.type === 'income' ? 'arrow-up' : t.type === 'expense' ? 'arrow-down' : 'arrow-right-left';
+        const amtClass = t.type === 'income' ? 'amt-income' : t.type === 'expense' ? 'amt-expense' : '';
+        const prefix = t.type === 'income' ? '+' : t.type === 'expense' ? '-' : '';
+        const wallet = S.wallets.find(w => w.id === t.walletId);
+        const meta = [t.cat, monthLabel(t.month), wallet ? wallet.name : ''].filter(Boolean).join(' · ');
+        html += `<div class="search-result-item" onclick="closeSearch();showPage('transactions')">
+          <div class="search-result-icon ${iconClass}"><i data-lucide="${iconName}"></i></div>
+          <div class="search-result-body">
+            <div class="search-result-title">${highlight(t.desc || '(no description)', q)}</div>
+            <div class="search-result-meta">${highlight(meta, q)}</div>
+          </div>
+          <div class="search-result-amount ${amtClass}">${prefix}${sym()}${t.amount.toLocaleString()}</div>
+        </div>`;
+      });
+      totalCount += hits.length;
+    }
+  }
+
+  // ── Wallets ──
+  if (searchFilter === 'all' || searchFilter === 'wallets') {
+    const hits = S.wallets.filter(w =>
+      w.name.toLowerCase().includes(q) ||
+      (w.type && w.type.toLowerCase().includes(q)) ||
+      String(w.balance).includes(q)
+    );
+    if (hits.length) {
+      html += `<div class="search-section-label">Wallets (${hits.length})</div>`;
+      hits.forEach(w => {
+        html += `<div class="search-result-item" onclick="closeSearch();showPage('wallets')">
+          <div class="search-result-icon sri-wallet"><i data-lucide="wallet"></i></div>
+          <div class="search-result-body">
+            <div class="search-result-title">${highlight(w.name, q)}</div>
+            <div class="search-result-meta">${highlight(w.type || '', q)}</div>
+          </div>
+          <div class="search-result-amount">${sym()}${w.balance.toLocaleString()}</div>
+        </div>`;
+      });
+      totalCount += hits.length;
+    }
+  }
+
+  // ── Debts ──
+  if (searchFilter === 'all' || searchFilter === 'debts') {
+    const hits = S.debts.filter(d =>
+      d.name.toLowerCase().includes(q) ||
+      (d.type && d.type.toLowerCase().includes(q)) ||
+      (d.note && d.note.toLowerCase().includes(q)) ||
+      String(d.total).includes(q) || String(d.paid).includes(q)
+    );
+    if (hits.length) {
+      html += `<div class="search-section-label">Debts (${hits.length})</div>`;
+      hits.forEach(d => {
+        const remaining = (d.total || 0) - (d.paid || 0);
+        const typeLabel = d.type === 'owe' ? 'I owe' : d.type === 'owed' ? 'Owed to me' : 'Installment';
+        html += `<div class="search-result-item" onclick="closeSearch();showPage('debts')">
+          <div class="search-result-icon sri-debt"><i data-lucide="banknote"></i></div>
+          <div class="search-result-body">
+            <div class="search-result-title">${highlight(d.name, q)}</div>
+            <div class="search-result-meta">${typeLabel} · Remaining: ${sym()}${remaining.toLocaleString()}</div>
+          </div>
+          <div class="search-result-amount amt-expense">${sym()}${(d.total||0).toLocaleString()}</div>
+        </div>`;
+      });
+      totalCount += hits.length;
+    }
+  }
+
+  if (totalCount === 0) {
+    html = `<div class="search-no-results">No results for "<strong>${q}</strong>"</div>`;
+  }
+
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+// Close search on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSearch();
+});
 
 window.onload = async () => {
     await loadData();
