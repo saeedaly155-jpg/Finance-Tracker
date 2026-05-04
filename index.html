@@ -238,6 +238,9 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
 .search-result-amount { font-size: 16px; font-weight: 700; font-family: ui-monospace, monospace; white-space: nowrap; flex-shrink: 0; }
 .amt-income { color: var(--green); }
 .amt-expense { color: var(--red); }
+.entry-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.warn-box { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-mid); border-radius: var(--radius); padding: 14px; font-size: 15px; font-weight: 600; display: flex; align-items: center; }
+.search-no-results { padding: 32px 20px; text-align: center; color: var(--text3); font-size: 15px; font-weight: 500; }
 </style>
 </head>
 <body>
@@ -1058,7 +1061,7 @@ function runSearch() {
   let html = '', totalCount = 0;
   if (searchFilter === 'all' || searchFilter === 'transactions') {
     const hits = S.transactions.filter(t => (t.desc && t.desc.toLowerCase().includes(q)) || (t.cat && t.cat.toLowerCase().includes(q)) || (t.note && t.note.toLowerCase().includes(q)) || (t.month && t.month.includes(q)) || String(t.amount).includes(q) );
-    if (hits.length) { html += `<div class="search-section-label">Transactions (${hits.length})</div>`; hits.slice(0, 20).forEach(t => { const iconClass = t.type === 'income' ? 'sri-income' : t.type === 'expense' ? 'sri-expense' : 'sri-transfer', iconName = t.type === 'income' ? 'arrow-up' : t.type === 'expense' ? 'arrow-down' : 'arrow-right-left', amtClass = t.type === 'income' ? 'amt-income' : t.type === 'expense' ? 'amt-expense' : '', prefix = t.type === 'income' ? '+' : t.type === 'expense' ? '-' : '', wallet = S.wallets.find(w => w.id === t.walletId), meta = [t.cat, monthLabel(t.month), wallet ? wallet.name : ''].filter(Boolean).join(' · '); html += `<div class="search-result-item" onclick="closeSearch();showPage('transactions')"><div class="search-result-icon ${iconClass}"><i data-lucide="${iconName}"></i></div><div class="search-result-body"><div class="search-result-title">${highlight(t.desc || '(no description)', q)}</div><div class="search-result-meta">${highlight(meta, q)}</div></div><div class="search-result-amount ${amtClass}">${prefix}${sym()}${t.amount.toLocaleString()}</div></div>`; }); totalCount += hits.length; }
+    if (hits.length) { html += `<div class="search-section-label">Transactions (${hits.length})</div>`; hits.slice(0, 20).forEach(t => { const iconClass = t.type === 'income' ? 'sri-income' : t.type === 'expense' ? 'sri-expense' : 'sri-transfer', iconName = t.type === 'income' ? 'arrow-up' : t.type === 'expense' ? 'arrow-down' : 'arrow-right-left', amtClass = t.type === 'income' ? 'amt-income' : t.type === 'expense' ? 'amt-expense' : '', prefix = t.type === 'income' ? '+' : t.type === 'expense' ? '-' : '', wallet = S.wallets.find(w => w.id === (t.walletId || t.wallet)), meta = [t.cat, monthLabel(t.month), wallet ? wallet.name : ''].filter(Boolean).join(' · '); html += `<div class="search-result-item" onclick="closeSearch();showPage('transactions')"><div class="search-result-icon ${iconClass}"><i data-lucide="${iconName}"></i></div><div class="search-result-body"><div class="search-result-title">${highlight(t.desc || '(no description)', q)}</div><div class="search-result-meta">${highlight(meta, q)}</div></div><div class="search-result-amount ${amtClass}">${prefix}${sym()}${t.amount.toLocaleString()}</div></div>`; }); totalCount += hits.length; }
   }
   if (searchFilter === 'all' || searchFilter === 'wallets') {
     const hits = S.wallets.filter(w => w.name.toLowerCase().includes(q) || (w.type && w.type.toLowerCase().includes(q)) || String(w.balance).includes(q) );
