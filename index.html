@@ -10,6 +10,8 @@
 <link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%23121212&quot;}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
 <style>
 /* ── Apple UI Kit Structure & Typography + ORIGINAL Custom Colors ── */
@@ -597,9 +599,16 @@ function setSaveStatus(status){ const dot=document.getElementById('save-dot'); i
 function scheduleSave(){
   clearTimeout(saveTimer); setSaveStatus('saving');
   saveTimer=setTimeout(async()=>{
-    try{ await dbSet('data',JSON.parse(JSON.stringify(S))); setSaveStatus('saved');
-      if (window.gapi && gapi.client && gapi.client.getToken()) { const btn = document.getElementById('auth_button'); btn.innerHTML = '<i data-lucide="cloud-upload" style="width:16px;"></i> Update'; btn.className = 'btn b-btn sm'; btn.onclick = saveToDrive; lucide.createIcons(); }
-    }catch(e){ try{localStorage.setItem('ft_data',JSON.stringify(S));setSaveStatus('saved');} catch(e2){setSaveStatus('error');} }
+    try{ 
+      await dbSet('data',JSON.parse(JSON.stringify(S))); 
+      setSaveStatus('saved');
+      if (window.gapi && gapi.client && gapi.client.getToken()) { 
+        saveToDrive(); 
+      }
+    }catch(e){ 
+      try{localStorage.setItem('ft_data',JSON.stringify(S));setSaveStatus('saved');} 
+      catch(e2){setSaveStatus('error');} 
+    }
   },400);
 }
 
@@ -658,7 +667,7 @@ function handleCategoryChange(sel) {
       populateCategories();
       sel.value = cleanCat;
     } else {
-      populateCategories(); // Reset if cancelled
+      populateCategories(); 
     }
   }
 }
