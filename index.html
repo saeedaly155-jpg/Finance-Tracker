@@ -2,18 +2,62 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<!-- Updated Viewport for iOS / iPhone Notches & Safe Areas -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#1c1b18"/>
+<meta name="theme-color" content="#f7f6f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
 <title>Finance Tracker</title>
-<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%231c1b18&quot;}">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;Finance Tracker&quot;,&quot;short_name&quot;:&quot;Finance&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;background_color&quot;:&quot;%23f7f6f3&quot;,&quot;theme_color&quot;:&quot;%23121212&quot;}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
-/* ── التصميم الأساسي والألوان ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+/* ── Apple UI Kit Structure & Typography + ORIGINAL Custom Colors ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* USER'S ORIGINAL LIGHT COLORS */
+  --bg: #f7f6f3; --surface: #ffffff; --border: #e8e6e0; --border2: #d4d1c8;
+  --text: #1c1b18; --text2: #6b6860; --text3: #a09e98;
+  --green: #0f7a5a; --green-bg: #e8f5f0; --green-mid: #2db584;
+  --red: #c0392b; --red-bg: #fdf0ee; --red-mid: #e05c4b;
+  --amber: #9a6800; --amber-bg: #fef8e7; --amber-mid: #f0b429;
+  --blue: #1a5fa8; --blue-bg: #eef4fd; --blue-mid: #4a90d9;
+  --purple: #5b3fa8; --purple-bg: #f0eeff; --purple-mid: #8b6dd1;
+  
+  /* Strict Apple Inset Rounding & Shadows */
+  --radius: 10px;      /* Standard iOS input/button radius */
+  --radius-lg: 16px;   /* Standard iOS card radius */
+  --radius-xl: 20px;   /* Standard iOS modal radius */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow: 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+body.dark-mode {
+  /* USER'S ORIGINAL DARK COLORS */
+  --bg: #121212; --surface: #1c1c1e; --border: #2c2c2e; --border2: #3a3a3c;
+  --text: #f2f2f7; --text2: #ebebf599; --text3: #ebebf566;
+  --green: #34c759; --green-bg: rgba(52, 199, 89, 0.15); --green-mid: #30d158;
+  --red: #ff3b30; --red-bg: rgba(255, 59, 48, 0.15); --red-mid: #ff453a;
+  --amber: #ffcc00; --amber-bg: rgba(255, 204, 0, 0.15); --amber-mid: #ffd60a;
+  --blue: #007aff; --blue-bg: rgba(0, 122, 255, 0.15); --blue-mid: #0a84ff;
+  --purple: #af52de; --purple-bg: rgba(175, 82, 222, 0.15); --purple-mid: #bf5af2;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow: 0 4px 12px rgba(0,0,0,0.2);
+  --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 120px; /* Space for Floating Tab Bar */
+  transition: background 0.3s ease, color 0.3s ease;
+}
 
 /* iOS Safe Area Padding */
 @supports (padding: max(0px)) {
@@ -21,531 +65,260 @@
     padding-left: max(0px, env(safe-area-inset-left));
     padding-right: max(0px, env(safe-area-inset-right));
   }
-  .nav-wrapper {
-    bottom: max(16px, env(safe-area-inset-bottom)) !important;
-  }
 }
 
-:root{
-  --bg: #f7f6f3; --surface: #fff; --border: #e8e6e0; --border2: #d4d1c8;
-  --text: #1c1b18; --text2: #6b6860; --text3: #a09e98;
-  --green: #0f7a5a; --green-bg: #e8f5f0; --green-mid: #2db584;
-  --red: #c0392b; --red-bg: #fdf0ee; --red-mid: #e05c4b;
-  --amber: #9a6800; --amber-bg: #fef8e7; --amber-mid: #f0b429;
-  --blue: #1a5fa8; --blue-bg: #eef4fd; --blue-mid: #4a90d9;
-  --purple: #5b3fa8; --purple-bg: #f0eeff; --purple-mid: #8b6dd1;
-  --radius: 12px; --radius-lg: 16px;
-  --shadow: 0 2px 6px rgba(0,0,0,.04);
-  --shadow-md: 0 8px 24px rgba(0,0,0,.08);
+.app { max-width: 780px; margin: 0 auto; padding: 1.5rem 1rem; }
+i[data-lucide] { width: 1.2em; height: 1.2em; stroke-width: 2.2; display: inline-block; vertical-align: middle; }
+
+/* ── Top Navigation Bar ── */
+.top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; padding-top: max(10px, env(safe-area-inset-top)); gap: 10px; flex-wrap: wrap; }
+.app-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; flex-shrink: 0; }
+.top-right { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
+
+select.ctrl, .icon-btn {
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm);
+  font-size: 14px; font-weight: 600; cursor: pointer; outline: none; transition: 0.2s; -webkit-appearance: none;
 }
-
-body.dark-mode {
-  --bg: #121212; --surface: #1e1e1e; --border: #2a2a2a; --border2: #3a3a3a;
-  --text: #eaeaea; --text2: #a1a1aa; --text3: #71717a;
-  --green: #34d399; --green-bg: rgba(52, 211, 153, 0.1); --green-mid: #10b981;
-  --red: #fb7185; --red-bg: rgba(251, 113, 133, 0.1); --red-mid: #f43f5e;
-  --amber: #fbbf24; --amber-bg: rgba(251, 191, 36, 0.1); --amber-mid: #f59e0b;
-  --blue: #60a5fa; --blue-bg: rgba(96, 165, 250, 0.1); --blue-mid: #3b82f6;
-  --purple: #a78bfa; --purple-bg: rgba(167, 139, 250, 0.1); --purple-mid: #8b5cf6;
-  --shadow: 0 2px 6px rgba(0,0,0,.3);
-  --shadow-md: 0 8px 24px rgba(0,0,0,.5);
-}
-
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5; transition: background 0.3s, color 0.3s;}
-.app{max-width:780px;margin:0 auto;padding:1.5rem 1rem 5rem;}
-i[data-lucide] { width: 1.1em; height: 1.1em; stroke-width: 2.2; display: inline-block; vertical-align: middle; }
-
-/* ── الشريط العلوي ── */
-.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;gap:10px;}
-.app-title{font-size:22px;font-weight:700;letter-spacing:-.5px; flex-shrink: 0;}
-.top-right{display:flex;gap:8px;align-items:center; flex-wrap:nowrap;}
-
-select.ctrl, .icon-btn {padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none; transition:0.2s;}
-.icon-btn { display: flex; align-items: center; justify-content: center; padding: 8px 10px; }
-.icon-btn:hover, select.ctrl:hover { border-color:var(--border2); background:var(--bg); }
-.save-indicator{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px; white-space:nowrap;}
-.save-dot{width:7px;height:7px;border-radius:50%;background:var(--green-mid);transition:background .3s; flex-shrink:0;}
-.save-dot.saving{background:var(--amber-mid); animation: pulse 1s infinite;}
-.save-dot.error{background:var(--red-mid);}
+.icon-btn { display: flex; align-items: center; justify-content: center; padding: 8px; width: 36px; height: 36px; }
+.icon-btn:hover, select.ctrl:hover { background: var(--bg); border-color: var(--border2); }
+.save-indicator { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); background: transparent; padding: 0; font-weight: 500; }
+.save-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-mid); flex-shrink: 0; }
+.save-dot.saving { background: var(--amber-mid); animation: pulse 1s infinite; }
+.save-dot.error { background: var(--red-mid); }
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
 
-/* ── القوائم - Apple News Style ── */
-.nav-wrapper {
+/* ── iOS 16 Style Floating Nav Bar (Isolated Search & Pill) ── */
+.bottom-floating-area {
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px; /* Wider to accommodate Data tab nicely */
   display: flex;
-  align-items: stretch;
-  gap: 8px;
-  margin-bottom: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Gap between Pill and FAB */
+  z-index: 200;
+  pointer-events: none; /* Let clicks pass through empty space */
+  padding: 0 16px;
 }
 
-.nav-tabs {
-  display: flex;
-  gap: 2px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 5px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  box-shadow: var(--shadow-md);
-  flex: 1;
-  min-width: 0;
+/* Apple Frosted Glass Effect */
+.nav-tabs.pill, .search-fab {
+  pointer-events: auto; /* Re-enable clicks for the actual elements */
+  background: rgba(250, 250, 252, 0.75);
+  backdrop-filter: saturate(180%) blur(25px);
+  -webkit-backdrop-filter: saturate(180%) blur(25px);
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+  transition: background 0.3s, border 0.3s;
 }
-.nav-tabs::-webkit-scrollbar { display: none; }
+
+body.dark-mode .nav-tabs.pill, body.dark-mode .search-fab {
+  background: rgba(30, 30, 30, 0.75); 
+  border: 0.5px solid rgba(255, 255, 255, 0.15); 
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.nav-tabs.pill {
+  display: flex;
+  flex: 1;
+  gap: 2px;
+  border-radius: 999px;
+  padding: 6px;
+}
 
 .nav-tab {
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 8px 10px;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text2);
-  font-size: 11px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  transition: all .2s;
-  white-space: nowrap;
-  text-align: center;
+  flex: 1; border: none; background: transparent; color: var(--text2);
+  font-size: 10px; font-weight: 600; font-family: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 0;
+  border-radius: 999px; transition: all 0.2s ease;
+}
+.nav-tab i[data-lucide] { width: 22px; height: 22px; stroke-width: 2.2; transition: 0.2s; }
+.nav-tab:hover { background: rgba(118, 118, 128, 0.08); color: var(--text); }
+.nav-tab.active { color: var(--blue); }
+.nav-tab.active i[data-lucide] { color: var(--blue-mid); stroke-width: 2.5; }
+
+.search-fab {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-}
-.nav-tab i[data-lucide] { width: 22px; height: 22px; stroke-width: 2; flex-shrink: 0; }
-.nav-tab:hover { background: var(--bg); color: var(--text); }
-.nav-tab.active {
-  background: var(--bg);
-  color: var(--blue);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08), inset 0 1px 2px rgba(0,0,0,0.04);
-}
-.nav-tab.active i[data-lucide] { color: var(--blue-mid); }
-
-/* Search button — same pill style, same inner padding as a tab */
-.nav-extra-btn {
   flex-shrink: 0;
-  padding: 5px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
   color: var(--text2);
-  transition: all .2s;
+  transition: all 0.2s ease;
 }
-/* Inner icon wrapper matches tab inner size: 22px icon + 8px top + 8px bottom + 3px gap + 11px text-line ≈ same height */
-.nav-extra-btn .search-icon-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 10px;
-  border-radius: 999px;
-  gap: 3px;
-}
-.nav-extra-btn i[data-lucide] { width: 22px; height: 22px; stroke-width: 2; }
-.nav-extra-btn:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-bg); }
-.nav-extra-btn.active { color: var(--blue); border-color: var(--blue-mid); background: var(--blue-bg); }
+.search-fab:active { transform: scale(0.92); }
+.search-fab:hover { color: var(--blue-mid); background: rgba(118, 118, 128, 0.08); }
+.search-fab i[data-lucide] { width: 24px; height: 24px; stroke-width: 2.5; }
 
-/* ── الكروت ── */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow); transition: background 0.3s, border-color 0.3s;}
-.card-title{font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1.2rem; display:flex; align-items:center; gap:6px;}
+/* ── Cards ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); transition: background 0.3s, border-color 0.3s; }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
 
-.wallets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:1.5rem;}
-.wallet-card{border-radius:var(--radius-lg);padding:1.25rem;position:relative;overflow:hidden;box-shadow:var(--shadow-md);color:#fff; transition:transform 0.2s;}
-.wallet-card:active{transform:scale(0.98);}
-.wallet-card .actions {position:absolute; top:12px; right:12px; display:flex; gap:6px; opacity:0; transition:opacity .2s;}
-.wallet-card:hover .actions, .wallet-card:focus-within .actions {opacity:1;}
-.action-btn {background:rgba(255,255,255,.2); backdrop-filter: blur(4px); border:none; border-radius:8px; color:#fff; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor:pointer; transition:0.2s;}
-.action-btn:hover {background:rgba(255,255,255,.4); transform: scale(1.1);}
+/* ── Wallets Grid ── */
+.wallets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
+.wallet-card { border-radius: var(--radius-lg); padding: 1.25rem; position: relative; overflow: hidden; color: #fff; box-shadow: var(--shadow-md); transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1); }
+.wallet-card:active { transform: scale(0.96); }
+.wallet-card .actions { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; opacity: 1; }
+.action-btn { background: rgba(0,0,0,0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: none; border-radius: 50%; color: #fff; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+.action-btn:hover { background: rgba(0,0,0,0.4); transform: scale(1.1); }
+.w-label { font-size: 12px; opacity: .8; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.w-name { font-size: 18px; font-weight: 700; margin-bottom: 12px; padding-right: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.3px; }
+.w-balance { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+.w-type { font-size: 13px; opacity: .8; margin-top: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
 
-.w-label{font-size:11px;opacity:.8;margin-bottom:4px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
-.w-name{font-size:16px;font-weight:700;margin-bottom:10px; padding-right: 60px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-.w-balance{font-size:26px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:-.5px;}
-.w-type{font-size:11px;opacity:.7;margin-top:8px;font-weight:600;text-transform:uppercase;}
+.add-wallet-card { border-radius: var(--radius-lg); padding: 1.25rem; border: 2px dashed var(--border2); background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--text2); font-size: 15px; font-weight: 600; min-height: 140px; transition: all .2s; }
+.add-wallet-card:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-bg); }
 
-.add-wallet-card{border-radius:var(--radius-lg);padding:1.25rem;border:2px dashed var(--border2);background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text2);font-size:14px;font-weight:600;min-height:130px;transition:all .2s;}
-.add-wallet-card:hover{border-color:var(--blue-mid);color:var(--blue);background:var(--blue-bg);}
+/* ── Color Picker ── */
+.color-picker-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
+.color-dot { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all .2s cubic-bezier(0.175, 0.885, 0.32, 1); box-shadow: var(--shadow-sm); }
+.color-dot:hover { transform: scale(1.15); }
+.color-dot.selected { border-color: var(--text); transform: scale(1.1); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text); }
 
-.color-picker-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
-.color-dot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s; box-shadow: var(--shadow);}
-.color-dot:hover{transform:scale(1.15);}
-.color-dot.selected{border-color:var(--text);transform:scale(1.1); box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text);}
+/* ── Metrics Grid ── */
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; margin-bottom: 1.5rem; }
+.metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; text-align: left; box-shadow: var(--shadow); }
+.metric-label { font-size: 12px; color: var(--text3); margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.metric-value { font-size: 22px; font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: -0.5px; }
 
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:1.5rem;}
-.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow);}
-.metric-label{font-size:12px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;}
-.metric-value{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;}
-
-.form-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;}
-.field{display:flex;flex-direction:column;gap:6px;flex:1;min-width:140px;}
-.field label{font-size:13px;color:var(--text2);font-weight:600;}
-.field input, .field select{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;width:100%;outline:none;transition:all .2s;}
-.field input:focus, .field select:focus{border-color:var(--blue-mid);background:var(--surface); box-shadow: 0 0 0 3px var(--blue-bg);}
+/* ── Forms (Apple UIKit Style) ── */
+.form-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 14px; }
+.field { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 140px; }
+.field label { font-size: 13px; color: var(--text2); font-weight: 600; margin-left: 2px; }
+.field input, .field select { padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); color: var(--text); font-size: 16px; font-family: inherit; width: 100%; outline: none; transition: all 0.2s ease; -webkit-appearance: none; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02); }
+body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+.field input:focus, .field select:focus { border-color: var(--blue-mid); background: var(--surface); box-shadow: 0 0 0 4px var(--blue-bg); }
 .field input[type="date"], .field input[type="month"] { color: var(--text); }
 ::-webkit-calendar-picker-indicator { filter: var(--calendar-filter, none); cursor: pointer; }
-body.dark-mode { --calendar-filter: invert(1); }
 
-.btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
-.btn{padding:10px 20px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:600;transition:all .2s;white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:6px;}
-.btn:hover{background:var(--bg); transform:translateY(-1px);}
-.btn:active{transform:scale(.97);}
-.btn.g-btn{background:var(--green-bg);border-color:var(--green-mid);color:var(--green);}
-.btn.g-btn:hover{background:rgba(45,181,132,0.2);}
-.btn.r-btn{background:var(--red-bg);border-color:var(--red-mid);color:var(--red);}
-.btn.r-btn:hover{background:rgba(224,92,75,0.2);}
-.btn.b-btn{background:var(--blue-bg);border-color:var(--blue-mid);color:var(--blue);}
-.btn.b-btn:hover{background:rgba(74,144,217,0.2);}
-.btn.p-btn{background:var(--purple-bg);border-color:var(--purple-mid);color:var(--purple);}
-.btn.p-btn:hover{background:rgba(139,109,209,0.2);}
-.btn.sm{padding:8px 14px;font-size:13px;}
-.btn.danger{background:var(--red-bg);border-color:var(--red-mid);color:var(--red);font-size:13px;}
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.btn { padding: 14px 20px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 16px; font-family: inherit; font-weight: 600; cursor: pointer; transition: all .2s cubic-bezier(0.175, 0.885, 0.32, 1); white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-sm); }
+.btn:hover { background: var(--bg); transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn:active { transform: scale(.96); }
+.btn.g-btn { background: var(--green-bg); border-color: var(--green-mid); color: var(--green); }
+.btn.g-btn:hover { background: rgba(45,181,132,0.2); }
+.btn.r-btn { background: var(--red-bg); border-color: var(--red-mid); color: var(--red); }
+.btn.r-btn:hover { background: rgba(224,92,75,0.2); }
+.btn.b-btn { background: var(--blue-bg); border-color: var(--blue-mid); color: var(--blue); }
+.btn.b-btn:hover { background: rgba(74,144,217,0.2); }
+.btn.p-btn { background: var(--purple-bg); border-color: var(--purple-mid); color: var(--purple); }
+.btn.sm { padding: 10px 16px; font-size: 14px; border-radius: 999px; }
+.btn.danger { background: var(--red-bg); border-color: var(--red-mid); color: var(--red); }
 
-.entries-wrap{max-height:400px;overflow-y:auto; padding-right: 4px;}
+/* ── Lists (Table Views) ── */
+.entries-wrap { max-height: 450px; overflow-y: auto; padding-right: 4px; }
 .entries-wrap::-webkit-scrollbar { width: 6px; }
 .entries-wrap::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+.entry { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 0.5px solid var(--border); gap: 12px; }
+.entry:last-child { border-bottom: none; }
+.entry-left { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; }
+.entry-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.entry-icon.income { background: var(--green-bg); color: var(--green); }
+.entry-icon.expense { background: var(--red-bg); color: var(--red); }
+.entry-icon.transfer { background: var(--blue-bg); color: var(--blue); }
+.entry-desc { font-size: 16px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.2px; }
+.entry-meta { font-size: 13px; color: var(--text3); margin-top: 4px; font-weight: 500; }
+.entry-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.entry-amount { font-size: 17px; font-weight: 700; font-family: ui-monospace, SFMono-Regular, monospace; white-space: nowrap; }
+.entry-amount.g { color: var(--green); }
+.entry-amount.r { color: var(--text); }
+.del-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.del-btn:hover { color: var(--red); background: var(--red-bg); }
 
-.entry{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);gap:10px;}
-.entry:last-child{border-bottom:none;}
-.entry-left{display:flex;align-items:center;gap:12px;min-width:0;flex:1;}
-.entry-icon{width:38px;height:38px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.entry-icon.income{background:var(--green-bg); color:var(--green);}
-.entry-icon.expense{background:var(--red-bg); color:var(--red);}
-.entry-icon.transfer{background:var(--blue-bg); color:var(--blue);}
-.entry-desc{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.entry-meta{font-size:12px;color:var(--text3); margin-top:2px;}
-.entry-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.entry-amount{font-size:15px;font-weight:700;font-family:'DM Mono',monospace;white-space:nowrap;}
-.del-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:6px;border-radius:6px; transition:0.2s; display:flex; align-items:center; justify-content:center;}
-.del-btn:hover{color:var(--red);background:var(--red-bg);}
+.month-filter { display: flex; gap: 8px; align-items: center; margin-bottom: 1.5rem; }
+.month-group { font-size: 14px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; padding: 16px 0 8px; border-bottom: 0.5px solid var(--border); margin-bottom: 8px; }
 
-.month-filter{display:flex;gap:8px;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;}
-.month-group{font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:12px 0 6px;border-bottom:2px solid var(--border);margin-bottom:6px;}
+/* ── Segmented Control ── */
+.section-tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; background: var(--bg); padding: 4px; border-radius: 999px; border: 1px solid var(--border); }
+.section-tab { flex: 1; padding: 10px 16px; border-radius: 999px; border: none; background: transparent; color: var(--text2); font-size: 14px; cursor: pointer; font-family: inherit; font-weight: 600; text-align: center; white-space: nowrap; transition: 0.2s ease; }
+.section-tab:hover { color: var(--text); }
+.section-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
 
-.section-tabs{display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap;}
-.section-tab{padding:8px 16px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600; transition:0.2s;}
-.section-tab:hover{background:var(--surface);}
-.section-tab.active{background:var(--text);color:var(--surface);border-color:var(--text);}
-
-/* ── النوافذ المنبثقة (Modals) ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter: blur(4px); z-index:100;align-items:center;justify-content:center;padding:1rem;}
-.modal-overlay.open{display:flex; animation: fadeIn 0.2s ease;}
+/* ── Modals / iOS Action Sheets ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
+.modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-.modal{background:var(--surface);border-radius:var(--radius-lg);padding:1.75rem;width:100%;max-width:440px;box-shadow:var(--shadow-md); animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto;}
-@keyframes slideUp { from{transform:translateY(20px); opacity:0;} to{transform:translateY(0); opacity:1;} }
-.modal-title{font-size:18px;font-weight:700;margin-bottom:1.5rem;}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:1.5rem;}
+.modal { background: var(--surface); border-radius: var(--radius-xl); padding: 2rem; width: 100%; max-width: 440px; box-shadow: var(--shadow-md); animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+@keyframes slideUp { from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+.modal-title { font-size: 20px; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.5px; }
+.modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 2rem; }
 
-/* ── تنسيق كروت الديون ── */
-.debt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:14px;box-shadow:var(--shadow); display:flex; flex-direction:column; gap:14px;}
-.debt-header{display:flex;justify-content:space-between;align-items:flex-start;}
-.debt-name{font-size:16px;font-weight:700; display:flex; align-items:center; gap:6px; color:var(--text);}
-.debt-type-badge{font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px;}
-.debt-type-badge.owe{background:var(--red-bg);color:var(--red);}
-.debt-type-badge.owed{background:var(--green-bg);color:var(--green);}
-.debt-type-badge.install{background:var(--purple-bg);color:var(--purple);}
-.debt-meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.meta-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); padding: 5px 10px; border-radius: 8px; font-size: 12px; color: var(--text2); font-weight: 600; }
-.meta-chip i { width: 14px; height: 14px; stroke-width: 2.5; }
-.debt-progress-wrap { margin-top: 2px; }
-.debt-progress-bg { background: var(--border); border-radius: 999px; height: 6px; overflow: hidden; margin-bottom: 8px; }
-.debt-progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s; }
-.debt-footer-text { display: flex; justify-content: space-between; font-size: 13px; color: var(--text2); font-weight: 600; }
-.debt-footer-text .main-val { color: var(--text); font-family: 'DM Mono', monospace; font-size: 14px;}
-.debt-actions{display:flex;gap:8px;flex-wrap:wrap; margin-top: 6px; padding-top: 14px; border-top: 1px dashed var(--border);}
+/* ── Debt Cards ── */
+.debt-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); }
+.debt-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.debt-name { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; color: var(--text); letter-spacing: -0.2px; }
+.debt-type-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+.debt-type-badge.owe { background: var(--red-bg); color: var(--red); }
+.debt-type-badge.owed { background: var(--green-bg); color: var(--green); }
+.debt-type-badge.install { background: var(--purple-bg); color: var(--purple); }
+.debt-meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.meta-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 13px; color: var(--text2); font-weight: 600; }
+.debt-progress-bg { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 10px; }
+.debt-progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1); }
+.debt-footer-text { display: flex; justify-content: space-between; font-size: 14px; color: var(--text2); font-weight: 600; }
+.debt-footer-text .main-val { color: var(--text); font-family: ui-monospace, monospace; font-size: 15px;}
+.debt-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; padding-top: 16px; border-top: 1px dashed var(--border); }
 .debt-actions .btn { flex: 1; min-width: 80px; }
-.debt-actions .btn.danger { flex: 0 0 auto; padding: 8px 12px; }
+.debt-actions .btn.danger { flex: 0 0 auto; padding: 10px 14px; }
 
-.chart-wrap{position:relative;width:100%;height:240px;}
+.chart-wrap { position: relative; width: 100%; height: 260px; margin-top: 10px; }
 
-/* ══════════════════════════════════════════
-   RESPONSIVE BREAKPOINTS
-   ══════════════════════════════════════════ */
-
-/* ── Tablet (≤768px) ── */
-@media(max-width:768px){
-  .wallet-card .actions { opacity: 1; }
-  .action-btn { background: rgba(0,0,0,0.25); backdrop-filter: none; }
-  input, select, textarea { font-size: 16px !important; } /* prevent iOS zoom */
-  .app { padding: 1rem 0.75rem 7rem; }
-  .summary-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* ── Mobile (≤600px) — full responsive overhaul ── */
+/* ── Mobile Layout Fixes ── */
 @media (max-width: 600px) {
-
-  /* Body & layout */
-  body { font-size: 14px; padding-bottom: 110px; }
-  .app { padding: 0.75rem 0.75rem 7rem; }
-
-  /* ── Top bar: compact single row ── */
-  .top-bar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 0.75rem;
-    padding: 0;
-  }
-  .app-title { font-size: 17px; flex: 1; }
-  .top-right {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-    justify-content: space-between;
-  }
-  select.ctrl { font-size: 13px !important; padding: 6px 8px; flex: 1; min-width: 90px; }
-  .icon-btn { padding: 6px 8px; }
-  #auth_button { font-size: 12px !important; padding: 6px 10px; min-width: unset; }
-  .save-indicator { font-size: 11px; padding: 4px 8px; }
-
-  /* ── Floating pill nav ── */
-  .nav-wrapper {
-    position: fixed;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 24px);
-    max-width: 480px;
-    padding: 0;
-    margin: 0;
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .nav-tabs {
-    flex: 1;
-    border-radius: 999px;
-    padding: 4px;
-    overflow: hidden;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08);
-    border: 1px solid rgba(255,255,255,0.7);
-    margin: 0;
-    display: flex;
-    gap: 2px;
-  }
-  body.dark-mode .nav-tabs {
-    background: rgba(28,28,28,0.92);
-    border-color: rgba(255,255,255,0.1);
-  }
-  .nav-tab {
-    flex: 1 1 0;
-    padding: 7px 6px;
-    border-radius: 999px;
-    font-size: 10px;
-    font-weight: 700;
-    gap: 3px;
-    letter-spacing: 0;
-  }
-  .nav-tab i[data-lucide] {
-    width: 20px;
-    height: 20px;
-    stroke-width: 1.8;
-  }
-
-  /* Search button — same padding as mobile nav pill */
-  .nav-extra-btn {
-    padding: 4px;
-    flex-shrink: 0;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.16);
-    border: 1px solid rgba(255,255,255,0.7);
-  }
-  .nav-extra-btn .search-icon-wrap {
-    padding: 7px 8px;
-  }
-  .nav-extra-btn i[data-lucide] { width: 20px; height: 20px; }
-  body.dark-mode .nav-extra-btn {
-    background: rgba(28,28,28,0.92);
-    border-color: rgba(255,255,255,0.1);
-  }
-
-  /* ── Cards ── */
-  .card { padding: 14px; border-radius: 14px; margin-bottom: 12px; }
-  .card-title { font-size: 11px; margin-bottom: 1rem; }
-
-  /* ── Wallet grid ── */
-  .wallets-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .wallet-card { padding: 12px 10px; border-radius: 12px; }
-  .w-label { font-size: 10px; }
-  .w-name { font-size: 13px; margin-bottom: 4px; padding-right: 0; }
-  .w-balance { font-size: 17px; }
-  .w-type { font-size: 10px; margin-top: 4px; }
-  .wallet-card .actions { top: 6px; right: 6px; opacity: 1; }
-  .action-btn { width: 28px; height: 28px; min-height: 28px !important; padding: 0; }
-  .action-btn i { width: 14px; height: 14px; }
-
-  /* ── Summary metrics ── */
-  .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
-  .metric { padding: 12px; border-radius: 12px; }
-  .metric-label { font-size: 10px; }
-  .metric-value { font-size: 17px; }
-
-  /* ── Forms ── */
-  .form-row { flex-direction: column; gap: 10px; }
-  .field { min-width: 100% !important; max-width: 100% !important; }
-  .field label { font-size: 12px; }
-  .field input, .field select { padding: 10px 12px; border-radius: 10px; }
-  .transfer-arrow { transform: rotate(90deg); align-self: center; padding: 6px 0; color: var(--text2); }
-
-  /* ── Buttons ── */
-  .btn-row { flex-direction: column; gap: 8px; }
-  .btn-row .btn { width: 100%; justify-content: center; padding: 12px 16px; font-size: 14px; }
-  .btn { font-size: 13px; }
-
-  /* ── Transactions list ── */
-  .entry { padding: 10px 0; gap: 8px; }
-  .entry-icon { width: 34px; height: 34px; font-size: 14px; border-radius: 10px; }
-  .entry-desc { font-size: 14px; }
-  .entry-meta { font-size: 11px; }
-  .entry-amount { font-size: 14px; }
-
-  /* ── Section sub-tabs ── */
-  .section-tabs { gap: 4px; margin-bottom: 1rem; }
-  .section-tab { padding: 6px 12px; font-size: 12px; }
-
-  /* ── Modals ── */
-  .modal { padding: 1.25rem; border-radius: 16px; }
-  .modal-title { font-size: 16px; margin-bottom: 1rem; }
-
-  /* ── Debt cards ── */
-  .debt-card { padding: 12px; gap: 10px; }
-  .debt-name { font-size: 14px; }
-  .debt-type-badge { font-size: 10px; padding: 3px 8px; }
-  .meta-chip { font-size: 11px; padding: 4px 8px; }
-
-  /* ── Charts ── */
-  .chart-wrap { height: 200px; }
-}
-
-/* ── Small phones (≤390px) ── */
-@media (max-width: 390px) {
-  .nav-tab { font-size: 9px; padding: 6px 2px; }
-  .nav-tab i[data-lucide] { width: 19px; height: 19px; }
-  .w-balance { font-size: 15px; }
-  .metric-value { font-size: 15px; }
-  .app-title { font-size: 15px; }
+  .app { padding: 1rem 1rem 7rem; }
+  .top-bar { flex-direction: row; margin-bottom: 1rem; padding: 0; }
+  .app-title { font-size: 22px; }
+  .top-right { width: 100%; justify-content: space-between; gap: 6px; }
+  select.ctrl { flex: 1; min-width: 90px; }
+  .wallets-grid, .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .wallet-card { padding: 1rem; }
+  .w-balance { font-size: 22px; }
+  .form-row { flex-direction: column; align-items: stretch; margin-bottom: 10px; }
+  .btn-row .btn { width: 100%; }
+  
+  .modal-overlay { padding: 1rem; align-items: flex-end; }
+  .modal { padding: 1.5rem; border-radius: 24px 24px 12px 12px; margin-bottom: env(safe-area-inset-bottom); }
+  
+  .bottom-floating-area { width: calc(100% - 16px); padding: 0; }
 }
 
 /* ── Search Modal ── */
-.search-modal-box {
-  background: var(--surface);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 560px;
-  max-height: 82vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-  animation: slideUp 0.25s ease;
-}
-.search-input-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--border);
-}
-#search-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  font-family: 'DM Sans', sans-serif;
-  color: var(--text);
-  outline: none;
-  min-width: 0;
-}
+.search-modal-box { background: var(--surface); border-radius: 20px; width: 100%; max-width: 560px; max-height: 82vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-md); animation: slideUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); border: 1px solid rgba(255,255,255,0.1); }
+.search-input-row { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 0.5px solid var(--border); }
+#search-input { flex: 1; border: none; background: transparent; font-size: 18px; font-family: inherit; color: var(--text); outline: none; min-width: 0; font-weight: 500; }
 #search-input::placeholder { color: var(--text3); }
-.search-close-btn {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  width: 30px; height: 30px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text2); flex-shrink: 0;
-  transition: 0.2s;
-}
-.search-close-btn i { width: 15px; height: 15px; }
-.search-close-btn:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-mid); }
-.search-filters {
-  display: flex;
-  gap: 6px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  overflow-x: auto;
-  scrollbar-width: none;
-  flex-shrink: 0;
-}
+.search-close-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); flex-shrink: 0; transition: 0.2s; }
+.search-close-btn:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-mid); transform: scale(1.05); }
+.search-filters { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 0.5px solid var(--border); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
 .search-filters::-webkit-scrollbar { display: none; }
-.search-filter {
-  padding: 5px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text2);
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'DM Sans', sans-serif;
-  cursor: pointer;
-  white-space: nowrap;
-  display: flex; align-items: center; gap: 5px;
-  transition: 0.2s;
-}
-.search-filter i { width: 14px; height: 14px; }
-.search-filter:hover { background: var(--bg); color: var(--text); }
+.search-filter { padding: 6px 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--bg); color: var(--text2); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
 .search-filter.active { background: var(--text); color: var(--surface); border-color: var(--text); }
 .search-results { overflow-y: auto; flex: 1; padding: 8px 0; }
-.search-empty {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 12px; padding: 48px 20px; color: var(--text3); font-size: 14px;
-}
-.search-section-label {
-  font-size: 11px; font-weight: 700; color: var(--text3);
-  text-transform: uppercase; letter-spacing: .08em; padding: 10px 18px 4px;
-}
-.search-result-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 18px; cursor: pointer; transition: background 0.15s;
-  border-radius: 10px; margin: 0 6px;
-}
+.search-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 48px 20px; color: var(--text3); font-size: 15px; }
+.search-section-label { font-size: 12px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; padding: 14px 20px 6px; }
+.search-result-item { display: flex; align-items: center; gap: 14px; padding: 12px 20px; cursor: pointer; transition: background 0.15s; border-radius: 12px; margin: 0 8px; }
 .search-result-item:hover { background: var(--bg); }
-.search-result-icon {
-  width: 38px; height: 38px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.search-result-icon i { width: 18px; height: 18px; }
+.search-result-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sri-income { background: var(--green-bg); color: var(--green); }
 .sri-expense { background: var(--red-bg); color: var(--red); }
 .sri-transfer { background: var(--blue-bg); color: var(--blue); }
 .sri-wallet { background: var(--purple-bg); color: var(--purple); }
 .sri-debt { background: var(--amber-bg); color: var(--amber); }
 .search-result-body { flex: 1; min-width: 0; }
-.search-result-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.search-result-title mark { background: var(--amber-bg); color: var(--amber); border-radius: 3px; padding: 0 2px; font-style: normal; }
-.search-result-meta { font-size: 12px; color: var(--text3); margin-top: 2px; }
-.search-result-amount { font-size: 14px; font-weight: 700; font-family: 'DM Mono', monospace; white-space: nowrap; flex-shrink: 0; }
+.search-result-title { font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.2px; }
+.search-result-title mark { background: var(--amber-bg); color: var(--amber); border-radius: 3px; padding: 0 2px; }
+.search-result-meta { font-size: 13px; color: var(--text3); margin-top: 4px; font-weight: 500; }
+.search-result-amount { font-size: 16px; font-weight: 700; font-family: ui-monospace, monospace; white-space: nowrap; flex-shrink: 0; }
 .amt-income { color: var(--green); }
 .amt-expense { color: var(--red); }
-.search-no-results { text-align: center; padding: 32px; color: var(--text3); font-size: 14px; }
-@media (max-width: 600px) {
-  .search-modal-box { border-radius: 16px; max-height: 88vh; }
-  #search-input { font-size: 15px; }
-}
 </style>
 </head>
 <body>
@@ -553,16 +326,12 @@ body.dark-mode { --calendar-filter: invert(1); }
   <div class="top-bar">
     <div class="app-title">Finance Tracker</div>
     <div class="top-right">
-
-      <!-- ضفنا الديف ده عشان نجمعهم مع بعض بمسافة صغيرة -->
       <div style="display: flex; gap: 6px;">
         <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode"><i id="theme-icon" data-lucide="moon"></i></button>
         <button class="icon-btn" onclick="toggleHide()" title="Hide/Show Balance"><i id="eye-icon" data-lucide="eye"></i></button>
       </div>
-
-      <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()" style="min-width:130px; white-space:nowrap;"><i data-lucide="cloud" style="width:16px;"></i> Sync Drive</button>
-      <div class="save-indicator"><div class="save-dot" id="save-dot"></div><span id="save-label" style="font-size:12px;color:var(--text3);">Saved</span></div>
-
+      <button id="auth_button" class="btn b-btn sm" onclick="handleAuthClick()" style="min-width:110px; white-space:nowrap;"><i data-lucide="cloud" style="width:16px;"></i> Sync Drive</button>
+      <div class="save-indicator"><div class="save-dot" id="save-dot"></div><span id="save-label" style="display:none;">Saved</span></div>
       <select class="ctrl" id="currency-select" onchange="changeCurrency()">
         <option value="EGP">E£ EGP</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option>
         <option value="GBP">£ GBP</option><option value="SAR">﷼ SAR</option><option value="AED">د.إ AED</option>
@@ -571,16 +340,21 @@ body.dark-mode { --calendar-filter: invert(1); }
     </div>
   </div>
 
-  <div class="nav-wrapper">
-    <div class="nav-tabs">
+  <!-- iOS 16 Style Isolated Floating Nav Layout -->
+  <div class="bottom-floating-area">
+    <div class="nav-tabs pill">
       <button class="nav-tab active" onclick="showPage('wallets')"><i data-lucide="wallet"></i> Wallets</button>
       <button class="nav-tab" onclick="showPage('transactions')"><i data-lucide="list"></i> Txns</button>
       <button class="nav-tab" onclick="showPage('debts')"><i data-lucide="banknote"></i> Debts</button>
       <button class="nav-tab" onclick="showPage('budget')"><i data-lucide="pie-chart"></i> Budget</button>
       <button class="nav-tab" onclick="showPage('chart')"><i data-lucide="bar-chart-2"></i> Chart</button>
-      <button class="nav-tab" onclick="showPage('data')" id="nav-data-btn"><i data-lucide="database"></i> Data</button>
+      <!-- Data button restored (removed display: none) -->
+      <button class="nav-tab" onclick="showPage('data')"><i data-lucide="database"></i> Data</button>
     </div>
-    <button class="nav-extra-btn" onclick="openSearch()" id="nav-search-btn" title="Search"><div class="search-icon-wrap"><i data-lucide="search"></i></div></button>
+    
+    <button class="search-fab" onclick="openSearch()" title="Search">
+      <i data-lucide="search"></i>
+    </button>
   </div>
 
   <div id="page-wallets">
@@ -589,169 +363,163 @@ body.dark-mode { --calendar-filter: invert(1); }
       <div class="card-title"><i data-lucide="plus-circle"></i> Add or withdraw money</div>
       <div class="form-row">
         <div class="field"><label>Wallet</label><select id="aw-wallet"></select></div>
-        <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="aw-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Amount</label><input type="number" id="aw-amount" placeholder="0.00" min="0" step="0.01"/></div>
         <div class="field"><label>Note (optional)</label><input type="text" id="aw-note" placeholder="e.g. ATM..."/></div>
       </div>
       <div class="btn-row">
-        <button class="btn g-btn" onclick="walletOp('add')"><i data-lucide="plus"></i> Add money</button>
-        <button class="btn r-btn" onclick="walletOp('withdraw')"><i data-lucide="minus"></i> Withdraw</button>
+        <button class="btn g-btn" onclick="walletOp('add')">Add money</button>
+        <button class="btn r-btn" onclick="walletOp('withdraw')">Withdraw</button>
       </div>
     </div>
     <div class="card">
       <div class="card-title"><i data-lucide="arrow-right-left"></i> Transfer between wallets</div>
       <div class="form-row">
         <div class="field"><label>From</label><select id="tf-from"></select></div>
-        <div class="transfer-arrow"><i data-lucide="arrow-right"></i></div>
         <div class="field"><label>To</label><select id="tf-to"></select></div>
-        <div class="field" style="max-width:160px;"><label>Amount</label><input type="number" id="tf-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Amount</label><input type="number" id="tf-amount" placeholder="0.00" min="0" step="0.01"/></div>
         <div class="field"><label>Note</label><input type="text" id="tf-note" placeholder="Transfer note..."/></div>
       </div>
-      <div class="btn-row"><button class="btn b-btn" onclick="doTransfer()"><i data-lucide="arrow-right"></i> Transfer</button></div>
+      <div class="btn-row"><button class="btn b-btn" onclick="doTransfer()">Transfer</button></div>
     </div>
     <div class="card">
       <div class="card-title"><i data-lucide="history"></i> Wallet history</div>
-      <div class="entries-wrap" id="wallet-history"><div class="empty">No wallet transactions yet.</div></div>
+      <div class="entries-wrap" id="wallet-history"><div class="empty" style="color:var(--text3); font-size:15px;">No wallet transactions yet.</div></div>
     </div>
   </div>
 
   <div id="page-transactions" style="display:none;">
     <div class="summary-grid">
-      <div class="metric"><div class="metric-label">Total income</div><div class="metric-value g" id="total-income">0</div></div>
-      <div class="metric"><div class="metric-label">Total expenses</div><div class="metric-value r" id="total-expense">0</div></div>
+      <div class="metric"><div class="metric-label">Total income</div><div class="metric-value" id="total-income" style="color:var(--green);">0</div></div>
+      <div class="metric"><div class="metric-label">Total expenses</div><div class="metric-value" id="total-expense" style="color:var(--red);">0</div></div>
       <div class="metric"><div class="metric-label">Net</div><div class="metric-value" id="net-balance">0</div></div>
     </div>
     <div class="card">
       <div class="card-title"><i data-lucide="plus-circle"></i> Add transaction</div>
       <div class="form-row">
         <div class="field"><label>Description</label><input type="text" id="tx-desc" placeholder="e.g. Groceries..."/></div>
-        <div class="field" style="max-width:150px;"><label>Amount</label><input type="number" id="tx-amount" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field" style="max-width:150px;"><label>Wallet</label><select id="tx-wallet"></select></div>
-        <div class="field" style="max-width:150px;"><label>Category</label>
+        <div class="field"><label>Amount</label><input type="number" id="tx-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Wallet</label><select id="tx-wallet"></select></div>
+        <div class="field"><label>Category</label>
           <select id="tx-cat"><option>Food</option><option>Transport</option><option>Housing</option><option>Health</option><option>Entertainment</option><option>Shopping</option><option>Utilities</option><option>Education</option><option>Savings</option><option>Salary</option><option>Freelance</option><option>Other</option></select>
         </div>
-        <div class="field" style="max-width:160px;"><label>Month</label><input type="month" id="tx-month"/></div>
+        <div class="field"><label>Month</label><input type="month" id="tx-month"/></div>
       </div>
       <div class="btn-row">
-        <button class="btn g-btn" onclick="addTx('income')"><i data-lucide="arrow-up"></i> Income</button>
-        <button class="btn r-btn" onclick="addTx('expense')"><i data-lucide="arrow-down"></i> Expense</button>
+        <button class="btn g-btn" onclick="addTx('income')">Income</button>
+        <button class="btn r-btn" onclick="addTx('expense')">Expense</button>
       </div>
     </div>
     <div class="card">
-      <div class="month-filter">
-        <label>Filter:</label>
-        <select class="ctrl" id="month-filter-select" onchange="renderTxList()"><option value="all">All months</option></select>
-      </div>
       <div class="section-tabs">
         <button class="section-tab active" id="stab-all" onclick="filterTx('all')">All</button>
         <button class="section-tab" id="stab-income" onclick="filterTx('income')">Income</button>
         <button class="section-tab" id="stab-expense" onclick="filterTx('expense')">Expenses</button>
       </div>
-      <div class="entries-wrap" id="tx-list"><div class="empty">No transactions yet.</div></div>
+      <div class="month-filter">
+        <select class="ctrl" id="month-filter-select" onchange="renderTxList()" style="width:100%;"><option value="all">All months</option></select>
+      </div>
+      <div class="entries-wrap" id="tx-list"><div class="empty" style="color:var(--text3); font-size:15px;">No transactions yet.</div></div>
     </div>
   </div>
 
   <div id="page-debts" style="display:none;">
     <div class="summary-grid">
-      <div class="metric"><div class="metric-label">I owe</div><div class="metric-value r" id="total-owe">0</div></div>
-      <div class="metric"><div class="metric-label">Owed to me</div><div class="metric-value g" id="total-owed">0</div></div>
+      <div class="metric"><div class="metric-label">I owe</div><div class="metric-value" id="total-owe" style="color:var(--red);">0</div></div>
+      <div class="metric"><div class="metric-label">Owed to me</div><div class="metric-value" id="total-owed" style="color:var(--green);">0</div></div>
       <div class="metric"><div class="metric-label">Installments</div><div class="metric-value" style="color:var(--purple);" id="total-install">0</div></div>
     </div>
-    <button class="btn p-btn" style="width:100%; margin-bottom:1.5rem; font-size:15px; padding:12px;" onclick="openDebtModal()"><i data-lucide="plus"></i> Add Debt or Installment</button>
-    <div id="debts-list"><div class="empty">No debts or installments yet.</div></div>
+    <button class="btn p-btn" style="width:100%; margin-bottom:1.5rem;" onclick="openDebtModal()">Add Debt or Installment</button>
+    <div id="debts-list"><div class="empty" style="color:var(--text3); font-size:15px; padding: 20px; text-align:center;">No debts or installments yet.</div></div>
   </div>
 
   <div id="page-budget" style="display:none;">
-    <div id="warn-box" class="warn-box"></div>
-    
-    <!-- Multi-Goal Tracker Widget -->
-    <div class="card" style="margin-bottom: 1rem;">
-      <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <span style="display: flex; align-items: center; gap: 6px;"><i data-lucide="target"></i> Financial Goals</span>
-        <button class="btn sm b-btn" onclick="openGoalModal()" style="padding: 4px 10px;"><i data-lucide="plus" style="width: 14px;"></i> Add Goal</button>
-      </div>
-      <div id="goals-list"><div class="empty">No goals set yet. Click Add to create one.</div></div>
-    </div>
-
-    <div id="budget-bar-wrap" style="display:none;" class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-weight:600;font-size:14px;"><i data-lucide="pie-chart" style="width:16px; margin-right:4px;"></i> Monthly expense budget</span>
-        <span id="budget-bar-label" style="font-weight:600;font-family:'DM Mono',monospace;font-size:14px;"></span>
-      </div>
-      <div style="background:var(--border);border-radius:999px;height:8px;overflow:hidden;"><div id="budget-bar-fill" style="height:100%;border-radius:999px;transition:width .4s;background:var(--green-mid);width:0%;"></div></div>
-      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:13px;color:var(--text3); font-weight: 500;">
-        <span id="budget-spent-label"></span><span id="budget-remaining-label"></span>
-      </div>
-    </div>
+    <div id="warn-box" class="warn-box" style="padding: 14px; border-radius: var(--radius); margin-bottom: 1.25rem; font-size: 15px; font-weight: 600; display: none;"></div>
     
     <div class="card">
+      <div class="card-title" style="justify-content: space-between; width: 100%;">
+        <span style="display: flex; align-items: center; gap: 8px;"><i data-lucide="target"></i> Financial Goals</span>
+        <button class="btn sm b-btn" onclick="openGoalModal()">Add Goal</button>
+      </div>
+      <div id="goals-list"><div class="empty" style="color:var(--text3); font-size:15px;">No goals set yet. Click Add to create one.</div></div>
+    </div>
+
+    <div class="card">
       <div class="card-title"><i data-lucide="settings"></i> Set Expense Budget</div>
+      <div id="budget-bar-wrap" style="display:none; margin-bottom: 1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-weight:600;font-size:15px;">Monthly expense budget</span>
+          <span id="budget-bar-label" style="font-weight:700;font-size:15px; font-family: ui-monospace, monospace;"></span>
+        </div>
+        <div class="debt-progress-bg"><div id="budget-bar-fill" class="debt-progress-fill" style="background:var(--green-mid); width:0%;"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:14px;color:var(--text2); font-weight:600;">
+          <span id="budget-spent-label"></span><span id="budget-remaining-label"></span>
+        </div>
+      </div>
       <div class="form-row">
         <div class="field"><label>Monthly limit</label><input type="number" id="budget-input" placeholder="Enter amount..." min="0" step="1"/></div>
-        <button class="btn b-btn" style="align-self:flex-end;" onclick="setBudget()">Set Budget</button>
-        <button class="btn sm" style="align-self:flex-end;color:var(--text3);" onclick="clearBudget()"><i data-lucide="x"></i> Clear</button>
+        <button class="btn b-btn" onclick="setBudget()">Set Budget</button>
+        <button class="btn sm" style="color:var(--red); border-color: transparent; background: transparent; box-shadow: none;" onclick="clearBudget()"><i data-lucide="x"></i> Clear</button>
       </div>
     </div>
     
     <div class="card">
       <div class="card-title"><i data-lucide="briefcase"></i> Income sources</div>
-      <div class="form-row" style="margin-bottom:12px;">
+      <div class="form-row" style="margin-bottom:16px;">
         <div class="field"><label>Source name</label><input type="text" id="src-name" placeholder="e.g. Main job..."/></div>
-        <div class="field" style="max-width:140px;"><label>Type</label>
+        <div class="field"><label>Type</label>
           <select id="src-type"><option>Salary</option><option>Freelance</option><option>Business</option><option>Rental</option><option>Investment</option><option>Pension</option><option>Gift</option><option>Other</option></select>
         </div>
-        <div class="field" style="max-width:150px;"><label>Monthly amount</label><input type="number" id="src-amount" placeholder="0.00" min="0" step="0.01"/></div>
-        <div class="field" style="max-width:150px;"><label>Into wallet</label><select id="src-wallet"></select></div>
-        <button class="btn g-btn" style="align-self:flex-end;" onclick="addSource()"><i data-lucide="plus"></i> Add Source</button>
+        <div class="field"><label>Monthly amount</label><input type="number" id="src-amount" placeholder="0.00" min="0" step="0.01"/></div>
+        <div class="field"><label>Into wallet</label><select id="src-wallet"></select></div>
+        <button class="btn g-btn" onclick="addSource()">Add Source</button>
       </div>
-      <div id="sources-list"><div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div></div>
+      <div id="sources-list"><div class="empty" style="color:var(--text3); font-size:15px;">No income sources yet.</div></div>
     </div>
   </div>
 
   <div id="page-chart" style="display:none;">
     <div class="card">
       <div class="card-title"><i data-lucide="trending-up"></i> Custom Timeline</div>
-      <div class="section-tabs" id="timeline-scale-tabs" style="margin-bottom: 1rem;">
+      <div class="section-tabs" id="timeline-scale-tabs">
         <button class="section-tab" onclick="changeTimelineScale('day')">Day</button>
         <button class="section-tab" onclick="changeTimelineScale('week')">Week</button>
         <button class="section-tab active" onclick="changeTimelineScale('month')">Month</button>
         <button class="section-tab" onclick="changeTimelineScale('year')">Year</button>
       </div>
-      <div class="form-row" style="margin-bottom: 14px; align-items: flex-end;">
-        <div class="field" style="flex:2;">
-          <label>Select metric to track</label>
-          <select id="timeline-select"></select>
-        </div>
+      <div class="form-row" style="margin-bottom: 16px; align-items: flex-end;">
+        <div class="field"><label>Select metric to track</label><select id="timeline-select"></select></div>
         <button class="btn b-btn" onclick="addTimelineMetric()"><i data-lucide="plus"></i> Add to Chart</button>
       </div>
-      <div id="timeline-chips" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;"></div>
-      <div class="chart-wrap"><canvas id="timeline-chart" role="img"></canvas></div>
+      <div id="timeline-chips" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;"></div>
+      <div class="chart-wrap"><canvas id="timeline-chart"></canvas></div>
     </div>
 
     <div class="card">
       <div class="card-title"><i data-lucide="bar-chart"></i> Income vs expenses by category</div>
-      <div class="chart-wrap"><canvas id="cat-chart" role="img" aria-label="Chart">Chart.</canvas></div>
+      <div class="chart-wrap"><canvas id="cat-chart"></canvas></div>
     </div>
     <div class="card">
       <div class="card-title"><i data-lucide="pie-chart"></i> Wallet balances</div>
-      <div class="chart-wrap"><canvas id="wallet-chart" role="img" aria-label="Wallets">Balances.</canvas></div>
+      <div class="chart-wrap"><canvas id="wallet-chart"></canvas></div>
     </div>
   </div>
 
+  <!-- Restore Data View -->
   <div id="page-data" style="display:none;">
     <div class="card">
-      <div class="card-title"><i data-lucide="save"></i> Backup data</div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">احفظ نسخة احتياطية من بياناتك في ملف خارجي.</p>
-      <button class="btn g-btn" onclick="exportData()"><i data-lucide="download"></i> Export backup</button>
+      <div class="card-title">Backup data</div>
+      <p style="font-size:15px;color:var(--text2);margin-bottom:16px; font-weight: 500;">احفظ نسخة احتياطية من بياناتك في ملف خارجي.</p>
+      <button class="btn g-btn" onclick="exportData()">Export backup</button>
     </div>
     <div class="card">
-      <div class="card-title"><i data-lucide="upload-cloud"></i> Restore data</div>
-      <p style="font-size:14px;color:var(--text2);margin-bottom:14px;">استرجع بياناتك من ملف قمت بحفظه مسبقاً.</p>
-      <button class="btn b-btn" onclick="document.getElementById('import-input').click()"><i data-lucide="upload"></i> Import backup</button>
+      <div class="card-title">Restore data</div>
+      <p style="font-size:15px;color:var(--text2);margin-bottom:16px; font-weight: 500;">استرجع بياناتك من ملف قمت بحفظه مسبقاً.</p>
+      <button class="btn b-btn" onclick="document.getElementById('import-input').click()">Import backup</button>
       <input type="file" id="import-input" accept=".json" style="display:none;" onchange="importData(event)"/>
     </div>
     <div class="card">
-      <div class="card-title" style="color:var(--red);"><i data-lucide="alert-triangle"></i> Danger zone</div>
-      <button class="btn danger" onclick="confirmClearAll()"><i data-lucide="trash-2"></i> Clear all data</button>
+      <div class="card-title" style="color:var(--red);">Danger zone</div>
+      <button class="btn danger" onclick="confirmClearAll()">Clear all data</button>
     </div>
   </div>
 </div>
@@ -760,18 +528,18 @@ body.dark-mode { --calendar-filter: invert(1); }
 <div class="modal-overlay" id="search-modal" onclick="handleSearchOverlayClick(event)">
   <div class="search-modal-box">
     <div class="search-input-row">
-      <i data-lucide="search" style="width:20px;height:20px;color:var(--text3);flex-shrink:0;"></i>
+      <i data-lucide="search" style="color:var(--text3);"></i>
       <input type="text" id="search-input" placeholder="Search transactions, wallets, debts…" oninput="runSearch()" autocomplete="off" autocorrect="off" spellcheck="false"/>
       <button class="search-close-btn" onclick="closeSearch()"><i data-lucide="x"></i></button>
     </div>
     <div id="search-filters" class="search-filters">
       <button class="search-filter active" data-filter="all" onclick="setSearchFilter('all')">All</button>
-      <button class="search-filter" data-filter="transactions" onclick="setSearchFilter('transactions')"><i data-lucide="list"></i> Transactions</button>
-      <button class="search-filter" data-filter="wallets" onclick="setSearchFilter('wallets')"><i data-lucide="wallet"></i> Wallets</button>
-      <button class="search-filter" data-filter="debts" onclick="setSearchFilter('debts')"><i data-lucide="banknote"></i> Debts</button>
+      <button class="search-filter" data-filter="transactions" onclick="setSearchFilter('transactions')">Transactions</button>
+      <button class="search-filter" data-filter="wallets" onclick="setSearchFilter('wallets')">Wallets</button>
+      <button class="search-filter" data-filter="debts" onclick="setSearchFilter('debts')">Debts</button>
     </div>
     <div id="search-results" class="search-results">
-      <div class="search-empty"><i data-lucide="search" style="width:36px;height:36px;opacity:.2;"></i><p>Start typing to search…</p></div>
+      <div class="search-empty"><i data-lucide="search" style="width:48px;height:48px;opacity:.2;"></i><p>Start typing to search…</p></div>
     </div>
   </div>
 </div>
@@ -781,7 +549,7 @@ body.dark-mode { --calendar-filter: invert(1); }
   <div class="modal">
     <div class="modal-title" id="wallet-modal-title">Add new wallet</div>
     <div class="form-row" style="flex-direction:column; align-items:stretch;">
-      <div class="field"><label>Wallet name</label><input type="text" id="wm-name" placeholder="e.g. Cash, CIB Visa..."/></div>
+      <div class="field"><label>Wallet name</label><input type="text" id="wm-name" placeholder="e.g. Cash, Visa..."/></div>
       <div class="field"><label>Type</label>
         <select id="wm-type"><option value="Cash">Cash</option><option value="Debit card">Debit card</option><option value="Credit card">Credit card</option><option value="Savings">Savings</option><option value="E-wallet">E-wallet</option><option value="Other">Other</option></select>
       </div>
@@ -797,8 +565,8 @@ body.dark-mode { --calendar-filter: invert(1); }
       <div class="field"><label>Color</label><div class="color-picker-row" id="color-picker"></div></div>
     </div>
     <div class="modal-footer">
-      <button class="btn sm" onclick="closeWalletModal()">Cancel</button>
-      <button class="btn g-btn" id="wallet-save-btn" onclick="saveWallet()">Save</button>
+      <button class="btn sm" style="background:transparent; box-shadow:none;" onclick="closeWalletModal()">Cancel</button>
+      <button class="btn g-btn sm" id="wallet-save-btn" onclick="saveWallet()">Save</button>
     </div>
   </div>
 </div>
@@ -811,22 +579,22 @@ body.dark-mode { --calendar-filter: invert(1); }
       <div class="field"><label>Type</label>
         <select id="dm-type"><option value="owe">I owe</option><option value="owed">Owed to me</option><option value="install">Installment</option></select>
       </div>
-      <div class="form-row" style="margin:0; gap:12px;">
+      <div class="form-row" style="margin:0;">
         <div class="field"><label>Total Amount</label><input type="number" id="dm-total" placeholder="0.00" min="0" step="0.01"/></div>
         <div class="field"><label>Paid So Far</label><input type="number" id="dm-paid" placeholder="0.00" min="0" step="0.01" value="0"/></div>
       </div>
-      <div class="form-row" style="margin:0; gap:12px;">
+      <div class="form-row" style="margin:0;">
         <div class="field"><label>Monthly Payment</label><input type="number" id="dm-monthly" placeholder="0.00" min="0" step="0.01"/></div>
         <div class="field"><label>Wallet</label><select id="dm-wallet"></select></div>
       </div>
-      <div class="form-row" style="margin:0; gap:12px;">
+      <div class="form-row" style="margin:0;">
         <div class="field"><label>Start Date</label><input type="date" id="dm-start"/></div>
         <div class="field"><label>Due Date</label><input type="date" id="dm-due"/></div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn sm" onclick="closeDebtModal()">Cancel</button>
-      <button class="btn p-btn" id="debt-save-btn" onclick="saveDebt()">Save</button>
+      <button class="btn sm" style="background:transparent; box-shadow:none;" onclick="closeDebtModal()">Cancel</button>
+      <button class="btn p-btn sm" id="debt-save-btn" onclick="saveDebt()">Save</button>
     </div>
   </div>
 </div>
@@ -839,8 +607,8 @@ body.dark-mode { --calendar-filter: invert(1); }
       <div class="field"><label>From wallet</label><select id="pm-wallet"></select></div>
     </div>
     <div class="modal-footer">
-      <button class="btn sm" onclick="closePayModal()">Cancel</button>
-      <button class="btn g-btn" onclick="confirmPay()">Confirm Pay</button>
+      <button class="btn sm" style="background:transparent; box-shadow:none;" onclick="closePayModal()">Cancel</button>
+      <button class="btn g-btn sm" onclick="confirmPay()">Confirm Pay</button>
     </div>
   </div>
 </div>
@@ -849,16 +617,16 @@ body.dark-mode { --calendar-filter: invert(1); }
   <div class="modal">
     <div class="modal-title" id="goal-modal-title">Add Goal</div>
     <div class="form-row" style="flex-direction:column; align-items:stretch;">
-      <div class="field"><label>Goal Name</label><input type="text" id="gm-name" placeholder="e.g. New Laptop, Vacation..."/></div>
-      <div class="form-row" style="margin:0; gap:12px;">
+      <div class="field"><label>Goal Name</label><input type="text" id="gm-name" placeholder="e.g. New Laptop..."/></div>
+      <div class="form-row" style="margin:0;">
         <div class="field"><label>Target Amount</label><input type="number" id="gm-target" placeholder="0.00" min="0" step="0.01"/></div>
         <div class="field"><label>Saved So Far</label><input type="number" id="gm-saved" placeholder="0.00" min="0" step="0.01" value="0"/></div>
       </div>
       <div class="field"><label>Color</label><div class="color-picker-row" id="goal-color-picker"></div></div>
     </div>
     <div class="modal-footer">
-      <button class="btn sm" onclick="closeGoalModal()">Cancel</button>
-      <button class="btn b-btn" id="goal-save-btn" onclick="saveGoal()">Save</button>
+      <button class="btn sm" style="background:transparent; box-shadow:none;" onclick="closeGoalModal()">Cancel</button>
+      <button class="btn b-btn sm" id="goal-save-btn" onclick="saveGoal()">Save</button>
     </div>
   </div>
 </div>
@@ -919,14 +687,13 @@ async function initializeDriveFile() {
             await loadFromDrive();
         }
         sessionStorage.setItem('drive_synced', 'true');
-        btn.innerHTML = '<i data-lucide="cloud-upload" style="width:16px;"></i> Update Drive';
+        btn.innerHTML = '<i data-lucide="cloud-upload" style="width:16px;"></i> Update';
         btn.className = 'btn b-btn sm';
         btn.onclick = saveToDrive;
         lucide.createIcons();
     } catch (e) {
-        btn.innerHTML = '<i data-lucide="alert-circle" style="width:16px;"></i> Auth Error';
+        btn.innerHTML = 'Auth Error';
         btn.className = 'btn r-btn sm';
-        lucide.createIcons();
     }
 }
 
@@ -951,10 +718,8 @@ async function saveToDrive() {
             if (resp.result.files.length > 0) driveFileId = resp.result.files[0].id;
         }
         
-        // حالة جاري الحفظ
-        btn.innerHTML = '<i data-lucide="loader" style="width:16px;"></i> Saving...';
+        btn.innerHTML = 'Saving...';
         btn.className = 'btn sm';
-        lucide.createIcons();
         
         const fileContent = JSON.stringify(S);
 
@@ -976,15 +741,12 @@ async function saveToDrive() {
             driveFileId = result.id;
         }
         
-        // حالة تم الحفظ بنجاح
-        btn.innerHTML = '<i data-lucide="check-circle" style="width:16px;"></i> Synced';
+        btn.innerHTML = '<i data-lucide="check" style="width:16px;"></i> Synced';
         btn.className = 'btn g-btn sm';
         lucide.createIcons();
     } catch (error) {
-        // حالة الخطأ
-        btn.innerHTML = '<i data-lucide="alert-circle" style="width:16px;"></i> Error';
-        btn.className = 'btn r-btn sm'; // لون أحمر للخطأ
-        lucide.createIcons();
+        btn.innerHTML = 'Error';
+        btn.className = 'btn r-btn sm';
     }
 }
 
@@ -996,7 +758,6 @@ async function loadFromDrive() {
 // --- App Logic ---
 const SYMS={EGP:'E£',USD:'$',EUR:'€',GBP:'£',SAR:'﷼',AED:'د.إ',JPY:'¥',INR:'₹',CAD:'C$',AUD:'A$'};
 
-// Updated WALLET_COLORS
 const WALLET_COLORS=[
   {name:'Forest',grad:'linear-gradient(135deg,#1a6b4a,#0f4a33)',hex:'#1a6b4a'},
   {name:'Navy',grad:'linear-gradient(135deg,#1a3a8a,#0d2460)',hex:'#1a3a8a'},
@@ -1057,10 +818,10 @@ async function dbSet(key,val){
 }
 
 function setSaveStatus(status){
-  const dot=document.getElementById('save-dot'),lbl=document.getElementById('save-label');
-  if(status==='saving'){dot.className='save-dot saving';lbl.textContent='Saving...';}
-  else if(status==='saved'){dot.className='save-dot';lbl.textContent='Saved';}
-  else{dot.className='save-dot error';lbl.textContent='Error';}
+  const dot=document.getElementById('save-dot');
+  if(status==='saving'){dot.className='save-dot saving';}
+  else if(status==='saved'){dot.className='save-dot';}
+  else{dot.className='save-dot error';}
 }
 
 function scheduleSave(){
@@ -1072,8 +833,8 @@ function scheduleSave(){
       setSaveStatus('saved');
       if (window.gapi && gapi.client && gapi.client.getToken()) {
           const btn = document.getElementById('auth_button');
-          btn.innerHTML = '<i data-lucide="cloud-upload" style="width:16px;"></i> Update Drive';
-          btn.className = 'btn b-btn sm'; // يرجع الزرار لونه أزرق يطلب التحديث
+          btn.innerHTML = '<i data-lucide="cloud-upload" style="width:16px;"></i> Update';
+          btn.className = 'btn b-btn sm'; 
           btn.onclick = saveToDrive;
           lucide.createIcons();
       }
@@ -1127,7 +888,7 @@ function nowMonth(){return new Date().toISOString().slice(0,7);}
 function monthLabel(ym){if(!ym)return'';const[y,m]=ym.split('-');return MONTHS[parseInt(m)-1]+' '+y;}
 function wById(id){return S.wallets.find(w=>w.id===id);}
 function wName(id){const w=wById(id);return w?w.name:id;}
-function wBadge(id){const w=wById(id);if(!w)return'';return`<span style="display:inline-flex;font-size:10px;padding:2px 7px;border-radius:999px;font-weight:600;background:var(--border);color:var(--text2);">${w.name}</span>`;}
+function wBadge(id){const w=wById(id);if(!w)return'';return`<span style="display:inline-flex;font-size:12px;padding:4px 10px;border-radius:8px;font-weight:600;background:var(--border);color:var(--text);">${w.name}</span>`;}
 
 function parseLegacyDate(dStr) {
     if (!dStr || dStr.includes('-')) return dStr; 
@@ -1157,18 +918,17 @@ function openWalletModal(id = null){
         document.getElementById('wm-currency').value = w.currency || 'default';
         selectedColor = w.color || 0;
         document.getElementById('wallet-modal-title').innerText = 'Edit Wallet';
-        document.getElementById('wallet-save-btn').innerHTML = '<i data-lucide="save"></i> Save Changes';
+        document.getElementById('wallet-save-btn').innerText = 'Save Changes';
     } else {
         selectedColor = 0;
         document.getElementById('wm-name').value = '';
         document.getElementById('wm-balance').value = '0';
         document.getElementById('wm-currency').value = 'default';
         document.getElementById('wallet-modal-title').innerText = 'Add new wallet';
-        document.getElementById('wallet-save-btn').innerHTML = '<i data-lucide="plus"></i> Add wallet';
+        document.getElementById('wallet-save-btn').innerText = 'Add wallet';
     }
     renderColorPicker();
     document.getElementById('wallet-modal').classList.add('open');
-    lucide.createIcons();
 }
 
 function closeWalletModal(){ document.getElementById('wallet-modal').classList.remove('open'); }
@@ -1204,7 +964,7 @@ function openDebtModal(id = null) {
         document.getElementById('dm-start').value = d.startDate || parseLegacyDate(d.date) || new Date().toISOString().split('T')[0];
         document.getElementById('dm-due').value = d.dueDate || '';
         document.getElementById('debt-modal-title').innerText = 'Edit Debt';
-        document.getElementById('debt-save-btn').innerHTML = '<i data-lucide="save"></i> Save Changes';
+        document.getElementById('debt-save-btn').innerText = 'Save Changes';
     } else {
         document.getElementById('dm-name').value = '';
         document.getElementById('dm-type').value = 'owe';
@@ -1214,10 +974,9 @@ function openDebtModal(id = null) {
         document.getElementById('dm-start').value = new Date().toISOString().split('T')[0];
         document.getElementById('dm-due').value = '';
         document.getElementById('debt-modal-title').innerText = 'Add Debt / Installment';
-        document.getElementById('debt-save-btn').innerHTML = '<i data-lucide="check"></i> Save';
+        document.getElementById('debt-save-btn').innerText = 'Save';
     }
     document.getElementById('debt-modal').classList.add('open');
-    lucide.createIcons();
 }
 function closeDebtModal() { document.getElementById('debt-modal').classList.remove('open'); }
 
@@ -1367,18 +1126,17 @@ function openGoalModal(id = null) {
         document.getElementById('gm-saved').value = g.saved;
         selectedGoalColor = g.color || 0;
         document.getElementById('goal-modal-title').innerText = 'Edit Goal';
-        document.getElementById('goal-save-btn').innerHTML = '<i data-lucide="save"></i> Save';
+        document.getElementById('goal-save-btn').innerText = 'Save';
     } else {
         document.getElementById('gm-name').value = '';
         document.getElementById('gm-target').value = '';
         document.getElementById('gm-saved').value = '0';
         selectedGoalColor = 0;
         document.getElementById('goal-modal-title').innerText = 'Add Goal';
-        document.getElementById('goal-save-btn').innerHTML = '<i data-lucide="plus"></i> Add';
+        document.getElementById('goal-save-btn').innerText = 'Add';
     }
     renderGoalColorPicker();
     document.getElementById('goal-modal').classList.add('open');
-    lucide.createIcons();
 }
 
 function closeGoalModal() { document.getElementById('goal-modal').classList.remove('open'); }
@@ -1423,7 +1181,7 @@ function renderGoals() {
     if(!S.goals) S.goals = [];
     const el = document.getElementById('goals-list');
     if(!S.goals.length) {
-        el.innerHTML = '<div class="empty">No goals set yet. Click Add Goal to start saving.</div>';
+        el.innerHTML = '<div class="empty" style="color:var(--text3); font-size:14px; padding: 12px 0;">No goals set yet. Click Add Goal to start saving.</div>';
         return;
     }
     el.innerHTML = S.goals.map(g => {
@@ -1431,23 +1189,23 @@ function renderGoals() {
         let done = g.saved >= g.target;
         let c = WALLET_COLORS[g.color] || WALLET_COLORS[0];
         return `
-        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px dashed var(--border);">
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="font-weight:700; font-size:15px; display:flex; align-items:center; gap:6px;">
+                <span style="font-weight:700; font-size:16px; display:flex; align-items:center; gap:8px;">
                     ${g.name} ${done ? '<i data-lucide="check-circle-2" style="color:var(--green-mid); width:18px;"></i>' : ''}
                 </span>
-                <div style="display:flex; gap:6px;">
-                    <button class="btn sm g-btn" onclick="fundGoal(${g.id})" style="padding:4px 8px; font-size:12px;" title="Add Money"><i data-lucide="plus" style="width:14px;"></i></button>
-                    <button class="btn sm" onclick="openGoalModal(${g.id})" style="padding:4px 8px; font-size:12px;" title="Edit"><i data-lucide="pencil" style="width:14px;"></i></button>
-                    <button class="btn sm danger" onclick="deleteGoal(${g.id})" style="padding:4px 8px; font-size:12px;" title="Delete"><i data-lucide="trash-2" style="width:14px;"></i></button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn sm g-btn" onclick="fundGoal(${g.id})" style="padding:8px; font-size:12px;"><i data-lucide="plus" style="width:14px;"></i></button>
+                    <button class="btn sm" onclick="openGoalModal(${g.id})" style="padding:8px; font-size:12px; background:var(--bg); border-color:var(--border);"><i data-lucide="pencil" style="width:14px;"></i></button>
+                    <button class="btn sm danger" onclick="deleteGoal(${g.id})" style="padding:8px; font-size:12px;"><i data-lucide="trash-2" style="width:14px;"></i></button>
                 </div>
             </div>
-            <div style="width: 100%; background-color: var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 8px;">
-                <div style="width: ${pct}%; height: 100%; background: ${c.grad}; transition: width 0.4s ease; border-radius: 999px;"></div>
+            <div class="debt-progress-bg">
+                <div class="debt-progress-fill" style="width: ${pct}%; background: ${c.grad};"></div>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--text2); font-weight:600;">
-                <span>Saved: <span style="color:var(--text); font-family:'DM Mono',monospace;">${fmt(g.saved)}</span></span>
-                <span>Target: <span style="color:var(--text); font-family:'DM Mono',monospace;">${fmt(g.target)}</span></span>
+            <div style="display:flex; justify-content:space-between; font-size:14px; color:var(--text2); font-weight:600;">
+                <span>Saved: <span style="color:var(--text);">${fmt(g.saved)}</span></span>
+                <span>Target: <span style="color:var(--text);">${fmt(g.target)}</span></span>
             </div>
         </div>`;
     }).join('');
@@ -1517,18 +1275,18 @@ function renderWallets(){
     S.wallets.map(w=>`
       <div class="wallet-card" style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad};">
         <div class="actions">
-          <button class="action-btn" onclick="openWalletModal('${w.id}')" title="Edit"><i data-lucide="pencil" style="width:14px;"></i></button>
-          <button class="action-btn" onclick="deleteWallet('${w.id}')" title="Delete"><i data-lucide="x" style="width:16px;"></i></button>
+          <button class="action-btn" onclick="openWalletModal('${w.id}')"><i data-lucide="pencil" style="width:14px;"></i></button>
+          <button class="action-btn" onclick="deleteWallet('${w.id}')"><i data-lucide="x" style="width:16px;"></i></button>
         </div>
         <div class="w-label">Balance</div><div class="w-name">${w.name}</div>
         <div class="w-balance">${fmt(w.balance, w.currency)}</div><div class="w-type">${w.type}</div>
       </div>`).join('')+
-    `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px; height:28px;"></i><span>Add wallet</span></div>`;
+    `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:32px; height:32px;"></i><span>Add wallet</span></div>`;
 }
 
 function renderWalletHistory(){
   const el=document.getElementById('wallet-history');
-  if(!S.walletHistory.length){el.innerHTML='<div class="empty">No wallet transactions yet.</div>';return;}
+  if(!S.walletHistory.length){el.innerHTML='<div class="empty" style="color:var(--text3); font-size:15px; padding: 12px 0;">No wallet transactions yet.</div>';return;}
   el.innerHTML=S.walletHistory.map(h=>{
     let icon,amtStr,amtClass;
     const wCur = wById(h.wallet)?.currency;
@@ -1552,14 +1310,14 @@ function renderWalletHistory(){
 function renderSummary(){
   const inc=S.transactions.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0), exp=S.transactions.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0), net=inc-exp;
   document.getElementById('total-income').textContent=fmt(inc); document.getElementById('total-expense').textContent=fmt(exp);
-  const nb=document.getElementById('net-balance'); nb.textContent=(net<0?'−':'')+fmt(net); nb.className='metric-value '+(net>=0?'g':'r');
+  const nb=document.getElementById('net-balance'); nb.textContent=(net<0?'−':'')+fmt(net); nb.style.color=(net>=0?'var(--green)':'var(--text)');
 }
 
 function renderTxList(){
   const el=document.getElementById('tx-list'), mf=document.getElementById('month-filter-select').value;
   let list=txFilter==='all'?S.transactions:S.transactions.filter(t=>t.type===txFilter);
   if(mf!=='all')list=list.filter(t=>t.month===mf);
-  if(!list.length){el.innerHTML='<div class="empty">No transactions found.</div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty" style="color:var(--text3); font-size:15px; padding: 12px 0;">No transactions found.</div>';return;}
   const groups={}; list.forEach(t=>{const m=t.month||'Unknown';if(!groups[m])groups[m]=[];groups[m].push(t);});
   const sortedMonths=Object.keys(groups).sort().reverse();
   el.innerHTML=sortedMonths.map(m=>`
@@ -1582,11 +1340,11 @@ function renderDebts(){
   document.getElementById('total-owe').textContent=fmt(S.debts.filter(d=>d.type==='owe').reduce((s,d)=>s+(d.total-d.paid),0));
   document.getElementById('total-owed').textContent=fmt(S.debts.filter(d=>d.type==='owed').reduce((s,d)=>s+(d.total-d.paid),0));
   document.getElementById('total-install').textContent=fmt(S.debts.filter(d=>d.type==='install').reduce((s,d)=>s+(d.total-d.paid),0));
-  if(!S.debts.length){el.innerHTML='<div class="empty">No debts or installments yet.</div>';return;}
+  if(!S.debts.length){el.innerHTML='<div class="empty" style="color:var(--text3); font-size:15px; padding: 20px; text-align:center;">No debts or installments yet.</div>';return;}
   const typeLabels={owe:'I Owe',owed:'Owed to Me',install:'Installments'}; let html='';
   ['owe','owed','install'].forEach(type=>{
     const group=S.debts.filter(d=>d.type===type);if(!group.length)return;
-    html+=`<div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;">${typeLabels[type]}</div>`;
+    html+=`<div style="font-size:13px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin:20px 0 10px;">${typeLabels[type]}</div>`;
     group.forEach(d=>{
       const pct=Math.min((d.paid/d.total)*100,100), remaining=d.total-d.paid, done=remaining<=0;
       const barColor=type==='owe'?'var(--red-mid)':type==='owed'?'var(--green-mid)':'var(--purple-mid)';
@@ -1597,17 +1355,17 @@ function renderDebts(){
       html+=`<div class="debt-card">
         <div class="debt-header">
           <div style="flex:1;">
-            <div class="debt-name">${d.name}${done?' <i data-lucide="check-circle-2" style="color:var(--green-mid); width:18px;"></i>':''}</div>
+            <div class="debt-name">${d.name}${done?' <i data-lucide="check-circle-2" style="color:var(--green-mid); width:20px;"></i>':''}</div>
             <div class="debt-meta-row">
-                <div class="meta-chip"><i data-lucide="calendar"></i> ${startStr} <i data-lucide="arrow-right" style="width:12px;"></i> ${dueStr}</div>
-                ${d.monthly ? `<div class="meta-chip"><i data-lucide="credit-card"></i> ${fmt(d.monthly, wCur)} / mo</div>` : ''}
+                <div class="meta-chip"><i data-lucide="calendar" style="width:14px;"></i> ${startStr} <i data-lucide="arrow-right" style="width:12px;"></i> ${dueStr}</div>
+                ${d.monthly ? `<div class="meta-chip"><i data-lucide="credit-card" style="width:14px;"></i> ${fmt(d.monthly, wCur)} / mo</div>` : ''}
             </div>
           </div>
           <span class="debt-type-badge ${type}">${type==='owe'?'I owe':type==='owed'?'Owed to me':'Installment'}</span>
         </div>
         
         <div class="debt-progress-wrap">
-            <div class="debt-footer-text" style="margin-bottom:6px;">
+            <div class="debt-footer-text" style="margin-bottom:8px;">
               <span>Paid: <span class="main-val">${fmt(d.paid, wCur)}</span></span>
               <span>Total: <span class="main-val">${fmt(d.total, wCur)}</span></span>
             </div>
@@ -1616,10 +1374,10 @@ function renderDebts(){
         </div>
 
         <div class="debt-actions">
-          ${!done?`<button class="btn sm p-btn" onclick="openPayModal(${d.id})" style="flex:2;"><i data-lucide="banknote"></i> Pay</button>`:''}
-          ${!done?`<button class="btn sm" onclick="markDebtDone(${d.id})" style="color:var(--green);"><i data-lucide="check"></i> Done</button>`:''}
-          <button class="btn sm" onclick="openDebtModal(${d.id})"><i data-lucide="pencil"></i> Edit</button>
-          <button class="btn sm danger" onclick="deleteDebt(${d.id})"><i data-lucide="trash-2"></i></button>
+          ${!done?`<button class="btn sm p-btn" onclick="openPayModal(${d.id})" style="flex:2;"><i data-lucide="banknote" style="width:18px;"></i> Pay</button>`:''}
+          ${!done?`<button class="btn sm" onclick="markDebtDone(${d.id})" style="color:var(--green);"><i data-lucide="check" style="width:18px;"></i> Done</button>`:''}
+          <button class="btn sm" onclick="openDebtModal(${d.id})"><i data-lucide="pencil" style="width:16px;"></i> Edit</button>
+          <button class="btn sm danger" onclick="deleteDebt(${d.id})"><i data-lucide="trash-2" style="width:16px;"></i></button>
         </div>
       </div>`;
     });
@@ -1629,20 +1387,20 @@ function renderDebts(){
 
 function renderSources(){
   const el=document.getElementById('sources-list');
-  if(!S.sources.length){el.innerHTML='<div class="empty" style="padding:1rem 0;font-size:13px;">No income sources yet.</div>';return;}
-  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+  if(!S.sources.length){el.innerHTML='<div class="empty" style="color:var(--text3); font-size:15px; padding: 12px 0;">No income sources yet.</div>';return;}
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px; margin-top:16px;">
   ${S.sources.map(s=>`
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px; box-shadow: var(--shadow);">
-      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-        <span style="font-size:11px;font-weight:700;background:var(--green-bg);color:var(--green);padding:4px 8px;border-radius:999px;">${s.type}</span>
-        <button class="del-btn" onclick="deleteSrc(${s.id})" style="padding: 2px;"><i data-lucide="x"></i></button>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px; box-shadow: var(--shadow);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+        <span style="font-size:12px;font-weight:700;background:var(--green-bg);color:var(--green);padding:4px 10px;border-radius:8px;">${s.type}</span>
+        <button class="del-btn" onclick="deleteSrc(${s.id})" style="padding: 4px;"><i data-lucide="x"></i></button>
       </div>
-      <div style="font-size:14px;color:var(--text2);margin-bottom:6px; font-weight: 600;">${s.name}</div>
-      <div style="font-size:18px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;">${fmt(s.amount, wById(s.wallet)?.currency)}/mo</div>
+      <div style="font-size:15px;color:var(--text2);margin-bottom:6px; font-weight: 600;">${s.name}</div>
+      <div style="font-size:20px;font-weight:700;color:var(--text); font-family: ui-monospace, monospace; letter-spacing: -0.5px;">${fmt(s.amount, wById(s.wallet)?.currency)}<span style="font-size: 14px; color: var(--text3);">/mo</span></div>
       
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:12px; padding-top:12px; border-top: 1px dashed var(--border);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:14px; padding-top:14px; border-top: 1px dashed var(--border);">
         <div>${wBadge(s.wallet)}</div>
-        <button onclick="addIncomeFromSource('${s.name}', ${s.amount}, '${s.wallet}')" class="btn g-btn sm" style="padding: 4px 8px; font-size: 12px; border-radius: 6px;"><i data-lucide="plus" style="width:14px;"></i> To Wallet</button>
+        <button onclick="addIncomeFromSource('${s.name}', ${s.amount}, '${s.wallet}')" class="btn g-btn sm" style="padding: 8px 12px; font-size: 13px; border-radius: 10px; box-shadow: none;"><i data-lucide="plus" style="width:16px;"></i> Add</button>
       </div>
     </div>`).join('')}
   </div>`;
@@ -1658,12 +1416,11 @@ function renderBudget(){
     document.getElementById('budget-bar-label').textContent=pct.toFixed(0)+'% used';
     document.getElementById('budget-spent-label').textContent='Spent: '+fmt(exp);
     document.getElementById('budget-remaining-label').textContent='Remaining: '+fmt(Math.max(S.budget-exp,0));
-    if(pct>=100){fill.style.background='var(--red-mid)';wb.style.display='flex';wb.className='warn-box red';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Budget exceeded! Spent '+fmt(exp)+' of '+fmt(S.budget);}
-    else if(pct>=80){fill.style.background='var(--amber-mid)';wb.style.display='flex';wb.className='warn-box amber';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Approaching limit — '+pct.toFixed(0)+'% used.';}
+    if(pct>=100){fill.style.background='var(--red-mid)';wb.style.display='block';wb.style.background='var(--red-bg)';wb.style.color='var(--red)';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Budget exceeded! Spent '+fmt(exp)+' of '+fmt(S.budget);}
+    else if(pct>=80){fill.style.background='var(--amber-mid)';wb.style.display='block';wb.style.background='var(--amber-bg)';wb.style.color='var(--amber)';wb.innerHTML='<i data-lucide="alert-triangle" style="margin-right:8px;"></i> Approaching limit — '+pct.toFixed(0)+'% used.';}
     else{fill.style.background='var(--green-mid)';wb.style.display='none';}
   }else{bw.style.display='none';wb.style.display='none';}
 }
-
 
 let timelineScale = 'month';
 function changeTimelineScale(scale) {
@@ -1677,7 +1434,6 @@ function changeTimelineScale(scale) {
 }
 
 function renderCharts(){
-
   const cats=[...new Set(S.transactions.map(t=>t.cat))];
   const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98';
   const gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
@@ -1688,13 +1444,10 @@ function renderCharts(){
   timelineSelect.innerHTML = baseOptions + catOptions;
 
   document.getElementById('timeline-chips').innerHTML = activeTimelineMetrics.map(m => 
-    `<div class="meta-chip" style="background:var(--surface); border-color:var(--border2); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:14px; color:var(--red);" onclick="removeTimelineMetric('${m}')"></i></div>`
+    `<div class="meta-chip" style="background:var(--bg); border-color:var(--border); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:16px; color:var(--red);" onclick="removeTimelineMetric('${m}')"></i></div>`
   ).join('');
 
-  // --- Timeline Dynamic Grouping Logic ---
   const groupedData = {};
-  
-  // Sort transactions by date oldest to newest
   const sortedTxs = [...S.transactions].sort((a,b) => {
       const da = new Date(parseLegacyDate(a.date) || (a.month + "-01"));
       const db = new Date(parseLegacyDate(b.date) || (b.month + "-01"));
@@ -1705,17 +1458,14 @@ function renderCharts(){
       let key;
       const dateObj = new Date(parseLegacyDate(t.date) || (t.month + "-01"));
       
-      if (timelineScale === 'day') {
-          key = dateObj.toLocaleDateString('en-GB'); // DD/MM/YYYY
-      } else if (timelineScale === 'week') {
+      if (timelineScale === 'day') { key = dateObj.toLocaleDateString('en-GB'); } 
+      else if (timelineScale === 'week') {
           const firstDay = new Date(dateObj);
           firstDay.setDate(dateObj.getDate() - dateObj.getDay());
           key = "Wk " + firstDay.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'});
-      } else if (timelineScale === 'month') {
-          key = monthLabel(t.month);
-      } else if (timelineScale === 'year') {
-          key = dateObj.getFullYear().toString();
-      }
+      } 
+      else if (timelineScale === 'month') { key = monthLabel(t.month); } 
+      else if (timelineScale === 'year') { key = dateObj.getFullYear().toString(); }
       
       if (!groupedData[key]) groupedData[key] = [];
       groupedData[key].push(t);
@@ -1724,7 +1474,7 @@ function renderCharts(){
   const chartLabels = Object.keys(groupedData);
   if (chartLabels.length === 0) chartLabels.push(timelineScale === 'month' ? monthLabel(nowMonth()) : 'No Data');
 
-  const chartColors = ['#10b981', '#f43f5e', '#3b82f6', '#f59e0b', '#8b5cf6', '#14b8a6', '#f97316'];
+  const chartColors = ['#2db584', '#e05c4b', '#4a90d9', '#f0b429', '#8b6dd1', '#4CA1A3', '#e8623b'];
   const timelineDatasets = activeTimelineMetrics.map((metric, idx) => {
       const data = chartLabels.map(label => {
           let txs = groupedData[label] || [];
@@ -1748,8 +1498,8 @@ function renderCharts(){
       type: 'line', data: { labels: chartLabels, datasets: timelineDatasets },
       options: { 
           responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-          scales: { x: { grid: { display: false }, ticks: { font: { size: 10 }, color: tc } },
-                    y: { ticks: { callback: v => sym() + v.toLocaleString(), font: { size: 11 }, color: tc }, grid: { color: gc } } }
+          scales: { x: { grid: { display: false }, ticks: { font: { size: 12 }, color: tc } },
+                    y: { ticks: { callback: v => sym() + v.toLocaleString(), font: { size: 12 }, color: tc }, grid: { color: gc } } }
       }
   });
 
@@ -1757,12 +1507,12 @@ function renderCharts(){
   if(cats.length){
     catChart=new Chart(document.getElementById('cat-chart').getContext('2d'),{
       type:'bar',data:{labels:cats,datasets:[
-        {label:'Income',data:cats.map(c=>S.transactions.filter(t=>t.type==='income'&&t.cat===c).reduce((s,t)=>s+t.amount,0)),backgroundColor:'#10b981',borderRadius:4},
-        {label:'Expense',data:cats.map(c=>S.transactions.filter(t=>t.type==='expense'&&t.cat===c).reduce((s,t)=>s+t.amount,0)),backgroundColor:'#f43f5e',borderRadius:4}
+        {label:'Income',data:cats.map(c=>S.transactions.filter(t=>t.type==='income'&&t.cat===c).reduce((s,t)=>s+t.amount,0)),backgroundColor:'#2db584',borderRadius:6},
+        {label:'Expense',data:cats.map(c=>S.transactions.filter(t=>t.type==='expense'&&t.cat===c).reduce((s,t)=>s+t.amount,0)),backgroundColor:'#e05c4b',borderRadius:6}
       ]},
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-        scales:{x:{grid:{display:false},ticks:{font:{size:11},color:tc}},
-          y:{ticks:{callback:v=>sym()+v.toLocaleString(),font:{size:11},color:tc},grid:{color:gc}}}}
+        scales:{x:{grid:{display:false},ticks:{font:{size:12},color:tc}},
+          y:{ticks:{callback:v=>sym()+v.toLocaleString(),font:{size:12},color:tc},grid:{color:gc}}}}
     });
   }
   
@@ -1775,8 +1525,8 @@ function renderCharts(){
       backgroundColor:total>0?S.wallets.map(w=>WALLET_COLORS[w.color]?.hex||'#888'):S.wallets.map(()=>isDark?'#333':'#eee'),
       borderWidth:0,borderRadius:4
     }]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-      plugins:{legend:{position:'bottom',labels:{font:{size:13,family:"'DM Sans'",weight: 'bold'},color:tc,padding:20}}}}
+    options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:13,family:"-apple-system",weight: '600'},color:tc,padding:20}}}}
   });
 }
 
@@ -1794,7 +1544,7 @@ function openSearch() {
 function closeSearch() {
   document.getElementById('search-modal').classList.remove('open');
   document.getElementById('search-input').value = '';
-  document.getElementById('search-results').innerHTML = `<div class="search-empty"><i data-lucide="search" style="width:36px;height:36px;opacity:.2;"></i><p>Start typing to search…</p></div>`;
+  document.getElementById('search-results').innerHTML = `<div class="search-empty"><i data-lucide="search" style="width:48px;height:48px;opacity:.2;"></i><p>Start typing to search…</p></div>`;
   lucide.createIcons();
 }
 
@@ -1821,7 +1571,7 @@ function runSearch() {
   const container = document.getElementById('search-results');
 
   if (!q) {
-    container.innerHTML = `<div class="search-empty"><i data-lucide="search" style="width:36px;height:36px;opacity:.2;"></i><p>Start typing to search…</p></div>`;
+    container.innerHTML = `<div class="search-empty"><i data-lucide="search" style="width:48px;height:48px;opacity:.2;"></i><p>Start typing to search…</p></div>`;
     lucide.createIcons();
     return;
   }
@@ -1829,7 +1579,6 @@ function runSearch() {
   let html = '';
   let totalCount = 0;
 
-  // ── Transactions ──
   if (searchFilter === 'all' || searchFilter === 'transactions') {
     const hits = S.transactions.filter(t =>
       (t.desc && t.desc.toLowerCase().includes(q)) ||
@@ -1860,7 +1609,6 @@ function runSearch() {
     }
   }
 
-  // ── Wallets ──
   if (searchFilter === 'all' || searchFilter === 'wallets') {
     const hits = S.wallets.filter(w =>
       w.name.toLowerCase().includes(q) ||
@@ -1883,7 +1631,6 @@ function runSearch() {
     }
   }
 
-  // ── Debts ──
   if (searchFilter === 'all' || searchFilter === 'debts') {
     const hits = S.debts.filter(d =>
       d.name.toLowerCase().includes(q) ||
@@ -1917,7 +1664,6 @@ function runSearch() {
   lucide.createIcons();
 }
 
-// Close search on Escape key
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeSearch();
 });
@@ -1932,9 +1678,7 @@ window.onload = async () => {
 <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 
 <script>
-// ── Inline expression evaluator for all number inputs ──
-// On focus: switches to type=text so operators (+−×÷%) can be typed.
-// On Enter or blur: evaluates the expression and restores type=number.
+// ── Inline expression evaluator ──
 (function () {
   function evalExpr(str) {
     const safe = str.trim()
@@ -1951,14 +1695,12 @@ window.onload = async () => {
     if (input.dataset.exprAttached) return;
     input.dataset.exprAttached = '1';
 
-    // Remember original attributes
     const originalMin  = input.min;
     const originalStep = input.step;
 
     input.addEventListener('focus', () => {
       input.setAttribute('type', 'text');
       input.setAttribute('inputmode', 'decimal');
-      // Move cursor to end
       const v = input.value;
       input.value = '';
       input.value = v;
@@ -1966,25 +1708,21 @@ window.onload = async () => {
 
     function finalize() {
       const raw = input.value;
-      // Has an operator? Try to evaluate
       if (/[+\-*\/x÷%]/.test(raw)) {
         const result = evalExpr(raw);
         if (result !== null) {
-          // Restore to number type first, then set numeric value
           input.setAttribute('type', 'number');
           if (originalMin)  input.min  = originalMin;
           if (originalStep) input.step = originalStep;
           input.value = result;
           input.dispatchEvent(new Event('input',  { bubbles: true }));
           input.dispatchEvent(new Event('change', { bubbles: true }));
-          // Green flash feedback
           input.style.transition = 'background 0.2s';
           input.style.background = 'var(--green-bg)';
           setTimeout(() => { input.style.background = ''; }, 800);
           return;
         }
       }
-      // No operator or invalid — just restore type keeping current value
       const numVal = parseFloat(raw);
       input.setAttribute('type', 'number');
       if (originalMin)  input.min  = originalMin;
@@ -2000,7 +1738,6 @@ window.onload = async () => {
   }
 
   function attachAll() {
-    // Query both type=number (un-focused) and type=text with our marker (focused)
     document.querySelectorAll('input[type=number]:not([data-expr-attached])').forEach(attachTo);
   }
 
