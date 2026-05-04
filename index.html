@@ -89,17 +89,45 @@ body.dark-mode .nav-tabs.pill, body.dark-mode .search-fab { background: rgba(30,
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); transition: background 0.3s, border-color 0.3s; }
 .card-title { font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
 
-/* ── Apple Wallet Stack System ── */
-.wallet-stack-wrap { position: relative; height: 230px; margin-bottom: 1.5rem; cursor: pointer; perspective: 1000px; -webkit-tap-highlight-color: transparent; }
-.wallet-stack-wrap:active .wallet-card.stacked { transform: scale(0.96) !important; }
-
-.wallet-card { 
-  border-radius: 20px; padding: 1.5rem; position: relative; overflow: hidden; color: #fff; 
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.2); 
-  display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; 
+/* ── Wallet Row System ── */
+.wallet-row-wrap {
+  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 1.5rem;
+  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
 }
-.wallet-card.stacked { position: absolute; top: 0; left: 0; width: 100%; height: 180px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1), opacity 0.4s ease; box-shadow: 0 -4px 16px rgba(0,0,0,0.1), 0 15px 30px rgba(0,0,0,0.15), inset 0 1px 1px rgba(255,255,255,0.2); }
-.wallet-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%); pointer-events: none; }
+.wallet-row-wrap::-webkit-scrollbar { display: none; }
+
+.wallet-card {
+  border-radius: 20px; padding: 1.25rem 1.5rem; position: relative; overflow: hidden; color: #fff;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.2);
+  display: flex; flex-direction: column; justify-content: space-between;
+  flex: 0 0 auto; width: 200px; min-height: 160px;
+  scroll-snap-align: start; cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.175,0.885,0.32,1),
+              opacity 0.35s ease,
+              filter 0.35s ease,
+              width 0.35s cubic-bezier(0.175,0.885,0.32,1),
+              box-shadow 0.35s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.wallet-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%);
+  pointer-events: none;
+}
+/* Collapsed (blurred) state */
+.wallet-card.blurred {
+  opacity: 0.45; filter: blur(1.5px) saturate(0.6); transform: scale(0.95);
+  pointer-events: auto;
+}
+/* Expanded (active) state */
+.wallet-card.expanded {
+  width: 280px; box-shadow: 0 18px 40px rgba(0,0,0,0.22), inset 0 1px 1px rgba(255,255,255,0.2);
+  transform: scale(1.03);
+}
+/* Extra detail row shown only when expanded */
+.w-extra { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.25); }
+.wallet-card.expanded .w-extra { display: block; animation: fadeInUp 0.25s ease; }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
 
 .w-top { display: flex; justify-content: space-between; align-items: flex-start; z-index: 1; }
 .w-bottom { z-index: 1; margin-top: auto; padding-top: 24px; }
@@ -110,7 +138,7 @@ body.dark-mode .nav-tabs.pill, body.dark-mode .search-fab { background: rgba(30,
 .wallet-card .actions { display: flex; gap: 8px; }
 .action-btn { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: #fff; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
 .action-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
-.add-wallet-card { border-radius: 20px; padding: 1.5rem; border: 2px dashed var(--border2); background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--text2); font-size: 15px; font-weight: 600; min-height: 180px; transition: all .2s; }
+.add-wallet-card { border-radius: 20px; padding: 1.25rem; border: 2px dashed var(--border2); background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--text2); font-size: 15px; font-weight: 600; min-height: 160px; flex: 0 0 auto; width: 140px; transition: all .2s; scroll-snap-align: start; }
 .add-wallet-card:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-bg); }
 
 /* ── Other UI Elements ── */
@@ -718,40 +746,86 @@ function handleCategoryChange(sel) {
 function changeCurrency(){S.currency=document.getElementById('currency-select').value;scheduleSave();render(); if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck();}
 
 // ── Wallet Deck System ──
+let expandedWalletId = null;
+
 function renderWallets(){
   const container = document.getElementById('wallets-container');
   if (!S.wallets || S.wallets.length === 0) {
-    container.innerHTML = `<div class="add-wallet-card" onclick="openWalletModal()" style="margin-bottom: 1.5rem;"><i data-lucide="plus" style="width:32px; height:32px;"></i><span>Add wallet</span></div>`;
-    return;
+    container.innerHTML = `<div class="wallet-row-wrap"><div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px;height:28px;"></i><span>Add wallet</span></div></div>`;
+    lucide.createIcons(); return;
   }
 
-  let html = `<div class="wallet-stack-wrap" onclick="openWalletDeck()">`;
-  const maxDisplay = Math.min(S.wallets.length, 4);
-  
-  for(let i=0; i<maxDisplay; i++) {
-     const w = S.wallets[i];
-     const z = 10 - i;
-     const y = i * 16; 
-     const s = 1 - (i * 0.05); 
-     const o = 1 - (i * 0.15); 
-     
-     html += `
-      <div class="wallet-card stacked" style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad}; z-index:${z}; transform: translateY(${y}px) scale(${s}); opacity:${o};">
-        <div class="w-top">
+  // Keep expandedWalletId valid
+  if (expandedWalletId && !S.wallets.find(w => w.id === expandedWalletId)) expandedWalletId = null;
+  if (!expandedWalletId && S.wallets.length > 0) expandedWalletId = S.wallets[0].id;
+
+  let html = `<div class="wallet-row-wrap" id="wallet-row">`;
+  S.wallets.forEach(w => {
+    const isExp = w.id === expandedWalletId;
+    const cls = isExp ? 'expanded' : (expandedWalletId ? 'blurred' : '');
+    // Total transactions for this wallet
+    const txCount = S.transactions.filter(t => (t.walletId || t.wallet) === w.id).length;
+    html += `
+      <div class="wallet-card ${cls}" data-wid="${w.id}" onclick="expandWallet('${w.id}')"
+           style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad};">
+        <div class="w-top" style="justify-content:space-between; align-items:flex-start;">
           <div>
             <div class="w-name">${w.name}</div>
             <div class="w-type">${w.type}</div>
           </div>
-          ${i === 0 && S.wallets.length > 1 ? `<div style="background:rgba(0,0,0,0.25); padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600; display:flex; align-items:center; gap:4px; backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);"><i data-lucide="layers" style="width:14px; height:14px;"></i> View All</div>` : ''}
+          ${isExp ? `<div class="actions" onclick="event.stopPropagation()">
+            <button class="action-btn" onclick="openWalletModal('${w.id}')"><i data-lucide="pencil" style="width:14px;"></i></button>
+            <button class="action-btn" onclick="deleteWallet('${w.id}')"><i data-lucide="x" style="width:16px;"></i></button>
+          </div>` : ''}
         </div>
         <div class="w-bottom">
           <div class="w-label">Balance</div>
           <div class="w-balance">${fmt(w.balance, w.currency)}</div>
         </div>
+        <div class="w-extra">
+          <div style="font-size:12px;opacity:0.8;font-weight:600;">${txCount} transaction${txCount!==1?'s':''}</div>
+        </div>
       </div>`;
-  }
+  });
+  html += `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px;height:28px;"></i><span>Add</span></div>`;
   html += `</div>`;
   container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function expandWallet(id) {
+  if (expandedWalletId === id) return; // already expanded
+  expandedWalletId = id;
+  // Update classes without full re-render for smoothness
+  document.querySelectorAll('#wallet-row .wallet-card[data-wid]').forEach(card => {
+    const wid = card.dataset.wid;
+    card.classList.remove('expanded','blurred');
+    if (wid === id) {
+      card.classList.add('expanded');
+      // Show action buttons
+      if (!card.querySelector('.actions')) {
+        const w = S.wallets.find(x => x.id === wid);
+        const actDiv = document.createElement('div');
+        actDiv.className = 'actions';
+        actDiv.style.cssText = 'position:absolute;top:1.25rem;right:1.5rem;';
+        actDiv.onclick = e => e.stopPropagation();
+        actDiv.innerHTML = `<button class="action-btn" onclick="openWalletModal('${wid}')"><i data-lucide="pencil" style="width:14px;"></i></button>
+          <button class="action-btn" onclick="deleteWallet('${wid}')"><i data-lucide="x" style="width:16px;"></i></button>`;
+        card.querySelector('.w-top').appendChild(actDiv);
+        lucide.createIcons();
+      }
+      // Show extra
+      const extra = card.querySelector('.w-extra');
+      if (extra) extra.style.display = 'block';
+    } else {
+      card.classList.add('blurred');
+      // hide actions
+      const act = card.querySelector('.w-top .actions');
+      if (act) act.remove();
+      const extra = card.querySelector('.w-extra');
+      if (extra) extra.style.display = 'none';
+    }
+  });
 }
 
 function renderWalletDeck() {
@@ -798,11 +872,11 @@ function selectColor(i){selectedColor=i;renderColorPicker();}
 function saveWallet(){
   const name=document.getElementById('wm-name').value.trim();if(!name){document.getElementById('wm-name').focus();return;}
   const bal=parseFloat(document.getElementById('wm-balance').value)||0; const type=document.getElementById('wm-type').value; const cur=document.getElementById('wm-currency').value;
-  if(editingWalletId) { const w = wById(editingWalletId); if(w) { w.name=name; w.type=type; w.balance=bal; w.color=selectedColor; w.currency=cur; } } 
-  else { S.wallets.push({id:'w_'+Date.now(), name, type, color:selectedColor, balance:bal, currency: cur}); }
+  if(editingWalletId) { const w = wById(editingWalletId); if(w) { w.name=name; w.type=type; w.balance=bal; w.color=selectedColor; w.currency=cur; } }
+  else { const nw = {id:'w_'+Date.now(), name, type, color:selectedColor, balance:bal, currency: cur}; S.wallets.push(nw); expandedWalletId = nw.id; }
   closeWalletModal(); scheduleSave(); render(); if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck();
 }
-function deleteWallet(id){ if(!confirm('Delete this wallet?'))return; S.wallets=S.wallets.filter(w=>w.id!==id); scheduleSave(); render(); if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck(); }
+function deleteWallet(id){ if(!confirm('Delete this wallet?'))return; S.wallets=S.wallets.filter(w=>w.id!==id); if(expandedWalletId===id) expandedWalletId=S.wallets[0]?.id||null; scheduleSave(); render(); if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck(); }
 
 function openDebtModal(id = null) {
     editingDebtId = id; populateWalletSelects(); 
@@ -1100,22 +1174,282 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(
 
 window.onload = async () => { await loadData(); lucide.createIcons(); };
 
-// ── Inline expression evaluator ──
+// ── Calculator Popup for number inputs (desktop + mobile) ──
 (function () {
-  function evalExpr(str) { const safe = str.trim().replace(/x/gi, '*').replace(/÷/g, '/').replace(/,/g, '').replace(/\s/g, ''); if (!safe) return null; if (!/^[\d+\-*/().%]+$/.test(safe)) return null; try { const v = Function('"use strict"; return (' + safe + ')')(); return isFinite(v) ? parseFloat(v.toFixed(10)) : null; } catch (e) { return null; } }
-  function attachTo(input) {
-    if (input.dataset.exprAttached) return; input.dataset.exprAttached = '1';
-    const originalMin  = input.min, originalStep = input.step;
-    input.addEventListener('focus', () => { input.setAttribute('type', 'text'); input.setAttribute('inputmode', 'decimal'); const v = input.value; input.value = ''; input.value = v; });
-    function finalize() {
-      const raw = input.value;
-      if (/[+\-*\/x÷%]/.test(raw)) { const result = evalExpr(raw); if (result !== null) { input.setAttribute('type', 'number'); if (originalMin) input.min = originalMin; if (originalStep) input.step = originalStep; input.value = result; input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true })); input.style.transition = 'background 0.2s'; input.style.background = 'var(--green-bg)'; setTimeout(() => { input.style.background = ''; }, 800); return; } }
-      const numVal = parseFloat(raw); input.setAttribute('type', 'number'); if (originalMin) input.min = originalMin; if (originalStep) input.step = originalStep; if (!isNaN(numVal)) input.value = numVal;
-    }
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); finalize(); input.blur(); } }); input.addEventListener('blur', finalize);
+
+  /* ── Styles ── */
+  const style = document.createElement('style');
+  style.textContent = `
+  #calc-popup {
+    position: fixed; z-index: 99999;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+    padding: 10px;
+    width: 240px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    animation: calcFadeIn 0.18s cubic-bezier(0.175,0.885,0.32,1);
+    touch-action: none;
   }
-  function attachAll() { document.querySelectorAll('input[type=number]:not([data-expr-attached])').forEach(attachTo); }
-  attachAll(); new MutationObserver(attachAll).observe(document.body, { childList: true, subtree: true });
+  #calc-popup.visible { display: flex; }
+  @keyframes calcFadeIn { from{opacity:0;transform:translateY(6px) scale(0.97);} to{opacity:1;transform:none;} }
+
+  #calc-expr {
+    font-family: ui-monospace, monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-align: right;
+    min-height: 48px;
+    letter-spacing: -0.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: text;
+    user-select: text;
+    -webkit-user-select: text;
+    outline: none;
+    position: relative;
+  }
+  #calc-preview {
+    font-size: 13px;
+    color: var(--green);
+    font-family: ui-monospace, monospace;
+    text-align: right;
+    padding: 0 4px;
+    min-height: 18px;
+    font-weight: 600;
+    transition: opacity 0.15s;
+  }
+  .calc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .calc-btn {
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    height: 48px;
+    cursor: pointer;
+    transition: transform 0.08s, background 0.12s;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .calc-btn:active { transform: scale(0.91); }
+  .calc-btn.num  { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .calc-btn.op   { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-mid)33; font-size: 20px; }
+  .calc-btn.clr  { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-mid)33; font-size: 14px; }
+  .calc-btn.del  { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-mid)33; }
+  .calc-btn.eq   { background: var(--green); color: #fff; border: none; grid-column: span 2; font-size: 20px; }
+  .calc-btn.eq:hover { background: var(--green-mid); }
+  .calc-btn.zero { grid-column: span 1; }
+  body.dark-mode .calc-btn.num { background: #2c2c2e; border-color: #3a3a3c; }
+  `;
+  document.head.appendChild(style);
+
+  /* ── Popup DOM ── */
+  const popup = document.createElement('div');
+  popup.id = 'calc-popup';
+  popup.innerHTML = `
+    <div id="calc-expr" contenteditable="false">0</div>
+    <div id="calc-preview"></div>
+    <div class="calc-grid">
+      <button class="calc-btn clr" data-action="clear">AC</button>
+      <button class="calc-btn del" data-action="del">⌫</button>
+      <button class="calc-btn op"  data-action="op" data-val="%">%</button>
+      <button class="calc-btn op"  data-action="op" data-val="÷">÷</button>
+
+      <button class="calc-btn num" data-action="digit" data-val="7">7</button>
+      <button class="calc-btn num" data-action="digit" data-val="8">8</button>
+      <button class="calc-btn num" data-action="digit" data-val="9">9</button>
+      <button class="calc-btn op"  data-action="op" data-val="×">×</button>
+
+      <button class="calc-btn num" data-action="digit" data-val="4">4</button>
+      <button class="calc-btn num" data-action="digit" data-val="5">5</button>
+      <button class="calc-btn num" data-action="digit" data-val="6">6</button>
+      <button class="calc-btn op"  data-action="op" data-val="−">−</button>
+
+      <button class="calc-btn num" data-action="digit" data-val="1">1</button>
+      <button class="calc-btn num" data-action="digit" data-val="2">2</button>
+      <button class="calc-btn num" data-action="digit" data-val="3">3</button>
+      <button class="calc-btn op"  data-action="op" data-val="+">+</button>
+
+      <button class="calc-btn num zero" data-action="digit" data-val="0">0</button>
+      <button class="calc-btn num" data-action="digit" data-val=".">.</button>
+      <button class="calc-btn eq"  data-action="eq">=</button>
+    </div>
+  `;
+  document.body.appendChild(popup);
+
+  const exprEl   = popup.querySelector('#calc-expr');
+  const previewEl = popup.querySelector('#calc-preview');
+  let currentInput = null;
+  let expr = '';
+
+  /* ── Evaluator ── */
+  function evalExpr(str) {
+    const safe = str.trim()
+      .replace(/×/g, '*').replace(/÷/g, '/')
+      .replace(/−/g, '-').replace(/x/gi, '*')
+      .replace(/,/g, '').replace(/\s/g, '');
+    if (!safe) return null;
+    if (!/^[\d+\-*/().%]+$/.test(safe)) return null;
+    try {
+      let v = Function('"use strict"; return (' + safe + ')')();
+      return isFinite(v) ? parseFloat(v.toFixed(10)) : null;
+    } catch(e) { return null; }
+  }
+
+  function updateDisplay() {
+    exprEl.textContent = expr || '0';
+    const preview = evalExpr(expr);
+    const hasOp = /[+\-×÷−*/%]/.test(expr);
+    if (preview !== null && hasOp) {
+      previewEl.textContent = '= ' + preview.toLocaleString();
+    } else {
+      previewEl.textContent = '';
+    }
+  }
+
+  function applyToInput(val) {
+    if (!currentInput) return;
+    currentInput.value = val;
+    currentInput.dispatchEvent(new Event('input',  { bubbles: true }));
+    currentInput.dispatchEvent(new Event('change', { bubbles: true }));
+    currentInput.style.transition = 'background 0.2s';
+    currentInput.style.background = 'var(--green-bg)';
+    setTimeout(() => { if(currentInput) currentInput.style.background = ''; }, 800);
+  }
+
+  function commitAndClose() {
+    const result = evalExpr(expr);
+    const num = result !== null ? result : parseFloat(expr);
+    if (!isNaN(num)) applyToInput(num);
+    closePopup();
+  }
+
+  /* ── Button actions ── */
+  popup.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    const btn = e.target.closest('.calc-btn');
+    if (!btn) return;
+    e.preventDefault();
+    const action = btn.dataset.action;
+    const val    = btn.dataset.val;
+
+    if (action === 'digit') {
+      // Prevent double dots
+      if (val === '.' && expr.split(/[+\-×÷−*/%]/).pop().includes('.')) return;
+      expr += val;
+    } else if (action === 'op') {
+      // Replace trailing operator
+      expr = expr.replace(/[+\-×÷−*/%]+$/, '') + val;
+    } else if (action === 'del') {
+      expr = expr.slice(0, -1);
+    } else if (action === 'clear') {
+      expr = '';
+    } else if (action === 'eq') {
+      commitAndClose();
+      return;
+    }
+    updateDisplay();
+  });
+
+  /* ── Position popup near input ── */
+  function positionPopup(input) {
+    const rect = input.getBoundingClientRect();
+    const pw = 240, ph = 310;
+    const vw = window.innerWidth, vh = window.innerHeight;
+
+    let top  = rect.bottom + 8;
+    let left = rect.left;
+
+    // Flip up if not enough space below
+    if (top + ph > vh - 10) top = rect.top - ph - 8;
+    // Clamp horizontally
+    if (left + pw > vw - 10) left = vw - pw - 10;
+    if (left < 10) left = 10;
+
+    popup.style.top  = top  + 'px';
+    popup.style.left = left + 'px';
+  }
+
+  /* ── Open / Close ── */
+  function openPopup(input) {
+    currentInput = input;
+    const raw = parseFloat(input.value);
+    expr = isNaN(raw) ? '' : String(raw);
+    updateDisplay();
+    popup.classList.add('visible');
+    positionPopup(input);
+  }
+
+  function closePopup() {
+    popup.classList.remove('visible');
+    currentInput = null;
+  }
+
+  /* ── Close on outside click ── */
+  document.addEventListener('pointerdown', e => {
+    if (!popup.classList.contains('visible')) return;
+    if (!popup.contains(e.target) && e.target !== currentInput) {
+      // commit whatever is in the expr before closing
+      const result = evalExpr(expr);
+      const num = result !== null ? result : parseFloat(expr);
+      if (!isNaN(num)) applyToInput(num);
+      closePopup();
+    }
+  });
+
+  /* ── Keyboard support while popup is open ── */
+  document.addEventListener('keydown', e => {
+    if (!popup.classList.contains('visible')) return;
+    if ('0123456789'.includes(e.key)) { expr += e.key; updateDisplay(); }
+    else if (['+','-','*','/','%'].includes(e.key)) { expr = expr.replace(/[+\-×÷−*/%]+$/, '') + e.key; updateDisplay(); }
+    else if (e.key === '.') { if (!expr.split(/[+\-×÷−*/%]/).pop().includes('.')) { expr += '.'; updateDisplay(); } }
+    else if (e.key === 'Backspace') { expr = expr.slice(0, -1); updateDisplay(); }
+    else if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); commitAndClose(); }
+    else if (e.key === 'Escape') { closePopup(); }
+  });
+
+  /* ── Reposition on scroll/resize ── */
+  window.addEventListener('resize', () => { if (currentInput && popup.classList.contains('visible')) positionPopup(currentInput); });
+
+  /* ── Attach to every number input ── */
+  function attachTo(input) {
+    if (input.dataset.calcAttached) return;
+    input.dataset.calcAttached = '1';
+
+    input.addEventListener('click', e => {
+      e.stopPropagation();
+      openPopup(input);
+    });
+    input.addEventListener('focus', () => {
+      openPopup(input);
+    });
+    // Prevent native keyboard from hijacking on mobile
+    input.setAttribute('inputmode', 'none');
+    input.setAttribute('readonly', 'readonly');
+    input.style.cursor = 'pointer';
+  }
+
+  function attachAll() {
+    document.querySelectorAll('input[type=number]:not([data-calc-attached])').forEach(attachTo);
+  }
+
+  attachAll();
+  new MutationObserver(attachAll).observe(document.body, { childList: true, subtree: true });
+
 })();
 </script>
 </body>
