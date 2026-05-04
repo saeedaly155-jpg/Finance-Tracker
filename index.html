@@ -558,7 +558,29 @@ async function saveToDrive() {
         btn.innerHTML = '<i data-lucide="check" style="width:16px;"></i> Synced'; btn.className = 'btn g-btn sm'; lucide.createIcons();
     } catch (error) { btn.innerHTML = 'Error'; btn.className = 'btn r-btn sm'; }
 }
-async function loadFromDrive() { const response = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' }); if (response.result) { S = response.result; scheduleSave(); render(); } }
+
+async function loadFromDrive() { 
+    const response = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' }); 
+    if (response.result) { 
+        // 1. Safely merge the Drive data with the default state
+        S = { ...S, ...response.result }; 
+        
+        // 2. Fallbacks: Ensure critical arrays always exist to prevent .map() crashes
+        if (!S.categories || !S.categories.length) {
+            S.categories = ['Food','Transport','Housing','Health','Entertainment','Shopping','Utilities','Education','Savings','Salary','Freelance','Other'];
+        }
+        if (!S.transactions) S.transactions = [];
+        if (!S.wallets) S.wallets = [];
+        if (!S.debts) S.debts = [];
+        if (!S.walletHistory) S.walletHistory = [];
+        if (!S.sources) S.sources = [];
+        if (!S.goals) S.goals = [];
+
+        scheduleSave(); 
+        render(); 
+    } 
+}
+
 
 // --- App Logic ---
 const SYMS={EGP:'E£',USD:'$',EUR:'€',GBP:'£',SAR:'﷼',AED:'د.إ',JPY:'¥',INR:'₹',CAD:'C$',AUD:'A$'};
@@ -1002,9 +1024,9 @@ let timelineScale = 'month';
 function changeTimelineScale(scale) { timelineScale = scale; const scales = ['day', 'week', 'month', 'year'], tabs = document.querySelectorAll('#timeline-scale-tabs .section-tab'); if(tabs.length === 4) { tabs.forEach((tab, i) => tab.className = 'section-tab' + (scales[i] === scale ? ' active' : '')); } renderCharts(); }
 
 function renderCharts(){
-  const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+    const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
   const timelineSelect = document.getElementById('timeline-select');
-  timelineSelect.innerHTML = `<option value="Income">Total Income</option><option value="Expense">Total Expense</option><option value="Net">Net Balance</option>` + S.categories.map(c => `<option value="${c}">Category: ${c}</option>`).join('');
+  timelineSelect.innerHTML = `<option value="Income">Total Income</option><option value="Expense">Total Expense</option><option value="Net">Net Balance</option>` + (S.categories || []).map(c => `<option value="${c}">Category: ${c}</option>`).join('');
   
   // Safely escape quotes to prevent breaking the HTML timeline chips
   document.getElementById('timeline-chips').innerHTML = activeTimelineMetrics.map(m => {
@@ -1013,7 +1035,7 @@ function renderCharts(){
   }).join('');
 
   const groupedData = {};
-  const sortedTxs = [...S.transactions].sort((a,b) => { const da = new Date(parseLegacyDate(a.date) || (a.month + "-01")), db = new Date(parseLegacyDate(b.date) || (b.month + "-01")); return da - db; });
+ const sortedTxs = [...(S.transactions || [])].sort((a,b) => { const da = new Date(parseLegacyDate(a.date) || (a.month + "-01")), db = new Date(parseLegacyDate(b.date) || (b.month + "-01")); return da - db; });
   sortedTxs.forEach(t => {
       let key; const dateObj = new Date(parseLegacyDate(t.date) || (t.month + "-01"));
       if (timelineScale === 'day') { key = dateObj.toLocaleDateString('en-GB'); } 
