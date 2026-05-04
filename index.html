@@ -625,7 +625,23 @@ async function loadData(){
   render(); setSaveStatus('saved');
 }
 
-function toggleHide() { showBalance = !showBalance; document.getElementById('eye-icon').setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off'); render(); if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck(); }
+function toggleHide() { 
+    showBalance = !showBalance; 
+    document.getElementById('eye-icon').setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off'); 
+    
+    // Selectively render to avoid destroying charts and causing massive lag
+    renderWallets(); 
+    renderSummary(); 
+    renderTxList(); 
+    renderDebts(); 
+    renderSources(); 
+    renderBudget(); 
+    renderGoals(); 
+    
+    if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck(); 
+    lucide.createIcons(); 
+}
+
 function sym(c){ const curCode = (c && c !== 'default') ? c : S.currency; return SYMS[curCode] || curCode + ' '; }
 function fmt(n, c){ if(!showBalance) return '••••'; const curCode = (c && c !== 'default') ? c : S.currency; const abs = Math.abs(n); return sym(curCode) + (curCode==='JPY' ? Math.round(abs).toLocaleString() : abs.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})); }
 function nowMonth(){return new Date().toISOString().slice(0,7);}
@@ -643,11 +659,14 @@ function populateWalletSelects(){
   });
 }
 
-function populateCategories() {
+function populateCategories(forceVal) {
   const el = document.getElementById('tx-cat');
   if(!el) return;
-  const cur = el.value;
+  // Use the passed value, otherwise stick to current value, otherwise default
+  const cur = forceVal !== undefined ? forceVal : el.value;
+  
   el.innerHTML = S.categories.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="__add_new__" style="font-weight:600; color:var(--blue);">+ Add custom...</option>`;
+  
   if(S.categories.includes(cur)) {
       el.value = cur;
   } else if(S.categories.length) {
@@ -664,10 +683,9 @@ function handleCategoryChange(sel) {
         S.categories.push(cleanCat);
         scheduleSave();
       }
-      populateCategories();
-      sel.value = cleanCat;
+      populateCategories(cleanCat); // Passes the new selection back so it stays selected!
     } else {
-      populateCategories(); 
+      populateCategories(); // Reset to what it was before if they hit cancel
     }
   }
 }
@@ -679,7 +697,7 @@ function renderWallets(){
   const container = document.getElementById('wallets-container');
   if (!S.wallets || S.wallets.length === 0) {
     container.innerHTML = `<div class="add-wallet-card" onclick="openWalletModal()" style="margin-bottom: 1.5rem;"><i data-lucide="plus" style="width:32px; height:32px;"></i><span>Add wallet</span></div>`;
-    lucide.createIcons(); return;
+    return;
   }
 
   let html = `<div class="wallet-stack-wrap" onclick="openWalletDeck()">`;
@@ -786,10 +804,10 @@ function saveDebt() {
     if (!name) { document.getElementById('dm-name').focus(); return; } if (!total || total <= 0) { document.getElementById('dm-total').focus(); return; }
     if (editingDebtId) { const d = S.debts.find(x => x.id === editingDebtId); if (d) { d.name=name; d.type=type; d.total=total; d.paid=paid; d.monthly=monthly; d.wallet=wallet; d.startDate=startDate; d.dueDate=dueDate; } } 
     else { S.debts.push({ id: Date.now(), name, type, total, paid, monthly, wallet, startDate, dueDate, date: new Date().toLocaleDateString('en-GB') }); }
-    closeDebtModal(); scheduleSave(); renderDebts();
+    closeDebtModal(); scheduleSave(); renderDebts(); lucide.createIcons();
 }
-function deleteDebt(id){if(!confirm('Delete?'))return;S.debts=S.debts.filter(d=>d.id!==id);scheduleSave();renderDebts();}
-function markDebtDone(id){const d=S.debts.find(x=>x.id===id);if(d){d.paid=d.total;}scheduleSave();renderDebts();}
+function deleteDebt(id){if(!confirm('Delete?'))return;S.debts=S.debts.filter(d=>d.id!==id);scheduleSave();renderDebts(); lucide.createIcons();}
+function markDebtDone(id){const d=S.debts.find(x=>x.id===id);if(d){d.paid=d.total;}scheduleSave();renderDebts(); lucide.createIcons();}
 
 function walletOp(type){
   const wid=document.getElementById('aw-wallet').value, amt=parseFloat(document.getElementById('aw-amount').value), note=document.getElementById('aw-note').value.trim()||(type==='add'?'Added money':'Withdrawal');
@@ -822,14 +840,16 @@ function addTx(type){
   const w=wById(wid);if(!w)return; if(type==='expense'&&w.balance<amt){alert('Not enough balance in '+w.name);return;}
   w.balance+=(type==='income'?amt:-amt);
   S.transactions.unshift({id:Date.now(),type,desc,amount:amt,wallet:wid,cat,month,date:new Date().toLocaleDateString('en-GB')});
-  document.getElementById('tx-desc').value='';document.getElementById('tx-amount').value=''; scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets(); 
+  document.getElementById('tx-desc').value='';document.getElementById('tx-amount').value=''; scheduleSave();
+  updateMonthFilter(); renderTxList(); renderSummary(); renderWallets(); lucide.createIcons();
 }
 function deleteTx(id){
   const tx=S.transactions.find(t=>t.id===id);if(!tx)return;
   const w=wById(tx.wallet);if(w)w.balance+=(tx.type==='income'?-tx.amount:tx.amount);
-  S.transactions=S.transactions.filter(t=>t.id!==id); scheduleSave();updateMonthFilter();renderTxList();renderSummary();renderWallets(); 
+  S.transactions=S.transactions.filter(t=>t.id!==id); scheduleSave();
+  updateMonthFilter(); renderTxList(); renderSummary(); renderWallets(); lucide.createIcons();
 }
-function filterTx(f){txFilter=f;['all','income','expense'].forEach(x=>document.getElementById('stab-'+x).className='section-tab'+(f===x?' active':''));renderTxList();}
+function filterTx(f){txFilter=f;['all','income','expense'].forEach(x=>document.getElementById('stab-'+x).className='section-tab'+(f===x?' active':''));renderTxList(); lucide.createIcons();}
 
 function openPayModal(id){ payingDebtId=id;const d=S.debts.find(x=>x.id===id);if(!d)return; document.getElementById('pay-modal-title').textContent='Pay: '+d.name; document.getElementById('pm-amount').value=d.monthly||''; populateWalletSelects();document.getElementById('pm-wallet').value=d.wallet; document.getElementById('pay-modal').classList.add('open'); }
 function closePayModal(){document.getElementById('pay-modal').classList.remove('open');payingDebtId=null;}
@@ -844,9 +864,9 @@ function confirmPay(){
 function addSource(){
   const name=document.getElementById('src-name').value.trim(), type=document.getElementById('src-type').value, amt=parseFloat(document.getElementById('src-amount').value), wallet=document.getElementById('src-wallet').value;
   if(!name||!amt||amt<=0)return; S.sources.push({id:Date.now(),name,type,amount:amt,wallet});
-  document.getElementById('src-name').value='';document.getElementById('src-amount').value=''; scheduleSave();renderSources();
+  document.getElementById('src-name').value='';document.getElementById('src-amount').value=''; scheduleSave();renderSources(); lucide.createIcons();
 }
-function deleteSrc(id){S.sources=S.sources.filter(s=>s.id!==id);scheduleSave();renderSources();}
+function deleteSrc(id){S.sources=S.sources.filter(s=>s.id!==id);scheduleSave();renderSources(); lucide.createIcons();}
 function addIncomeFromSource(sourceName, amount, walletId) { const w = wById(walletId); if(w) w.balance += amount; S.transactions.unshift({ id: Date.now(), type: 'income', desc: sourceName + ' (Added)', amount: parseFloat(amount), wallet: walletId, cat: 'Salary', month: nowMonth(), date: new Date().toLocaleDateString('en-GB') }); scheduleSave(); render(); alert(`Added ${fmt(amount, w?.currency)} from ${sourceName} into your wallet!`); }
 
 let editingGoalId = null, selectedGoalColor = 0;
@@ -904,7 +924,22 @@ function updateMonthFilter(){ const months=[...new Set(S.transactions.map(t=>t.m
 function addTimelineMetric() { const val = document.getElementById('timeline-select').value; if (val && !activeTimelineMetrics.includes(val)) { activeTimelineMetrics.push(val); renderCharts(); } }
 function removeTimelineMetric(val) { activeTimelineMetrics = activeTimelineMetrics.filter(m => m !== val); renderCharts(); }
 
-function render(){ populateWalletSelects(); populateCategories(); renderWallets(); renderWalletHistory(); renderSummary(); updateMonthFilter(); renderTxList(); renderDebts(); renderSources(); renderBudget(); renderGoals(); if(currentPage==='chart')renderCharts(); lucide.createIcons(); }
+function render(){ 
+    populateWalletSelects(); 
+    populateCategories(); 
+    renderWallets(); 
+    renderWalletHistory(); 
+    renderSummary(); 
+    updateMonthFilter(); 
+    renderTxList(); 
+    renderDebts(); 
+    renderSources(); 
+    renderBudget(); 
+    renderGoals(); 
+    // ONLY render charts if we are explicitly on the chart tab
+    if(currentPage==='chart') renderCharts(); 
+    lucide.createIcons(); 
+}
 
 function renderWalletHistory(){
   const el=document.getElementById('wallet-history');
@@ -967,7 +1002,12 @@ function renderCharts(){
   const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
   const timelineSelect = document.getElementById('timeline-select');
   timelineSelect.innerHTML = `<option value="Income">Total Income</option><option value="Expense">Total Expense</option><option value="Net">Net Balance</option>` + S.categories.map(c => `<option value="${c}">Category: ${c}</option>`).join('');
-  document.getElementById('timeline-chips').innerHTML = activeTimelineMetrics.map(m => `<div class="meta-chip" style="background:var(--bg); border-color:var(--border); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:16px; color:var(--red);" onclick="removeTimelineMetric('${m}')"></i></div>`).join('');
+  
+  // Safely escape quotes to prevent breaking the HTML timeline chips
+  document.getElementById('timeline-chips').innerHTML = activeTimelineMetrics.map(m => {
+      const safeM = m.replace(/'/g, "\\'"); 
+      return `<div class="meta-chip" style="background:var(--bg); border-color:var(--border); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:16px; color:var(--red);" onclick="removeTimelineMetric('${safeM}')"></i></div>`;
+  }).join('');
 
   const groupedData = {};
   const sortedTxs = [...S.transactions].sort((a,b) => { const da = new Date(parseLegacyDate(a.date) || (a.month + "-01")), db = new Date(parseLegacyDate(b.date) || (b.month + "-01")); return da - db; });
