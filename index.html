@@ -91,12 +91,20 @@ body.dark-mode .nav-tabs.pill, body.dark-mode .search-fab { background: rgba(30,
 
 /* ── Wallet Row System ── */
 .wallet-row-wrap {
-  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 1.5rem;
-  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  display: flex; 
+  gap: 20px; /* Increased gap for better visual separation */
+  overflow-x: auto; 
+  padding: 20px 50% 30px; /* 50% padding allows first/last card to center */
+  margin-bottom: 1.5rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  margin-left: -50%; /* Offset the padding to keep container centered */
+  width: 200%; 
 }
-.wallet-row-wrap::-webkit-scrollbar { display: none; }
-
+  
 .wallet-card {
+  scroll-snap-align: center;
   border-radius: 20px; padding: 1.25rem 1.5rem; position: relative; overflow: hidden; color: #fff;
   box-shadow: 0 10px 24px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.2);
   display: flex; flex-direction: column; justify-content: space-between;
@@ -746,14 +754,57 @@ function handleCategoryChange(sel) {
 function changeCurrency(){S.currency=document.getElementById('currency-select').value;scheduleSave();render(); if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck();}
 
 // ── Wallet Deck System ──
+
+function handleWalletScroll() {
+  const container = document.getElementById('wallet-row');
+  if (!container) return;
+
+  const containerCenter = container.scrollLeft + (container.offsetWidth / 2);
+  let closestCard = null;
+  let minDistance = Infinity;
+
+  const cards = container.querySelectorAll('.wallet-card[data-wid]');
+  
+  cards.forEach(card => {
+    const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
+    const distance = Math.abs(containerCenter - cardCenter);
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestCard = card;
+    }
+  });
+
+  if (closestCard) {
+    const wid = closestCard.dataset.wid;
+    if (expandedWalletId !== wid) {
+      expandWallet(wid);
+    }
+  }
+}
+
+
+
+
+  
 let expandedWalletId = null;
 
-function renderWallets(){
+function renderWallets() {
   const container = document.getElementById('wallets-container');
-  if (!S.wallets || S.wallets.length === 0) {
-    container.innerHTML = `<div class="wallet-row-wrap"><div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px;height:28px;"></i><span>Add wallet</span></div></div>`;
-    lucide.createIcons(); return;
+  // ... (keep your existing HTML generation code) ...
+
+  container.innerHTML = html;
+  
+  // Attach the scroll listener to the new row
+  const row = document.getElementById('wallet-row');
+  if (row) {
+    row.addEventListener('scroll', handleWalletScroll);
+    // Trigger once on load to highlight the first card
+    handleWalletScroll(); 
   }
+  
+  lucide.createIcons();
+}
 
   // Keep expandedWalletId valid
   if (expandedWalletId && !S.wallets.find(w => w.id === expandedWalletId)) expandedWalletId = null;
