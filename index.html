@@ -30,6 +30,9 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
   --shadow: 0 4px 12px rgba(0,0,0,0.05);
   --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+
+  /* Apple Motion Variables */
+  --apple-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 body.dark-mode {
@@ -56,8 +59,20 @@ body {
 .app { 
   max-width: 780px; 
   margin: 0 auto; 
-  padding: 0 1rem 1.5rem; /* Changed: Top padding is now 0 */ 
+  padding: 0 1rem 1.5rem; 
 }
+
+/* ── Apple Motion Page Slide ── */
+.page-view {
+  animation: applePageSlide 0.45s var(--apple-spring);
+  will-change: transform, opacity;
+}
+
+@keyframes applePageSlide {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* ── Top Navigation Bar (iOS Sticky Glass) ── */
 .top-bar { 
   position: sticky; 
@@ -66,56 +81,28 @@ body {
   display: flex; 
   align-items: center; 
   justify-content: space-between; 
-  
-  /* Internal padding: handles safe area (notch) and keeps content from touching edges */
   padding: max(16px, env(safe-area-inset-top)) 16px 16px;
-  
-  /* Pulls the glass background flush to the absolute edges of the screen */
   margin: 0 -1rem 1.5rem -1rem; 
   gap: 10px; 
   flex-wrap: wrap; 
-  
-  /* Apple Glass Effect */
-  backdrop-filter: blur(30px) saturate(220%); /* Heavy blur, high saturation */
+  backdrop-filter: blur(30px) saturate(220%); 
   -webkit-backdrop-filter: blur(30px) saturate(220%); 
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
   overflow-x: auto; 
   -webkit-overflow-scrolling: touch; 
   scrollbar-width: none;
-  
-  
 }
-/* Hide scrollbar for cleaner look */
-.top-right::-webkit-scrollbar { 
-  display: none; 
-}
+.top-right::-webkit-scrollbar { display: none; }
 
-/* Prevent the buttons and elements from shrinking or getting crushed */
-.top-right .icon-btn,
-.top-right .btn,
-.top-right select.ctrl,
-.save-indicator {
-  flex-shrink: 0;
-}
-
-/* Ensure the currency dropdown text matches perfectly */
-select.ctrl {
-  font-weight: 700; /* Makes the E£ EGP text bold like your screenshot */
-  padding: 8px 14px;
-}
-body.dark-mode .top-bar {
-  background: rgba(18, 18, 18, 0.75);
-  
-}
+.top-right .icon-btn, .top-right .btn, .top-right select.ctrl, .save-indicator { flex-shrink: 0; }
+select.ctrl { font-weight: 700; padding: 8px 14px; }
+body.dark-mode .top-bar { background: rgba(18, 18, 18, 0.75); }
 .app-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; flex-shrink: 0;}
-.top-right { 
-  display: flex; 
-  gap: 8px; 
-  align-items: center; }
+.top-right { display: flex; gap: 8px; align-items: center; }
 
 select.ctrl, .icon-btn { padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 600; cursor: pointer; outline: none; transition: 0.2s; -webkit-appearance: none;}
 .icon-btn { display: flex; align-items: center; justify-content: center; padding: 8px; width: 36px; height: 36px; }
 .icon-btn:hover, select.ctrl:hover { background: var(--bg); border-color: var(--border2); }
+.icon-btn:active, select.ctrl:active { transform: scale(0.92); transition: transform 0.1s var(--apple-spring); }
 .save-indicator { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); font-weight: 500;  }
 .save-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-mid); flex-shrink: 0;  }
 .save-dot.saving { background: var(--amber-mid); animation: pulse 1s infinite; }
@@ -123,38 +110,59 @@ select.ctrl, .icon-btn { padding: 8px 12px; border: 1px solid var(--border); bor
 @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
 
 /* ── Floating Nav Bar (iOS 16 Glassmorphism) ── */
-.bottom-floating-area { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 100%; max-width: 360px; display: flex; align-items: center; justify-content: center; gap: 12px; z-index: 200; pointer-events: none; padding: 0 16px;  }
-
-/* ── Floating Nav Bar (iOS 16 Glassmorphism) ── */
 .bottom-floating-area { position: fixed; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: 100%; max-width: 360px; display: flex; align-items: center; justify-content: center; gap: 12px; z-index: 400; pointer-events: none; padding: 0 16px; }
 
-/* iOS 16 Ultra-Frosted Glass Base */
 .nav-tabs.pill, .search-fab { 
   pointer-events: auto; 
-  background: rgba(255, 255, 255, 0.35); /* Highly transparent */
-  backdrop-filter: blur(30px) saturate(220%); /* Heavy blur, high saturation */
+  background: rgba(255, 255, 255, 0.35); 
+  backdrop-filter: blur(30px) saturate(220%); 
   -webkit-backdrop-filter: blur(30px) saturate(220%); 
-  
-  /* Bright, physical edge lighting */
   border: 0.5px solid rgba(255, 255, 255, 0.8); 
   border-bottom: 0.5px solid rgba(255, 255, 255, 0.2);
-  
   box-shadow: 0 10px 40px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05); 
   transition: background 0.3s, border 0.3s; 
 }
 
-/* Dark Mode Deep Glass */
 body.dark-mode .nav-tabs.pill, body.dark-mode .search-fab { 
   background: rgba(28, 28, 30, 0.45); 
   border: 0.5px solid rgba(255, 255, 255, 0.15); 
   border-bottom: 0.5px solid rgba(0, 0, 0, 0.4);
   box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2); 
 }
-.nav-tabs.pill { display: flex; flex: 1; gap: 0; border-radius: 999px; padding: 6px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.nav-tabs.pill { 
+  display: flex; 
+  flex: 1; 
+  gap: 6px; /* مسافة بين كل زرار والتاني عشان الهوفر ميتداخلش */
+  border-radius: 999px; 
+  padding: 6px 8px; /* مساحة من اليمين والشمال عشان الزرار مابخبطش في الحافة */
+  overflow-x: auto; 
+  overflow-y: hidden; 
+  scroll-padding: 0 8px; /* عشان السحب يقف مرتاح */
+  scroll-snap-type: x mandatory; 
+  -webkit-overflow-scrolling: touch; 
+  scrollbar-width: none; 
+}
 .nav-tabs.pill::-webkit-scrollbar { display: none; }
-
-.nav-tab { flex: 0 0 25%; scroll-snap-align: start; border: none; background: transparent; color: var(--text2); font-size: 10px; font-weight: 600; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 6px 0; border-radius: 999px; transition: all 0.2s ease; }
-.nav-tab i[data-lucide] { width: 22px; height: 22px; stroke-width: 2.2; transition: 0.2s; }
+.nav-tab { 
+  flex: 0 0 calc(33.33% - 4px); /* دي اللي هتخليهم 3 زراير بالضبط */
+  scroll-snap-align: center; 
+  border: none; 
+  background: transparent; 
+  color: var(--text2); 
+  font-size: 10px; 
+  font-weight: 600; 
+  cursor: pointer; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 4px; 
+  padding: 8px 0; 
+  border-radius: 100px; 
+  transition: all 0.2s var(--apple-spring); 
+}
+.nav-tab i[data-lucide] { width: 20px; height: 20px; stroke-width: 1.5; transition: 0.2s; }
+.nav-tab:active { transform: scale(0.88); transition: transform 0.1s var(--apple-spring); }
 
 .nav-tab:hover { background: rgba(0, 0, 0, 0.05); color: var(--text); }
 body.dark-mode .nav-tab:hover { background: rgba(255, 255, 255, 0.1); }
@@ -162,8 +170,8 @@ body.dark-mode .nav-tab:hover { background: rgba(255, 255, 255, 0.1); }
 .nav-tab.active { color: var(--blue); }
 .nav-tab.active i[data-lucide] { color: var(--blue-mid); stroke-width: 2.5; }
 
-.search-fab { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; color: var(--text2); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1); }
-.search-fab:active { transform: scale(0.92); }
+.search-fab { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; color: var(--text2); transition: all 0.2s var(--apple-spring); }
+.search-fab:active { transform: scale(0.88); }
 .search-fab:hover { color: var(--blue-mid); background: rgba(0, 0, 0, 0.05); }
 body.dark-mode .search-fab:hover { background: rgba(255, 255, 255, 0.1); }
 
@@ -172,144 +180,40 @@ body.dark-mode .search-fab:hover { background: rgba(255, 255, 255, 0.1); }
 .card-title { font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
 
 /* ── Roulette-style Physical Card Stack ── */
-.wallet-deck {
-  position: relative;
-  width: relative;
-  height: 320px; /* Increased to fit the top and bottom spread perfectly */
-  margin-bottom: 1.5rem;
-  perspective: 1200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.wallet-deck { position: relative; width: relative; height: 320px; margin-bottom: 1.5rem; perspective: 1200px; display: flex; align-items: center; justify-content: center; }
+.wallet-card { position: absolute; width: 100%; max-width: 340px; height: 195px; border-radius: 18px; padding: 1.3rem 1.5rem; overflow: hidden; color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.5s cubic-bezier(0.34, 1.3, 0.64, 1), filter 0.5s ease, opacity 0.4s ease, box-shadow 0.4s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); will-change: transform, filter, opacity; }
+.wallet-card:active { transform: scale(0.96) !important; transition: transform 0.1s var(--apple-spring); }
+.wallet-card:not(.wc-active) { filter: brightness(0.50); blur:0.50; }
+.wallet-card.wc-active { filter: brightness(1); z-index: 100; box-shadow: 0 24px 48px rgba(0,0,0,0.25); }
+.wallet-card:not(.wc-active) .actions, .wallet-card:not(.wc-active) .w-mid, .wallet-card:not(.wc-active) .w-bottom { opacity: 0; pointer-events: none; }
+.wallet-card.wc-active .actions, .wallet-card.wc-active .w-mid, .wallet-card.wc-active .w-bottom { opacity: 1; pointer-events: auto; transition: opacity 0.4s ease 0.2s; }
+.wallet-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(125deg, rgba(255,255,255,0.22) 0%, transparent 60%); pointer-events: none; border-radius: inherit; }
 
-.wallet-card {
-  position: absolute;
-  width: 100%;
-  max-width: 340px;
-  height: 195px;
-  border-radius: 18px;
-  padding: 1.3rem 1.5rem;
-  overflow: hidden;
-  color: #fff;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.5s cubic-bezier(0.34, 1.3, 0.64, 1), 
-              filter 0.5s ease, 
-              opacity 0.4s ease, 
-              box-shadow 0.4s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  will-change: transform, filter, opacity;
-}
-
-/* Dim background cards */
-.wallet-card:not(.wc-active) {
-  filter: brightness(0.50);
-  blur:0.50;
-}
-
-.wallet-card.wc-active {
-  filter: brightness(1);
-  z-index: 100;
-  box-shadow: 0 24px 48px rgba(0,0,0,0.25);
-}
-
-/* Hide card details on background cards */
-.wallet-card:not(.wc-active) .actions,
-.wallet-card:not(.wc-active) .w-mid,
-.wallet-card:not(.wc-active) .w-bottom {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.wallet-card.wc-active .actions,
-.wallet-card.wc-active .w-mid,
-.wallet-card.wc-active .w-bottom {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.4s ease 0.2s;
-}
-
-.wallet-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(125deg, rgba(255,255,255,0.22) 0%, transparent 60%);
-  pointer-events: none;
-  border-radius: inherit;
-}
-
-
-
-.w-top {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  position: relative; z-index: 2;
-}
-.w-mid {
-  position: relative; z-index: 2;
-  flex: 1; display: flex; align-items: flex-end;
-}
-.w-bottom {
-  position: relative; z-index: 2;
-  display: flex; justify-content: space-between; align-items: flex-end;
-}
-
+.w-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 2; }
+.w-mid { position: relative; z-index: 2; flex: 1; display: flex; align-items: flex-end; }
+.w-bottom { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; }
 .w-name { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); line-height: 1.2; }
 .w-type { font-size: 10px; opacity: 0.72; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
 .w-label { font-size: 11px; opacity: 0.65; margin-bottom: 2px; font-weight: 500; letter-spacing: 0.04em; }
 .w-balance { font-size: 40px; font-weight: 700; letter-spacing: -0.5px; font-family:"Archivo Black", sans-serif; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
 .w-cardnum { font-size: 13px; font-family: ui-monospace, monospace; letter-spacing: 0.15em; opacity: 0.7; }
-
-.w-logo {
-  display: flex; align-items: center;
-}
-
-}
+.w-logo { display: flex; align-items: center; }
+.w-logo-circle { width: 24px; height: 24px; border-radius: 50%; opacity: 0.8; }
 .w-logo-circle:first-child { background: #eb001b; }
 .w-logo-circle:last-child  { background: #f79e1b; margin-left: -10px; }
 
-.wallet-card .actions {
-  display: flex; gap: 6px;
-  pointer-events: none;
-}
-.action-btn {
-  background: rgba(255,255,255,0.18);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 50%; color: #fff;
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background 0.2s, transform 0.15s;
-  flex-shrink: 0;
-}
+.wallet-card .actions { display: flex; gap: 6px; pointer-events: none; }
+.action-btn { background: rgba(255,255,255,0.18); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; color: #fff; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, transform 0.15s var(--apple-spring); flex-shrink: 0; }
 .action-btn:hover  { background: rgba(255,255,255,0.34); transform: scale(1.1); }
 .action-btn:active { transform: scale(0.92); }
 
-.wallet-dots {
-  display: flex; justify-content: center; gap: 6px;
-  margin-bottom: 1rem;
-}
-.wallet-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--border2);
-  transition: background 0.3s, transform 0.3s;
-  cursor: pointer;
-}
-.wallet-dot.active {
-  background: var(--blue-mid);
-  transform: scale(1.3);
-}
+.wallet-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 1rem; }
+.wallet-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border2); transition: background 0.3s, transform 0.3s var(--apple-spring); cursor: pointer; }
+.wallet-dot.active { background: var(--blue-mid); transform: scale(1.4); }
 
-.add-wallet-card {
-   padding: 14px 20px;
-  
-  cursor: pointer; display: flex; flex-direction: row;
-  align-items: center; justify-content: center; gap: 10px;
-  color: var(--text2); font-size: 15px; font-weight: 600;
-  width: 100%; transition: all .22s; margin-top: 0;
-}
+.add-wallet-card { padding: 14px 20px; cursor: pointer; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; color: var(--text2); font-size: 15px; font-weight: 600; width: 100%; transition: all .22s; margin-top: 0; }
 .add-wallet-card:hover { border-color: var(--blue-mid); color: var(--blue); }
+.add-wallet-card:active { transform: scale(0.98); }
 
 /* ── Other UI Elements ── */
 .color-picker-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 6px; }
@@ -328,9 +232,9 @@ body.dark-mode .search-fab:hover { background: rgba(255, 255, 255, 0.1); }
 body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
 .field input:focus, .field select:focus { border-color: var(--blue-mid); background: var(--surface); box-shadow: 0 0 0 4px var(--blue-bg); }
 .btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-.btn { padding: 14px 20px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 16px; font-family: inherit; font-weight: 600; cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-sm); }
+.btn { padding: 14px 20px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 16px; font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.2s var(--apple-spring); display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: var(--shadow-sm); }
 .btn:hover { background: var(--bg); transform: translateY(-1px); box-shadow: var(--shadow); }
-.btn:active { transform: scale(.96); }
+.btn:active { transform: scale(0.96); box-shadow: var(--shadow-sm); }
 .btn.g-btn { background: var(--green-bg); border-color: var(--green-mid); color: var(--green); }
 .btn.r-btn { background: var(--red-bg); border-color: var(--red-mid); color: var(--red); }
 .btn.b-btn { background: var(--blue-bg); border-color: var(--blue-mid); color: var(--blue); }
@@ -356,6 +260,7 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
 .entry-amount.r { color: var(--text); }
 .del-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 8px; border-radius: 8px; transition: 0.2s; }
 .del-btn:hover { color: var(--red); background: var(--red-bg); }
+.del-btn:active { transform: scale(0.85); }
 .month-filter { display: flex; gap: 8px; align-items: center; margin-bottom: 1.5rem; }
 .month-group { font-size: 14px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; padding: 16px 0 8px; border-bottom: 0.5px solid var(--border); margin-bottom: 8px; }
 
@@ -366,7 +271,7 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
 .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-.modal { background: var(--surface); border-radius: var(--radius-xl); padding: 2rem; width: 100%; max-width: 440px; box-shadow: var(--shadow-md); animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+.modal { background: var(--surface); border-radius: var(--radius-xl); padding: 2rem; width: 100%; max-width: 440px; box-shadow: var(--shadow-md); animation: slideUp 0.3s var(--apple-spring); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
 @keyframes slideUp { from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;} }
 .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.5px; }
 .modal-footer { display: flex; gap: 12px; justify-content: flex-end; margin-top: 2rem; }
@@ -385,31 +290,27 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
 .debt-meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .meta-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 13px; color: var(--text2); font-weight: 600; }
 .debt-progress-bg { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; margin-bottom: 10px; }
-.debt-progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1); }
+.debt-progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s var(--apple-spring); }
 .debt-footer-text { display: flex; justify-content: space-between; font-size: 14px; color: var(--text2); font-weight: 600; }
 .debt-footer-text .main-val { color: var(--text); font-family: ui-monospace, monospace; font-size: 15px;}
 .debt-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; padding-top: 16px; border-top: 1px dashed var(--border); }
 .debt-actions .btn { flex: 1; min-width: 80px; }
+
+/* ── Chart Enhancements ── */
+.chart-controls { display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.timeline-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--text); animation: popIn 0.3s var(--apple-spring); box-shadow: var(--shadow-sm); }
+.timeline-chip i { cursor: pointer; color: var(--red); transition: transform 0.2s; }
+.timeline-chip i:hover { transform: scale(1.2); }
+@keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .chart-wrap { position: relative; width: 100%; height: 260px; margin-top: 10px; }
 
 /* ── Mobile Layout Fixes ── */
 @media (max-width: 600px) {
-  .app { padding: 0 1rem 7rem; } /* Changed: Top padding is now 0 */
-  .top-bar { 
-    flex-direction: row; 
-    margin: 0 -1rem 1rem -1rem; /* Keeps it edge-to-edge on mobile */
-    padding: max(16px, env(safe-area-inset-top)) 16px 12px; 
-  }
+  .app { padding: 0 1rem 7rem; }
+  .top-bar { flex-direction: row; margin: 0 -1rem 1rem -1rem; padding: max(16px, env(safe-area-inset-top)) 16px 12px; }
   .app-title { font-size: 22px; }
-  .top-right { 
-    width: 100%; 
-    justify-content: flex-start; /* Aligns them neatly to the left on mobile */
-    gap: 8px; 
-    padding-bottom: 4px; /* Gives a tiny bit of breathing room if they scroll */
-  }
-  select.ctrl { 
-    min-width: max-content; /* Stops the currency box from shrinking text */
-  }
+  .top-right { width: 100%; justify-content: flex-start; gap: 8px; padding-bottom: 4px; }
+  select.ctrl { min-width: max-content; }
   .summary-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .form-row { flex-direction: column; align-items: stretch; margin-bottom: 10px; }
   .btn-row .btn { width: 100%; }
@@ -419,7 +320,7 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
 }
 
 /* ── Search Modal ── */
-.search-modal-box { background: var(--surface); border-radius: 20px; width: 100%; max-width: 560px; max-height: 82vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-md); animation: slideUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1); border: 1px solid rgba(255,255,255,0.1); }
+.search-modal-box { background: var(--surface); border-radius: 20px; width: 100%; max-width: 560px; max-height: 82vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-md); animation: slideUp 0.25s var(--apple-spring); border: 1px solid rgba(255,255,255,0.1); }
 .search-input-row { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 0.5px solid var(--border); }
 #search-input { flex: 1; border: none; background: transparent; font-size: 18px; font-family: inherit; color: var(--text); outline: none; min-width: 0; font-weight: 500; }
 #search-input::placeholder { color: var(--text3); }
@@ -483,7 +384,7 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
     <button class="search-fab" onclick="openSearch()" title="Search"><i data-lucide="search"></i></button>
   </div>
 
-  <div id="page-wallets">
+  <div id="page-wallets" class="page-view">
     <div id="wallets-container"></div>
     
     <div class="card">
@@ -597,15 +498,17 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
   <div id="page-chart" style="display:none;">
     <div class="card">
       <div class="card-title"><i data-lucide="trending-up"></i> Custom Timeline</div>
-      <div class="section-tabs" id="timeline-scale-tabs">
-        <button class="section-tab" onclick="changeTimelineScale('day')">Day</button>
-        <button class="section-tab" onclick="changeTimelineScale('week')">Week</button>
-        <button class="section-tab active" onclick="changeTimelineScale('month')">Month</button>
-        <button class="section-tab" onclick="changeTimelineScale('year')">Year</button>
-      </div>
-      <div class="form-row" style="margin-bottom: 16px;">
-        <div class="field"><label>Select metric to track</label><select id="timeline-select"></select></div>
-        <button class="btn b-btn" onclick="addTimelineMetric()" style="width: 100%;"><i data-lucide="plus"></i> Add to Chart</button>
+      <div class="chart-controls">
+        <div class="section-tabs" id="timeline-scale-tabs" style="margin-bottom: 0;">
+          <button class="section-tab" onclick="changeTimelineScale('day')">Day</button>
+          <button class="section-tab" onclick="changeTimelineScale('week')">Week</button>
+          <button class="section-tab active" onclick="changeTimelineScale('month')">Month</button>
+          <button class="section-tab" onclick="changeTimelineScale('year')">Year</button>
+        </div>
+        <div class="form-row" style="margin-bottom: 0;">
+          <div class="field" style="flex:1;"><label style="display:none;">Select metric</label><select id="timeline-select"></select></div>
+          <button class="btn b-btn" onclick="addTimelineMetric()" style="white-space:nowrap;"><i data-lucide="plus"></i> Add to Chart</button>
+        </div>
       </div>
       <div id="timeline-chips" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;"></div>
       <div class="chart-wrap"><canvas id="timeline-chart"></canvas></div>
@@ -647,7 +550,6 @@ body.dark-mode .field input, body.dark-mode .field select { box-shadow: inset 0 
       <button class="icon-btn" onclick="closeWalletDeck()"><i data-lucide="x"></i></button>
     </div>
     <div id="wallet-deck-list" style="display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding-right: 4px; flex-grow: 1;">
-      <!-- Wallet Cards Populated Here -->
     </div>
   </div>
 </div>
@@ -771,10 +673,7 @@ async function saveToDrive() {
 async function loadFromDrive() { 
     const response = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' }); 
     if (response.result) { 
-        // 1. Safely merge the Drive data with the default state
         S = { ...S, ...response.result }; 
-        
-        // 2. Fallbacks: Ensure critical arrays always exist to prevent .map() crashes
         if (!S.categories || !S.categories.length) {
             S.categories = ['Food','Transport','Housing','Health','Entertainment','Shopping','Utilities','Education','Savings','Salary','Freelance','Other'];
         }
@@ -784,9 +683,7 @@ async function loadFromDrive() {
         if (!S.walletHistory) S.walletHistory = [];
         if (!S.sources) S.sources = [];
         if (!S.goals) S.goals = [];
-
-        scheduleSave(); 
-        render(); 
+        scheduleSave(); render(); 
     } 
 }
 
@@ -862,16 +759,7 @@ async function loadData(){
 function toggleHide() { 
     showBalance = !showBalance; 
     document.getElementById('eye-icon').setAttribute('data-lucide', showBalance ? 'eye' : 'eye-off'); 
-    
-    // Selectively render to avoid destroying charts and causing massive lag
-    renderWallets(); 
-    renderSummary(); 
-    renderTxList(); 
-    renderDebts(); 
-    renderSources(); 
-    renderBudget(); 
-    renderGoals(); 
-    
+    renderWallets(); renderSummary(); renderTxList(); renderDebts(); renderSources(); renderBudget(); renderGoals(); 
     if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck(); 
     lucide.createIcons(); 
 }
@@ -896,16 +784,9 @@ function populateWalletSelects(){
 function populateCategories(forceVal) {
   const el = document.getElementById('tx-cat');
   if(!el) return;
-  // Use the passed value, otherwise stick to current value, otherwise default
   const cur = forceVal !== undefined ? forceVal : el.value;
-  
   el.innerHTML = S.categories.map(c => `<option value="${c}">${c}</option>`).join('') + `<option value="__add_new__" style="font-weight:600; color:var(--blue);">+ Add custom...</option>`;
-  
-  if(S.categories.includes(cur)) {
-      el.value = cur;
-  } else if(S.categories.length) {
-      el.value = S.categories[0];
-  }
+  if(S.categories.includes(cur)) { el.value = cur; } else if(S.categories.length) { el.value = S.categories[0]; }
 }
 
 function handleCategoryChange(sel) {
@@ -913,13 +794,10 @@ function handleCategoryChange(sel) {
     const newCat = prompt("Enter new category name:");
     if(newCat && newCat.trim()) {
       const cleanCat = newCat.trim();
-      if(!S.categories.includes(cleanCat)) {
-        S.categories.push(cleanCat);
-        scheduleSave();
-      }
-      populateCategories(cleanCat); // Passes the new selection back so it stays selected!
+      if(!S.categories.includes(cleanCat)) { S.categories.push(cleanCat); scheduleSave(); }
+      populateCategories(cleanCat); 
     } else {
-      populateCategories(); // Reset to what it was before if they hit cancel
+      populateCategories(); 
     }
   }
 }
@@ -975,20 +853,13 @@ function renderWallets() {
       </div>`;
   });
 
-  // Dot indicators
   let dotsHtml = `<div class="wallet-dots">`;
   S.wallets.forEach((w, i) => {
     dotsHtml += `<div class="wallet-dot${w.id === expandedWalletId ? ' active' : ''}" onclick="expandWallet('${w.id}')"></div>`;
   });
   dotsHtml += `</div>`;
 
-  container.innerHTML = `
-    <div class="wallet-deck" id="wallet-row">
-      ${cardsHtml}
-    </div>
-    ${dotsHtml}
-    <div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:22px;height:22px;"></i><span>Add wallet</span></div>`;
-
+  container.innerHTML = `<div class="wallet-deck" id="wallet-row">${cardsHtml}</div>${dotsHtml}<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:22px;height:22px;"></i><span>Add wallet</span></div>`;
   lucide.createIcons();
   positionDeckCards(activeIdx);
 }
@@ -999,35 +870,15 @@ function positionDeckCards(activeIdx) {
 
   cards.forEach((card, i) => {
     let translateY, zIndex, scale, opacity;
-    
-    // Circular math to make it wrap like an infinite roulette
     let offset = i - activeIdx;
     if (N >= 3) {
       if (offset > Math.floor(N / 2)) offset -= N;
       else if (offset < -Math.floor(N / 2)) offset += N;
     }
 
-    if (offset === 0) {
-      // Active card dead center
-      translateY = 0;
-      zIndex = 100;
-      scale = 1;
-      opacity = 1;
-    } else if (offset < 0) {
-      // Cards BEFORE the active one stack neatly at the top
-      translateY = -65; 
-      zIndex = 50 - Math.abs(offset);
-      scale = 0.88;
-      // Only show the IMMEDIATE neighbor so there's exactly one card peeking around the active one
-      opacity = offset === -1 ? 0.95 : 0; 
-    } else {
-      // Cards AFTER the active one stack neatly at the bottom
-      translateY = 65; 
-      zIndex = 50 - Math.abs(offset);
-      scale = 0.88;
-      // Only show the IMMEDIATE neighbor so there's exactly one card peeking around the active one
-      opacity = offset === 1 ? 0.95 : 0;
-    }
+    if (offset === 0) { translateY = 0; zIndex = 100; scale = 1; opacity = 1; } 
+    else if (offset < 0) { translateY = -65; zIndex = 50 - Math.abs(offset); scale = 0.88; opacity = offset === -1 ? 0.95 : 0; } 
+    else { translateY = 65; zIndex = 50 - Math.abs(offset); scale = 0.88; opacity = offset === 1 ? 0.95 : 0; }
 
     card.style.transform = `translateY(${translateY}px) scale(${scale})`;
     card.style.zIndex = zIndex;
@@ -1039,16 +890,8 @@ function expandWallet(id) {
   if (expandedWalletId === id) return;
   expandedWalletId = id;
   const activeIdx = S.wallets.findIndex(w => w.id === id);
-
-  document.querySelectorAll('#wallet-row .wallet-card[data-wid]').forEach(card => {
-    card.classList.toggle('wc-active', card.dataset.wid === id);
-  });
-
-  // Update dots
-  document.querySelectorAll('.wallet-dot').forEach((dot, i) => {
-    dot.classList.toggle('active', i === activeIdx);
-  });
-
+  document.querySelectorAll('#wallet-row .wallet-card[data-wid]').forEach(card => { card.classList.toggle('wc-active', card.dataset.wid === id); });
+  document.querySelectorAll('.wallet-dot').forEach((dot, i) => { dot.classList.toggle('active', i === activeIdx); });
   positionDeckCards(activeIdx);
 }
 
@@ -1235,9 +1078,23 @@ function confirmClearAll(){
   document.getElementById('budget-input').value=''; scheduleSave();render(); 
 }
 
+/* ── Enchanced Navigation with Apple Motion ── */
 function showPage(p){
   const allTabs=['wallets','transactions','debts','budget','chart','data'];
-  allTabs.forEach(x => document.getElementById('page-'+x).style.display = x===p ? 'block' : 'none');
+  allTabs.forEach(x => {
+    const el = document.getElementById('page-'+x);
+    if(x === p) {
+        el.style.display = 'block';
+        el.style.animation = 'none';
+        el.offsetHeight; /* trigger reflow for smooth animation restart */
+        el.style.animation = null;
+        el.classList.add('page-view');
+    } else {
+        el.style.display = 'none';
+        el.classList.remove('page-view');
+    }
+  });
+  
   document.querySelectorAll('.nav-tab').forEach((btn,i) => btn.className = 'nav-tab' + (allTabs[i]===p ? ' active' : ''));
   const activeTab = document.querySelector('.nav-tab.active'); if(activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
   currentPage=p; if(p==='chart') renderCharts();
@@ -1259,7 +1116,6 @@ function render(){
     renderSources(); 
     renderBudget(); 
     renderGoals(); 
-    // ONLY render charts if we are explicitly on the chart tab
     if(currentPage==='chart') renderCharts(); 
     lucide.createIcons(); 
 }
@@ -1321,19 +1177,19 @@ function renderBudget(){
 let timelineScale = 'month';
 function changeTimelineScale(scale) { timelineScale = scale; const scales = ['day', 'week', 'month', 'year'], tabs = document.querySelectorAll('#timeline-scale-tabs .section-tab'); if(tabs.length === 4) { tabs.forEach((tab, i) => tab.className = 'section-tab' + (scales[i] === scale ? ' active' : '')); } renderCharts(); }
 
+/* ── Enhanced Chart Rendering with Futuristic Styles ── */
 function renderCharts(){
-    const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+  const tc = getComputedStyle(document.body).getPropertyValue('--text3').trim() || '#a09e98', gc = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
   const timelineSelect = document.getElementById('timeline-select');
   timelineSelect.innerHTML = `<option value="Income">Total Income</option><option value="Expense">Total Expense</option><option value="Net">Net Balance</option>` + (S.categories || []).map(c => `<option value="${c}">Category: ${c}</option>`).join('');
   
-  // Safely escape quotes to prevent breaking the HTML timeline chips
   document.getElementById('timeline-chips').innerHTML = activeTimelineMetrics.map(m => {
       const safeM = m.replace(/'/g, "\\'"); 
-      return `<div class="meta-chip" style="background:var(--bg); border-color:var(--border); color:var(--text);">${m} <i data-lucide="x" style="cursor:pointer; width:16px; color:var(--red);" onclick="removeTimelineMetric('${safeM}')"></i></div>`;
+      return `<div class="timeline-chip">${m} <i data-lucide="x" style="width:16px;" onclick="removeTimelineMetric('${safeM}')"></i></div>`;
   }).join('');
 
   const groupedData = {};
- const sortedTxs = [...(S.transactions || [])].sort((a,b) => { const da = new Date(parseLegacyDate(a.date) || (a.month + "-01")), db = new Date(parseLegacyDate(b.date) || (b.month + "-01")); return da - db; });
+  const sortedTxs = [...(S.transactions || [])].sort((a,b) => { const da = new Date(parseLegacyDate(a.date) || (a.month + "-01")), db = new Date(parseLegacyDate(b.date) || (b.month + "-01")); return da - db; });
   sortedTxs.forEach(t => {
       let key; const dateObj = new Date(parseLegacyDate(t.date) || (t.month + "-01"));
       if (timelineScale === 'day') { key = dateObj.toLocaleDateString('en-GB'); } 
@@ -1351,7 +1207,13 @@ function renderCharts(){
           if (metric === 'Net') return txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0) - txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
           return txs.filter(t => t.cat === metric).reduce((s, t) => s + t.amount, 0);
       });
-      return { label: metric, data: data, borderColor: chartColors[idx % chartColors.length], backgroundColor: chartColors[idx % chartColors.length] + '20', borderWidth: 2, fill: true, tension: 0.4 };
+      return { 
+          label: metric, data: data, 
+          borderColor: chartColors[idx % chartColors.length], 
+          backgroundColor: chartColors[idx % chartColors.length] + '20', 
+          borderWidth: 3, fill: true, tension: 0.4, 
+          pointRadius: 0, pointHoverRadius: 6 
+      };
   });
 
   if (timelineChart) timelineChart.destroy();
@@ -1400,8 +1262,6 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
 
 // ── Calculator Popup for number inputs (desktop + mobile) ──
 (function () {
-
-  /* ── Styles ── */
   const style = document.createElement('style');
   style.textContent = `
   #calc-popup {
@@ -1481,7 +1341,6 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
   `;
   document.head.appendChild(style);
 
-  /* ── Popup DOM ── */
   const popup = document.createElement('div');
   popup.id = 'calc-popup';
   popup.innerHTML = `
@@ -1492,22 +1351,18 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
       <button class="calc-btn del" data-action="del">⌫</button>
       <button class="calc-btn op"  data-action="op" data-val="%">%</button>
       <button class="calc-btn op"  data-action="op" data-val="÷">÷</button>
-
       <button class="calc-btn num" data-action="digit" data-val="7">7</button>
       <button class="calc-btn num" data-action="digit" data-val="8">8</button>
       <button class="calc-btn num" data-action="digit" data-val="9">9</button>
       <button class="calc-btn op"  data-action="op" data-val="×">×</button>
-
       <button class="calc-btn num" data-action="digit" data-val="4">4</button>
       <button class="calc-btn num" data-action="digit" data-val="5">5</button>
       <button class="calc-btn num" data-action="digit" data-val="6">6</button>
       <button class="calc-btn op"  data-action="op" data-val="−">−</button>
-
       <button class="calc-btn num" data-action="digit" data-val="1">1</button>
       <button class="calc-btn num" data-action="digit" data-val="2">2</button>
       <button class="calc-btn num" data-action="digit" data-val="3">3</button>
       <button class="calc-btn op"  data-action="op" data-val="+">+</button>
-
       <button class="calc-btn num zero" data-action="digit" data-val="0">0</button>
       <button class="calc-btn num" data-action="digit" data-val=".">.</button>
       <button class="calc-btn eq"  data-action="eq">=</button>
@@ -1520,29 +1375,18 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
   let currentInput = null;
   let expr = '';
 
-  /* ── Evaluator ── */
   function evalExpr(str) {
-    const safe = str.trim()
-      .replace(/×/g, '*').replace(/÷/g, '/')
-      .replace(/−/g, '-').replace(/x/gi, '*')
-      .replace(/,/g, '').replace(/\s/g, '');
+    const safe = str.trim().replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/x/gi, '*').replace(/,/g, '').replace(/\s/g, '');
     if (!safe) return null;
     if (!/^[\d+\-*/().%]+$/.test(safe)) return null;
-    try {
-      let v = Function('"use strict"; return (' + safe + ')')();
-      return isFinite(v) ? parseFloat(v.toFixed(10)) : null;
-    } catch(e) { return null; }
+    try { let v = Function('"use strict"; return (' + safe + ')')(); return isFinite(v) ? parseFloat(v.toFixed(10)) : null; } catch(e) { return null; }
   }
 
   function updateDisplay() {
     exprEl.textContent = expr || '0';
     const preview = evalExpr(expr);
     const hasOp = /[+\-×÷−*/%]/.test(expr);
-    if (preview !== null && hasOp) {
-      previewEl.textContent = '= ' + preview.toLocaleString();
-    } else {
-      previewEl.textContent = '';
-    }
+    if (preview !== null && hasOp) { previewEl.textContent = '= ' + preview.toLocaleString(); } else { previewEl.textContent = ''; }
   }
 
   function applyToInput(val) {
@@ -1562,7 +1406,6 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
     closePopup();
   }
 
-  /* ── Button actions ── */
   popup.addEventListener('pointerdown', e => {
     e.stopPropagation();
     const btn = e.target.closest('.calc-btn');
@@ -1571,44 +1414,27 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
     const action = btn.dataset.action;
     const val    = btn.dataset.val;
 
-    if (action === 'digit') {
-      // Prevent double dots
-      if (val === '.' && expr.split(/[+\-×÷−*/%]/).pop().includes('.')) return;
-      expr += val;
-    } else if (action === 'op') {
-      // Replace trailing operator
-      expr = expr.replace(/[+\-×÷−*/%]+$/, '') + val;
-    } else if (action === 'del') {
-      expr = expr.slice(0, -1);
-    } else if (action === 'clear') {
-      expr = '';
-    } else if (action === 'eq') {
-      commitAndClose();
-      return;
-    }
+    if (action === 'digit') { if (val === '.' && expr.split(/[+\-×÷−*/%]/).pop().includes('.')) return; expr += val; } 
+    else if (action === 'op') { expr = expr.replace(/[+\-×÷−*/%]+$/, '') + val; } 
+    else if (action === 'del') { expr = expr.slice(0, -1); } 
+    else if (action === 'clear') { expr = ''; } 
+    else if (action === 'eq') { commitAndClose(); return; }
     updateDisplay();
   });
 
-  /* ── Position popup near input ── */
   function positionPopup(input) {
     const rect = input.getBoundingClientRect();
     const pw = 240, ph = 310;
     const vw = window.innerWidth, vh = window.innerHeight;
-
     let top  = rect.bottom + 8;
     let left = rect.left;
-
-    // Flip up if not enough space below
     if (top + ph > vh - 10) top = rect.top - ph - 8;
-    // Clamp horizontally
     if (left + pw > vw - 10) left = vw - pw - 10;
     if (left < 10) left = 10;
-
     popup.style.top  = top  + 'px';
     popup.style.left = left + 'px';
   }
 
-  /* ── Open / Close ── */
   function openPopup(input) {
     currentInput = input;
     const raw = parseFloat(input.value);
@@ -1618,16 +1444,11 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
     positionPopup(input);
   }
 
-  function closePopup() {
-    popup.classList.remove('visible');
-    currentInput = null;
-  }
+  function closePopup() { popup.classList.remove('visible'); currentInput = null; }
 
-  /* ── Close on outside click ── */
   document.addEventListener('pointerdown', e => {
     if (!popup.classList.contains('visible')) return;
     if (!popup.contains(e.target) && e.target !== currentInput) {
-      // commit whatever is in the expr before closing
       const result = evalExpr(expr);
       const num = result !== null ? result : parseFloat(expr);
       if (!isNaN(num)) applyToInput(num);
@@ -1635,7 +1456,6 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
     }
   });
 
-  /* ── Keyboard support while popup is open ── */
   document.addEventListener('keydown', e => {
     if (!popup.classList.contains('visible')) return;
     if ('0123456789'.includes(e.key)) { expr += e.key; updateDisplay(); }
@@ -1646,34 +1466,21 @@ window.onload = async () => { await loadData(); lucide.createIcons(); };
     else if (e.key === 'Escape') { closePopup(); }
   });
 
-  /* ── Reposition on scroll/resize ── */
   window.addEventListener('resize', () => { if (currentInput && popup.classList.contains('visible')) positionPopup(currentInput); });
 
-  /* ── Attach to every number input ── */
   function attachTo(input) {
     if (input.dataset.calcAttached) return;
     input.dataset.calcAttached = '1';
-
-    input.addEventListener('click', e => {
-      e.stopPropagation();
-      openPopup(input);
-    });
-    input.addEventListener('focus', () => {
-      openPopup(input);
-    });
-    // Prevent native keyboard from hijacking on mobile
+    input.addEventListener('click', e => { e.stopPropagation(); openPopup(input); });
+    input.addEventListener('focus', () => { openPopup(input); });
     input.setAttribute('inputmode', 'none');
     input.setAttribute('readonly', 'readonly');
     input.style.cursor = 'pointer';
   }
 
-  function attachAll() {
-    document.querySelectorAll('input[type=number]:not([data-calc-attached])').forEach(attachTo);
-  }
-
+  function attachAll() { document.querySelectorAll('input[type=number]:not([data-calc-attached])').forEach(attachTo); }
   attachAll();
   new MutationObserver(attachAll).observe(document.body, { childList: true, subtree: true });
-
 })();
 </script>
 </body>
