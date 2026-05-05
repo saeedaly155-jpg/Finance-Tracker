@@ -82,63 +82,171 @@ body.dark-mode .nav-tabs.pill, body.dark-mode .search-fab { background: rgba(30,
 .nav-tab.active { color: var(--blue); }
 .nav-tab.active i[data-lucide] { color: var(--blue-mid); stroke-width: 2.5; }
 .search-fab { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; color: var(--text2); transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1); }
-.search-fab:active { transform: scale(1); }
+.search-fab:active { transform: scale(0.92); }
 .search-fab:hover { color: var(--blue-mid); background: rgba(118, 118, 128, 0.08); }
 
 /* ── Cards ── */
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow); transition: background 0.3s, border-color 0.3s; }
 .card-title { font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
 
-/* ── Wallet Row System ── */
-.wallet-row-wrap {
-  display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 1.5rem;
-  scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+/* ── Revolut-style Physical Card Stack ── */
+.wallet-deck {
+  position: relative;
+  width: 100%;
+  /* height set by JS */
+  margin-bottom: 1.5rem;
+  perspective: 1000px;
 }
-.wallet-row-wrap::-webkit-scrollbar { display: none; }
 
 .wallet-card {
-  border-radius: 20px; padding: 1.25rem 1.5rem; position: relative; overflow: hidden; color: #fff;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12), inset 0 1px 1px rgba(255,255,255,0.2);
-  display: flex; flex-direction: column; justify-content: space-between;
-  flex: 0 0 auto; width: 200px; min-height: 160px;
-  scroll-snap-align: start; cursor: pointer;
-  transition: transform 0.35s cubic-bezier(0.175,0.885,0.32,1),
-              opacity 0.35s ease,
-              filter 0.35s ease,
-              width 0.35s cubic-bezier(0.175,0.885,0.32,1),
-              box-shadow 0.35s ease;
+  position: absolute;
+  left: 0; right: 0;
+  /* Card proportions: standard credit card ratio ~1.586 */
+  height: 195px;
+  border-radius: 18px;
+  padding: 1.3rem 1.5rem;
+  overflow: hidden;
+  color: #fff;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Transitions for smooth stack animation */
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.2, 0.64, 1),
+    box-shadow 0.4s ease,
+    filter 0.4s ease,
+    opacity 0.4s ease;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.12);
+  will-change: transform;
+  transform-origin: center bottom;
 }
+
+/* Card shine overlay — left-to-right diagonal */
 .wallet-card::before {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(
+    125deg,
+    rgba(255,255,255,0.22) 0%,
+    rgba(255,255,255,0.06) 40%,
+    rgba(0,0,0,0.04) 70%,
+    rgba(0,0,0,0.10) 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* EMV chip mock */
+.w-chip {
+  width: 36px; height: 28px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #d4a843 0%, #f5d47a 40%, #b8860b 100%);
+  border: 1px solid rgba(255,255,255,0.3);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), 0 1px 3px rgba(0,0,0,0.3);
+  margin-bottom: 10px;
+  position: relative;
+  flex-shrink: 0;
+}
+.w-chip::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%; height: 45%;
+  border: 1px solid rgba(180,130,0,0.5);
+  border-radius: 2px;
+}
+
+.w-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  position: relative; z-index: 2;
+}
+.w-mid {
+  position: relative; z-index: 2;
+  flex: 1; display: flex; align-items: flex-end;
+}
+.w-bottom {
+  position: relative; z-index: 2;
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+
+.w-name { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); line-height: 1.2; }
+.w-type { font-size: 10px; opacity: 0.72; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+.w-label { font-size: 11px; opacity: 0.65; margin-bottom: 2px; font-weight: 500; letter-spacing: 0.04em; }
+.w-balance { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; font-family: ui-monospace, monospace; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+.w-cardnum { font-size: 13px; font-family: ui-monospace, monospace; letter-spacing: 0.15em; opacity: 0.7; }
+
+/* Mastercard-style dual circle logo */
+.w-logo {
+  display: flex; align-items: center;
+}
+.w-logo-circle {
+  width: 30px; height: 30px; border-radius: 50%;
+  opacity: 0.85;
+}
+.w-logo-circle:first-child { background: #eb001b; }
+.w-logo-circle:last-child  { background: #f79e1b; margin-left: -10px; }
+
+.wallet-card .actions {
+  display: flex; gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
   pointer-events: none;
 }
-/* Collapsed (blurred) state */
-.wallet-card.blurred {
-  opacity: 0.45; filter: blur(1.5px) saturate(0.6); transform: scale(0.95);
-  pointer-events: auto;
+.wallet-card.wc-active .actions {
+  opacity: 1; pointer-events: auto;
 }
-/* Expanded (active) state */
-.wallet-card.expanded {
-  width: 280px; box-shadow: 0 18px 40px rgba(0,0,0,0.22), inset 0 1px 1px rgba(255,255,255,0.2);
-  transform: scale(1);
+.action-btn {
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50%; color: #fff;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background 0.2s, transform 0.15s;
+  flex-shrink: 0;
 }
-/* Extra detail row shown only when expanded */
-.w-extra { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.25); }
-.wallet-card.expanded .w-extra { display: block; animation: fadeInUp 0.25s ease; }
-@keyframes fadeInUp { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+.action-btn:hover  { background: rgba(255,255,255,0.34); transform: scale(1.1); }
+.action-btn:active { transform: scale(0.92); }
 
-.w-top { display: flex; justify-content: space-between; align-items: flex-start; z-index: 1; }
-.w-bottom { z-index: 1; margin-top: auto; padding-top: 24px; }
-.w-name { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-.w-type { font-size: 12px; opacity: 0.75; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
-.w-label { font-size: 12px; opacity: 0.75; margin-bottom: 4px; font-weight: 500; }
-.w-balance { font-size: 32px; font-weight: 700; letter-spacing: -1px; font-family: ui-monospace, monospace; text-shadow: 0 2px 4px rgba(0,0,0,0.15); }
-.wallet-card .actions { display: flex; gap: 8px; }
-.action-btn { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; color: #fff; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-.action-btn:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
-.add-wallet-card { border-radius: 20px; padding: 1.25rem; border: 2px dashed var(--border2); background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: var(--text2); font-size: 15px; font-weight: 600; min-height: 160px; flex: 0 0 auto; width: 140px; transition: all .2s; scroll-snap-align: start; }
+/* Card detail (balance) — hidden on stacked cards, shown on active */
+.w-mid, .w-bottom { 
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease 0.12s, transform 0.3s ease 0.12s;
+  pointer-events: none;
+}
+.wallet-card.wc-active .w-mid,
+.wallet-card.wc-active .w-bottom {
+  opacity: 1; transform: none; pointer-events: auto;
+}
+
+/* Dot indicators below deck */
+.wallet-dots {
+  display: flex; justify-content: center; gap: 6px;
+  margin-bottom: 1rem;
+}
+.wallet-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--border2);
+  transition: background 0.3s, transform 0.3s;
+  cursor: pointer;
+}
+.wallet-dot.active {
+  background: var(--blue-mid);
+  transform: scale(1.3);
+}
+
+/* Add wallet button */
+.add-wallet-card {
+  border-radius: 16px; padding: 14px 20px;
+  border: 2px dashed var(--border2); background: transparent;
+  cursor: pointer; display: flex; flex-direction: row;
+  align-items: center; justify-content: center; gap: 10px;
+  color: var(--text2); font-size: 15px; font-weight: 600;
+  width: 100%; transition: all .22s; margin-top: 0;
+}
 .add-wallet-card:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-bg); }
 
 /* ── Other UI Elements ── */
@@ -745,87 +853,132 @@ function handleCategoryChange(sel) {
 
 function changeCurrency(){S.currency=document.getElementById('currency-select').value;scheduleSave();render(); if(document.getElementById('wallet-deck-modal').classList.contains('open')) renderWalletDeck();}
 
-// ── Wallet Deck System ──
+// ── Revolut-style Card Deck ──
 let expandedWalletId = null;
 
-function renderWallets(){
+const CARD_H = 195;           // card height px
+const DECK_PEEK = 22;         // how many px of each background card peeks above the active one
+
+function renderWallets() {
   const container = document.getElementById('wallets-container');
   if (!S.wallets || S.wallets.length === 0) {
-    container.innerHTML = `<div class="wallet-row-wrap"><div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px;height:28px;"></i><span>Add wallet</span></div></div>`;
+    container.innerHTML = `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:24px;height:24px;"></i><span>Add wallet</span></div>`;
     lucide.createIcons(); return;
   }
 
-  // Keep expandedWalletId valid
   if (expandedWalletId && !S.wallets.find(w => w.id === expandedWalletId)) expandedWalletId = null;
-  if (!expandedWalletId && S.wallets.length > 0) expandedWalletId = S.wallets[0].id;
+  if (!expandedWalletId) expandedWalletId = S.wallets[0].id;
 
-  let html = `<div class="wallet-row-wrap" id="wallet-row">`;
-  S.wallets.forEach(w => {
-    const isExp = w.id === expandedWalletId;
-    const cls = isExp ? 'expanded' : (expandedWalletId ? 'blurred' : '');
-    // Total transactions for this wallet
-    const txCount = S.transactions.filter(t => (t.walletId || t.wallet) === w.id).length;
-    html += `
-      <div class="wallet-card ${cls}" data-wid="${w.id}" onclick="expandWallet('${w.id}')"
-           style="background:${WALLET_COLORS[w.color]?.grad||WALLET_COLORS[0].grad};">
-        <div class="w-top" style="justify-content:space-between; align-items:flex-start;">
+  const activeIdx = S.wallets.findIndex(w => w.id === expandedWalletId);
+  // Deck height = card height + peek strips for all other cards above active
+  const deckH = CARD_H + Math.max(0, (S.wallets.length - 1)) * DECK_PEEK;
+
+  let cardsHtml = '';
+  S.wallets.forEach((w, i) => {
+    const isActive = w.id === expandedWalletId;
+    const bg = WALLET_COLORS[w.color]?.grad || WALLET_COLORS[0].grad;
+    cardsHtml += `
+      <div class="wallet-card${isActive ? ' wc-active' : ''}" data-wid="${w.id}"
+           onclick="expandWallet('${w.id}')"
+           style="background:${bg};">
+        <div class="w-top">
           <div>
             <div class="w-name">${w.name}</div>
             <div class="w-type">${w.type}</div>
           </div>
-          ${isExp ? `<div class="actions" onclick="event.stopPropagation()">
-            <button class="action-btn" onclick="openWalletModal('${w.id}')"><i data-lucide="pencil" style="width:14px;"></i></button>
-            <button class="action-btn" onclick="deleteWallet('${w.id}')"><i data-lucide="x" style="width:16px;"></i></button>
-          </div>` : ''}
+          <div class="actions" onclick="event.stopPropagation()">
+            <button class="action-btn" onclick="openWalletModal('${w.id}')"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
+            <button class="action-btn" onclick="deleteWallet('${w.id}')"><i data-lucide="x" style="width:15px;height:15px;"></i></button>
+          </div>
+        </div>
+        <div class="w-mid">
+          <div class="w-chip"></div>
         </div>
         <div class="w-bottom">
-          <div class="w-label">Balance</div>
-          <div class="w-balance">${fmt(w.balance, w.currency)}</div>
-        </div>
-        <div class="w-extra">
-          <div style="font-size:12px;opacity:0.8;font-weight:600;">${txCount} transaction${txCount!==1?'s':''}</div>
+          <div>
+            <div class="w-label">Balance</div>
+            <div class="w-balance">${fmt(w.balance, w.currency)}</div>
+          </div>
+          <div class="w-logo">
+            <div class="w-logo-circle"></div>
+            <div class="w-logo-circle"></div>
+          </div>
         </div>
       </div>`;
   });
-  html += `<div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:28px;height:28px;"></i><span>Add</span></div>`;
-  html += `</div>`;
-  container.innerHTML = html;
+
+  // Dot indicators
+  let dotsHtml = `<div class="wallet-dots">`;
+  S.wallets.forEach((w, i) => {
+    dotsHtml += `<div class="wallet-dot${w.id === expandedWalletId ? ' active' : ''}" onclick="expandWallet('${w.id}')"></div>`;
+  });
+  dotsHtml += `</div>`;
+
+  container.innerHTML = `
+    <div class="wallet-deck" id="wallet-row" style="height:${deckH}px;">
+      ${cardsHtml}
+    </div>
+    ${dotsHtml}
+    <div class="add-wallet-card" onclick="openWalletModal()"><i data-lucide="plus" style="width:22px;height:22px;"></i><span>Add wallet</span></div>`;
+
   lucide.createIcons();
+  positionDeckCards(activeIdx);
+}
+
+function positionDeckCards(activeIdx) {
+  const cards = Array.from(document.querySelectorAll('#wallet-row .wallet-card[data-wid]'));
+  const total = cards.length;
+
+  cards.forEach((card, i) => {
+    const offset = i - activeIdx; // negative = above active, positive = below active
+    let translateY, scale, zIndex, filterVal, opacity;
+
+    if (i === activeIdx) {
+      // Front card
+      translateY = (total - 1 - i) * DECK_PEEK; // sits at bottom of the peek stack
+      scale = 1;
+      zIndex = total + 10;
+      filterVal = 'none';
+      opacity = 1;
+    } else if (i < activeIdx) {
+      // Cards that come before active — hidden underneath (push below)
+      translateY = (total - 1 - activeIdx) * DECK_PEEK + (activeIdx - i) * CARD_H * 0.08;
+      scale = 1 - (activeIdx - i) * 0.04;
+      zIndex = i + 1;
+      filterVal = `brightness(${0.72 - (activeIdx - i) * 0.04}) saturate(0.6)`;
+      opacity = Math.max(0.4, 0.85 - (activeIdx - i) * 0.15);
+    } else {
+      // Cards that come after active — peek above (stacked behind/above in visual z)
+      const peekPos = i - activeIdx; // 1-based distance above active
+      translateY = (total - 1 - i) * DECK_PEEK;
+      scale = 1 - peekPos * 0.035;
+      zIndex = total - peekPos;
+      filterVal = `brightness(${0.82 - peekPos * 0.06}) saturate(0.65)`;
+      opacity = Math.max(0.5, 1 - peekPos * 0.18);
+    }
+
+    card.style.transform = `translateY(${translateY}px) scale(${scale})`;
+    card.style.zIndex = zIndex;
+    card.style.filter = filterVal;
+    card.style.opacity = opacity;
+  });
 }
 
 function expandWallet(id) {
-  if (expandedWalletId === id) return; // already expanded
+  if (expandedWalletId === id) return;
   expandedWalletId = id;
-  // Update classes without full re-render for smoothness
+  const activeIdx = S.wallets.findIndex(w => w.id === id);
+
   document.querySelectorAll('#wallet-row .wallet-card[data-wid]').forEach(card => {
-    const wid = card.dataset.wid;
-    card.classList.remove('expanded','blurred');
-    if (wid === id) {
-      card.classList.add('expanded');
-      // Show action buttons
-      if (!card.querySelector('.actions')) {
-        const w = S.wallets.find(x => x.id === wid);
-        const actDiv = document.createElement('div');
-        actDiv.className = 'actions';
-        actDiv.style.cssText = 'position:absolute;top:1.25rem;right:1.5rem;';
-        actDiv.onclick = e => e.stopPropagation();
-        actDiv.innerHTML = `<button class="action-btn" onclick="openWalletModal('${wid}')"><i data-lucide="pencil" style="width:14px;"></i></button>
-          <button class="action-btn" onclick="deleteWallet('${wid}')"><i data-lucide="x" style="width:16px;"></i></button>`;
-        card.querySelector('.w-top').appendChild(actDiv);
-        lucide.createIcons();
-      }
-      // Show extra
-      const extra = card.querySelector('.w-extra');
-      if (extra) extra.style.display = 'block';
-    } else {
-      card.classList.add('blurred');
-      // hide actions
-      const act = card.querySelector('.w-top .actions');
-      if (act) act.remove();
-      const extra = card.querySelector('.w-extra');
-      if (extra) extra.style.display = 'none';
-    }
+    card.classList.toggle('wc-active', card.dataset.wid === id);
   });
+
+  // Update dots
+  document.querySelectorAll('.wallet-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === activeIdx);
+  });
+
+  positionDeckCards(activeIdx);
 }
 
 function renderWalletDeck() {
