@@ -1,16 +1,3 @@
-Gemini
-Google Drive Sync Integration
-Conversation with Gemini
-i need to edit the code only of google drive as i need to embed the client id in the code and also i need to add sync button at the to bar and i need to only sync only first and one time and the rest to be synced auto
-
-To implement this exactly as requested without touching the rest of your design or existing structure, we will do two things:
-
-Add the sync button to your existing <header> top bar.
-
-Replace your current Google Drive script section with a new auto-sync block that embeds the Client ID and intercepts your existing saveState function to handle everything silently in the background after the first manual sync.
-
-1. Update the Header (HTML)
-Find the <header> block at the top of your index.html file and replace it with this version. It simply wraps the profile avatar and the new Sync button together on the right side.
 
 HTML
     <header style="padding: 20px 20px 12px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; z-index: 10;">
