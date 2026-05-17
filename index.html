@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- PWA iOS META TAGS -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -78,7 +77,6 @@
 <body>
 <div class="app" id="app">
 
-    <!-- HEADER -->
     <header style="padding: 20px 20px 12px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; z-index: 10;">
         <div>
             <p class="tag" style="color: var(--muted);">Finance Tracker</p>
@@ -99,10 +97,8 @@
         </div>
     </header>
 
-    <!-- MAIN -->
     <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
 
-    <!-- NAV -->
     <nav class="glass scroll-hide" style="border-top: 1px solid var(--border); position: absolute; bottom: 0; left: 0; right: 0; height: 88px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; z-index: 20; overflow-x: auto;">
         <button onclick="switchTab('home')" id="nav-home" class="nav-active" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
             <i data-lucide="layout-grid" style="width:20px;height:20px;"></i>
@@ -137,10 +133,8 @@
         </button>
     </nav>
 
-    <!-- OVERLAY -->
     <div id="overlay" onclick="closeSheet()" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:30;"></div>
 
-    <!-- BOTTOM SHEET -->
     <div id="bottom-sheet" class="sheet" style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#12121a;border-radius:32px 32px 0 0;border-top:1px solid var(--border);z-index:40;max-height:92vh;overflow-y:auto;" class="scroll-hide">
         <div style="width:36px;height:4px;background:rgba(255,255,255,0.12);border-radius:4px;margin:14px auto 0;"></div>
         <div id="sheet-content" style="padding: 20px 24px 40px;"></div>
@@ -372,7 +366,7 @@ function handleSearch() {
     const wallets = state.wallets.filter(w => w.name.toLowerCase().includes(query) || (w.currency && w.currency.toLowerCase().includes(query)));
     if (wallets.length) {
         html += '<p class="section-title" style="margin-top:10px;">Wallets</p>';
-        html += wallets.map(w => `<div class="tx-row" onclick="closeSheet(); switchTab('wallets'); setTimeout(()=>toggleWalletCard(${w.id}), 300);">
+        html += wallets.map(w => `<div class="tx-row" onclick="closeSheet(); switchTab('wallets');">
             <div class="icon-box" style="background:${w.color}18;"><i data-lucide="${w.icon}" style="color:${w.color};"></i></div>
             <div style="flex:1;"><p style="font-size:14px;font-weight:600;">${w.name}</p><p style="font-size:10px;color:var(--muted);">${w.currency||state.currency.code} ${fmtNum(w.balance)}</p></div>
         </div>`).join('');
@@ -453,7 +447,6 @@ function renderHome() {
     const alerts = state.budgets.filter(b => getCurrentMonthSpend(b.categoryId) >= b.limit * 0.8);
 
     return `<div class="fade-up">
-        <!-- Balance Card -->
         <div style="background:linear-gradient(135deg,#12181e,#0d1a14);border:1px solid rgba(16,185,129,0.15);border-radius:24px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden;">
             <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(16,185,129,0.06);border-radius:50%;filter:blur(20px);"></div>
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
@@ -480,24 +473,29 @@ function renderHome() {
             </div>
         </div>` : ''}
 
-        <!-- Wallet Strip -->
-        <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:24px;" class="scroll-hide">
+        <div style="display:flex;gap:16px;overflow-x:auto;padding:10px 0 24px;margin-bottom:14px;" class="scroll-hide">
             ${state.wallets.map(w => {
                 const wCurr = w.currency || state.currency.code;
-                return `<div style="flex-shrink:0;background:var(--surface2);border:1px solid var(--border);border-radius:18px;padding:14px 18px;min-width:140px;">
-                    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">
-                        <div style="width:32px;height:32px;border-radius:10px;background:${w.color}18;display:flex;align-items:center;justify-content:center;">
-                            <i data-lucide="${w.icon}" style="width:15px;height:15px;color:${w.color};"></i>
+                return `<div onclick="switchTab('wallets')" style="flex-shrink:0; width:280px; height:160px; border-radius:24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}99); position:relative; overflow:hidden; padding:20px; box-shadow: 0 12px 24px ${w.color}40; border: 1px solid rgba(255,255,255,0.2); display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
+                    <div style="position:absolute; top:-20px; right:-20px; width:120px; height:120px; background:rgba(255,255,255,0.1); border-radius:50%; pointer-events:none; filter:blur(5px);"></div>
+                    <div style="position:absolute; bottom:-30px; left:-10px; width:100px; height:100px; background:rgba(0,0,0,0.1); border-radius:50%; pointer-events:none; filter:blur(5px);"></div>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative; z-index:2;">
+                        <p style="font-size:16px; font-weight:700; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.2); letter-spacing:0.5px;">${w.name}</p>
+                        <div style="width:36px; height:24px; background:rgba(255,255,255,0.2); border-radius:6px; border:1px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+                            <div style="width:18px; height:10px; border:1px solid rgba(255,255,255,0.5); border-radius:2px; display:flex; gap:2px; padding:1px;">
+                                <div style="flex:1; border-right:1px solid rgba(255,255,255,0.5);"></div><div style="flex:1;"></div>
+                            </div>
                         </div>
-                        ${wCurr !== state.currency.code ? `<span style="font-size:9px;color:var(--muted);background:var(--bg);padding:2px 6px;border-radius:6px;">${wCurr}</span>` : ''}
                     </div>
-                    <p style="font-size:11px;color:var(--muted);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${w.name}</p>
-                    <p class="syne" style="font-size:15px;font-weight:700;color:var(--text);">${wCurr} ${fmtNum(w.balance)}</p>
+                    <div style="position:relative; z-index:2;">
+                        <p style="font-size:10px; color:rgba(255,255,255,0.8); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">Total Balance</p>
+                        <p class="syne" style="font-size:26px; font-weight:800; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">${wCurr} ${fmtNum(w.balance)}</p>
+                    </div>
                 </div>`
             }).join('')}
         </div>
 
-        <!-- Chart Tabs -->
         <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
             <p class="section-title" style="margin:0;">Cash Flow</p>
             <div style="display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px;border:1px solid var(--border);">
@@ -508,7 +506,6 @@ function renderHome() {
             <canvas id="cashFlowChart" height="180"></canvas>
         </div>
 
-        <!-- Expense Breakdown -->
         <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;">
             <div class="card" style="padding:16px;">
                 <p class="section-title">Spending Breakdown</p>
@@ -522,7 +519,6 @@ function renderHome() {
             </div>
         </div>
 
-        <!-- Transactions -->
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <p class="section-title" style="margin:0;">Recent</p>
             <button onclick="openAllTransactions()" style="font-size:10px;font-weight:700;color:var(--emerald);font-family:'Syne',sans-serif;">View All</button>
@@ -1339,66 +1335,48 @@ function payInstallment(id) {
 }
 function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchTab('debts'); showToast('Removed'); }
 
-// ─── WALLETS ────────────────────────────────────────────────────────
+// ─── NEW FIGMA-STYLE WALLETS ────────────────────────────────────────
 function renderWallets() {
-    return `<div class="fade-up">
-        <div id="wallet-stack" style="padding: 10px 0 30px; display: flex; flex-direction: column; align-items: center;">
-            ${state.wallets.map((w, i) => {
-                const isFirst = i === 0; const isExpanded = ui.expandedWalletId === w.id;
-                const height = isExpanded ? '170px' : '85px'; const transform = isExpanded ? 'translateY(-10px)' : 'translateY(0)';
-                const zIndex = isExpanded ? '50' : i.toString(); const shadow = isExpanded ? '0 12px 30px rgba(0,0,0,0.4)' : '0 -8px 20px rgba(0,0,0,0.25)';
+    return `<div class="fade-up" style="padding-bottom: 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 class="syne" style="font-size:24px;font-weight:800;">Saved Wallets</h2>
+            <button onclick="openWalletForm()" style="width:42px;height:42px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--emerald);"><i data-lucide="plus" style="width:20px;height:20px;"></i></button>
+        </div>
+        
+        <div style="display:flex;flex-direction:column;gap:16px;">
+            ${state.wallets.map(w => {
                 const wCurr = w.currency || state.currency.code;
-                const conv = wCurr !== state.currency.code ? `<span style="font-size:10px;color:var(--muted); opacity:${isExpanded?'0':'1'}; transition:opacity 0.3s;">≈ ${fmt(convertCurrency(w.balance, wCurr, state.currency.code))}</span>` : '';
+                const conv = wCurr !== state.currency.code ? `<span style="font-size:11px;color:rgba(255,255,255,0.7); display:block; margin-top:4px;">≈ ${fmt(convertCurrency(w.balance, wCurr, state.currency.code))}</span>` : '';
                 
                 return `
-                <div id="wallet-card-${w.id}" class="wallet-card-item" onclick="toggleWalletCard(${w.id})"
-                    style="width: 100%; max-width: 390px; height: ${height}; background: linear-gradient(145deg, var(--surface2) 0%, #0d0d12 100%);
-                           border: 1px solid var(--border); border-top: 2px solid ${w.color}; border-radius: 20px;
-                           padding: 16px 20px; margin-top: ${isFirst ? '0' : '-45px'}; z-index: ${zIndex};
-                           position: relative; transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-                           box-shadow: ${shadow}; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; transform: ${transform};">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 32px; height: 32px; border-radius: 10px; background: ${w.color}18; display: flex; align-items: center; justify-content: center;"><i data-lucide="${w.icon}" style="width: 16px; height: 16px; color: ${w.color};"></i></div>
-                            <div>
-                                <p style="font-size: 14px; font-weight: 700; color: var(--text);">${w.name}</p>
-                                <p id="wallet-sub-${w.id}" style="font-size: 11px; color: var(--muted); transition: opacity 0.3s; opacity: ${isExpanded?'0':'1'};">Tap to view</p>
+                <div style="position:relative;">
+                    <div style="width:100%; height:180px; border-radius:24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}88); position:relative; overflow:hidden; padding:24px; box-shadow: 0 16px 32px ${w.color}33; border: 1px solid rgba(255,255,255,0.25); display:flex; flex-direction:column; justify-content:space-between;">
+                        <div style="position:absolute; top:-30px; right:-20px; width:150px; height:150px; background:rgba(255,255,255,0.15); border-radius:50%; pointer-events:none; filter:blur(10px);"></div>
+                        <div style="position:absolute; bottom:-40px; left:-20px; width:120px; height:120px; background:rgba(0,0,0,0.15); border-radius:50%; pointer-events:none; filter:blur(10px);"></div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative; z-index:2;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div style="width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.3);">
+                                    <i data-lucide="${w.icon}" style="width:20px; height:20px; color:#fff;"></i>
+                                </div>
+                                <p style="font-size:18px; font-weight:700; color:#fff; letter-spacing:0.5px;">${w.name}</p>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button onclick="openWalletForm(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(255,255,255,0.2); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="edit-3" style="width:16px; height:16px;"></i></button>
+                                <button onclick="deleteWallet(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(244,63,94,0.3); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(244,63,94,0.4); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="trash-2" style="width:16px; height:16px;"></i></button>
                             </div>
                         </div>
-                        <div style="text-align: right;">
-                            <p id="wallet-bal-${w.id}" class="syne" style="font-size: ${isExpanded?'24px':'16px'}; font-weight: 800; color: ${w.color}; transition: all 0.3s;">${wCurr} ${fmtNum(w.balance)}</p>
+                        
+                        <div style="position:relative; z-index:2;">
+                            <p style="font-size:12px; color:rgba(255,255,255,0.8); margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">Total Balance</p>
+                            <p class="syne" style="font-size:32px; font-weight:800; color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,0.2); line-height:1;">${wCurr} ${fmtNum(w.balance)}</p>
                             ${conv}
                         </div>
-                    </div>
-                    <div id="wallet-actions-${w.id}" style="opacity: ${isExpanded?'1':'0'}; transform: ${isExpanded?'translateY(0)':'translateY(10px)'}; transition: all 0.3s; pointer-events: ${isExpanded?'auto':'none'}; display: flex; justify-content: flex-end; gap: 8px;">
-                        <button onclick="event.stopPropagation(); openWalletForm(${w.id})" style="width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text);"><i data-lucide="edit-3" style="width: 16px; height: 16px;"></i></button>
-                        <button onclick="event.stopPropagation(); deleteWallet(${w.id})" style="width: 40px; height: 40px; border-radius: 12px; background: rgba(244,63,94,0.1); display: flex; align-items: center; justify-content: center; color: var(--rose);"><i data-lucide="trash-2" style="width: 16px; height: 16px;"></i></button>
                     </div>
                 </div>`;
             }).join('')}
         </div>
-        <button onclick="openWalletForm()" class="btn-primary" style="background:var(--surface2);color:var(--text);border:1.5px dashed rgba(255,255,255,0.1); margin-bottom: 30px;">+ Add Wallet</button>
     </div>`;
-}
-
-function toggleWalletCard(id) {
-    const cards = document.querySelectorAll('.wallet-card-item');
-    ui.expandedWalletId = ui.expandedWalletId === id ? null : id;
-    cards.forEach((card, i) => {
-        const cardId = parseInt(card.id.split('-')[2]); const isExpanded = ui.expandedWalletId === cardId;
-        const sub = document.getElementById(`wallet-sub-${cardId}`); const bal = document.getElementById(`wallet-bal-${cardId}`); const acts = document.getElementById(`wallet-actions-${cardId}`);
-        const spans = card.querySelectorAll('span'); const convSpan = spans.length > 0 ? spans[spans.length-1] : null;
-
-        if (isExpanded) {
-            card.style.height = '170px'; card.style.transform = 'translateY(-10px)'; card.style.zIndex = '50'; card.style.boxShadow = '0 12px 30px rgba(0,0,0,0.4)';
-            if(sub) sub.style.opacity = '0'; if(bal) bal.style.fontSize = '24px'; if(convSpan && convSpan.innerHTML.includes('≈')) convSpan.style.opacity = '0';
-            if(acts) { acts.style.opacity = '1'; acts.style.transform = 'translateY(0)'; acts.style.pointerEvents = 'auto'; }
-        } else {
-            card.style.height = '85px'; card.style.transform = 'translateY(0)'; card.style.zIndex = i.toString(); card.style.boxShadow = '0 -8px 20px rgba(0,0,0,0.25)';
-            if(sub) sub.style.opacity = '1'; if(bal) bal.style.fontSize = '16px'; if(convSpan && convSpan.innerHTML.includes('≈')) convSpan.style.opacity = '1';
-            if(acts) { acts.style.opacity = '0'; acts.style.transform = 'translateY(10px)'; acts.style.pointerEvents = 'none'; }
-        }
-    });
 }
 
 function openWalletForm(id = null) {
