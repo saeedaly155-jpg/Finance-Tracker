@@ -72,6 +72,13 @@
         .sync-status-dot.connected { background: var(--emerald); box-shadow: 0 0 6px rgba(16,185,129,0.6); }
         .sync-status-dot.disconnected { background: var(--muted); }
         .sync-status-dot.syncing { background: #f59e0b; animation: spin 1s linear infinite; border-radius: 0; clip-path: polygon(50% 0%,100% 50%,50% 100%,0% 50%); }
+
+        /* AI FAB & Chat Styles */
+        .ai-fab { position: absolute; right: 20px; bottom: 104px; width: 56px; height: 56px; border-radius: 20px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(217, 70, 239, 0.4); z-index: 15; transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
+        .ai-fab:active { transform: scale(0.9); }
+        .chat-bubble { padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; max-width: 85%; font-family: 'DM Sans', sans-serif; }
+        .chat-user { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-bottom-right-radius: 4px; align-self: flex-end; }
+        .chat-bot { background: rgba(139, 92, 246, 0.15); color: #fff; border: 1px solid rgba(139, 92, 246, 0.3); border-bottom-left-radius: 4px; align-self: flex-start; }
     </style>
 </head>
 <body>
@@ -98,6 +105,10 @@
     </header>
 
     <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
+
+    <button id="ai-fab" class="ai-fab" onclick="openAIChat()">
+        <i data-lucide="sparkles" style="width:24px;height:24px;color:#fff;"></i>
+    </button>
 
     <nav class="glass scroll-hide" style="border-top: 1px solid var(--border); position: absolute; bottom: 0; left: 0; right: 0; height: 88px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; z-index: 20; overflow-x: auto;">
         <button onclick="switchTab('home')" id="nav-home" class="nav-active" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
@@ -222,6 +233,7 @@ const SUPPORTED_CURRENCIES = [
 let state;
 let charts = {};
 let liveRates = {};
+let chatHistory = []; // AI Chat history
 
 async function fetchRates() {
     try {
@@ -331,6 +343,181 @@ function updateHeaderAvatar() {
     if (state.user.photo) { img.src = state.user.photo; img.style.display = 'block'; initials.style.display = 'none'; }
     else { img.style.display = 'none'; initials.style.display = 'block'; initials.textContent = (state.user.name || 'U').charAt(0).toUpperCase(); }
 }
+
+// ─── AI CHAT LOGIC ───────────────────────────────────────────────────
+function openAIChat() {
+    const apiKey = localStorage.getItem('velto_gemini_key');
+    if (!apiKey) {
+        switchTab('settings');
+        setTimeout(() => showToast('Please setup your Gemini API Key first', 'warn'), 200);
+        return;
+    }
+    
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:16px;">
+            <div style="width:40px; height:40px; border-radius:14px; background:linear-gradient(135deg, #8b5cf6, #d946ef); display:flex; align-items:center; justify-content:center;">
+                <i data-lucide="sparkles" style="color:#fff;"></i>
+            </div>
+            <div>
+                <h2 class="syne" style="font-size:18px; font-weight:800; margin:0;">Smart Assistant</h2>
+                <p style="font-size:11px; color:var(--emerald);">Online & Ready</p>
+            </div>
+        </div>
+        
+        <div id="chat-messages" style="display:flex; flex-direction:column; gap:12px; max-height:50vh; overflow-y:auto; padding-bottom:10px; margin-bottom:16px;" class="scroll-hide">
+            ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">أهلاً بك! اقدر أحلل مصاريفك أو أسجل معاملاتك (مثال: خصم 200 جنيه أوبر من محفظة الكاش). إزاي أقدر أساعدك؟ 😊</div>` : ''}
+        </div>
+        
+        <div style="display:flex; gap:8px; align-items:flex-end;">
+            <textarea id="chat-input" class="input scroll-hide" placeholder="E.g., I just paid 150 for gas..." style="flex:1; resize:none; min-height:52px; max-height:100px; padding:16px; border-radius:18px;" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }"></textarea>
+            <button onclick="sendChatMessage()" style="width:52px; height:52px; border-radius:18px; background:var(--emerald); color:#000; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i data-lucide="send" style="width:20px; height:20px;"></i>
+            </button>
+        </div>
+    `;
+    openSheet();
+    lucide.createIcons();
+    setTimeout(() => document.getElementById('chat-input').focus(), 100);
+    
+    const chatContainer = document.getElementById('chat-messages');
+    chatHistory.forEach(msg => {
+        chatContainer.innerHTML += `<div class="chat-bubble ${msg.role === 'user' ? 'chat-user' : 'chat-bot'}">${msg.text}</div>`;
+    });
+    if(chatHistory.length > 0) chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+async function sendChatMessage() {
+    const inputEl = document.getElementById('chat-input');
+    const text = inputEl.value.trim();
+    if (!text) return;
+    
+    const chatContainer = document.getElementById('chat-messages');
+    
+    // Append User Message
+    chatContainer.innerHTML += `<div class="chat-bubble chat-user">${text}</div>`;
+    chatHistory.push({role: 'user', text});
+    inputEl.value = '';
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    // Append Loading State
+    const loadingId = 'loading-' + Date.now();
+    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex; gap:6px; align-items:center;"><div class="sync-status-dot syncing" style="background:#8b5cf6;"></div> Thinking...</div>`;
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    
+    try {
+        const apiKey = localStorage.getItem('velto_gemini_key');
+        
+        // Build Financial Context for AI
+        const wData = state.wallets.map(w => `{id:${w.id}, name:"${w.name}", balance:${w.balance}, currency:"${w.currency||state.currency.code}"}`).join(', ');
+        const cExp = state.categories.expense.map(c => `{id:"${c.id}", name:"${c.name}"}`).join(', ');
+        const cInc = state.categories.income.map(c => `{id:"${c.id}", name:"${c.name}"}`).join(', ');
+        const recentTx = state.transactions.slice(0, 10).map(t => `{date:"${t.date}", name:"${t.name}", amount:${t.amount}, type:"${t.type}"}`).join(', ');
+        
+        const sysPrompt = `You are a helpful AI financial assistant embedded within a user's local finance tracking app. You speak mostly in friendly Egyptian Arabic, or English if asked. Be concise.
+
+Data Context:
+- Base Currency: ${state.currency.code}
+- Active Wallets: [${wData}]
+- Expense Categories: [${cExp}]
+- Income Categories: [${cInc}]
+- Recent Transactions (Last 10): [${recentTx}]
+
+Instructions:
+1. If the user asks for analysis (e.g. "how much did I spend", "what is my balance"), use the data context to answer them naturally.
+2. If the user commands you to RECORD or ADD a transaction (e.g., "I spent 150 on gas from cash", "add 1000 salary to usd account"):
+   You MUST output EXACTLY this JSON format block anywhere in your response, so the app can parse it.
+   \`\`\`json
+   {
+     "execute": true,
+     "transaction": {
+       "name": "Short Description (e.g., Gas, Food)",
+       "amount": numeric_amount,
+       "type": "expense" or "income",
+       "categoryId": "category_id_from_list",
+       "walletId": wallet_id_from_list
+     },
+     "message": "Friendly confirmation message in Arabic"
+   }
+   \`\`\`
+   Note: Try your best to match the requested wallet and category to the available IDs in the Data Context.`;
+
+        const reqBody = {
+            system_instruction: { parts: [{ text: sysPrompt }] },
+            contents: [
+                ...chatHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })),
+                { role: 'user', parts: [{ text }] }
+            ]
+        };
+
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody)
+        });
+        
+        if (!response.ok) throw new Error('API Request Failed');
+        const data = await response.json();
+        let botText = data.candidates[0].content.parts[0].text;
+        
+        document.getElementById(loadingId).remove();
+        
+        // Detect Execution JSON
+        const jsonMatch = botText.match(/\`\`\`json\s*([\s\S]*?)\s*\`\`\`/);
+        if (jsonMatch) {
+            try {
+                const action = JSON.parse(jsonMatch[1]);
+                if (action.execute && action.transaction) {
+                    executeAITransaction(action.transaction);
+                    botText = action.message || 'تم تسجيل المعاملة بنجاح! ✅';
+                }
+            } catch(e) {
+                console.error('AI JSON Parsing Error', e);
+                botText = 'فهمت إنك عايز تسجل معاملة، بس في حاجة غلط في البيانات. ممكن توضح تاني؟';
+            }
+        }
+        
+        // Remove markdown JSON block from visual response if it's there
+        botText = botText.replace(/\`\`\`json\s*([\s\S]*?)\s*\`\`\`/, '').trim();
+        
+        chatContainer.innerHTML += `<div class="chat-bubble chat-bot">${botText.replace(/\n/g, '<br>')}</div>`;
+        chatHistory.push({role: 'bot', text: botText});
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        lucide.createIcons();
+        
+    } catch (err) {
+        document.getElementById(loadingId)?.remove();
+        chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--rose);">حصلت مشكلة في الاتصال. اتأكد إن الـ API Key صحيح وإنك متصل بالإنترنت.</div>`;
+    }
+}
+
+function executeAITransaction(txData) {
+    // Fallback logic if AI messes up IDs
+    const wallet = state.wallets.find(w => w.id === txData.walletId) || state.wallets[0];
+    let catArray = state.categories[txData.type] || state.categories['expense'];
+    const cat = catArray.find(c => c.id === txData.categoryId) || catArray[0];
+    
+    const tx = { 
+        id: genId(), 
+        name: txData.name, 
+        categoryId: cat.id, 
+        type: txData.type, 
+        amount: txData.amount, 
+        walletId: wallet.id, 
+        date: today(), 
+        note: 'Added via Smart Assistant' 
+    };
+    state.transactions.unshift(tx);
+    wallet.balance += txData.type === 'expense' ? -txData.amount : txData.amount;
+    
+    saveState();
+    
+    // Refresh background view if needed
+    if (ui.currentTab === 'home') {
+        document.getElementById('main-content').innerHTML = renderHome();
+        initCharts();
+    } else if (ui.currentTab === 'wallets') {
+        document.getElementById('main-content').innerHTML = renderWallets();
+    }
+}
+
 
 // ─── GLOBAL SEARCH APP-WIDE ──────────────────────────────────────────
 function openSearch() {
@@ -1445,6 +1632,17 @@ function renderSettings() {
             <div class="card" style="padding:12px;text-align:center;"><p class="syne" style="font-size:18px;font-weight:800;color:var(--emerald);">${state.budgets.length}</p><p style="font-size:9px;color:var(--muted);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Budgets</p></div>
         </div>
 
+        <div class="card" style="padding:16px; margin-bottom: 8px;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <div style="width:36px;height:36px;border-radius:11px;background:rgba(139, 92, 246, 0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="sparkles" style="width:16px;height:16px;color:#8b5cf6;"></i></div>
+                <div><p style="font-size:14px;font-weight:600;">Gemini AI Setup</p><p style="font-size:11px;color:var(--muted);">Add API key for smart assistant</p></div>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <input type="password" id="gemini-key" class="input" placeholder="Enter Gemini API Key" value="${localStorage.getItem('velto_gemini_key')||''}" style="flex:1;">
+                <button onclick="saveApiKey()" style="padding:0 16px; border-radius:12px; background:#8b5cf6; color:#fff; font-weight:700; font-family:'Syne',sans-serif;">Save</button>
+            </div>
+        </div>
+
         <div class="card ${gd.connected ? 'gdrive-connected' : ''}" style="padding:0;overflow:hidden;margin-bottom:8px;border-color:${gd.connected ? 'rgba(16,185,129,0.25)' : 'var(--border)'};">
             <div style="padding:16px;display:flex;align-items:center;gap:12px;">
                 <div style="width:36px;height:36px;border-radius:11px;background:rgba(66,133,244,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg></div>
@@ -1480,6 +1678,11 @@ function renderSettings() {
             <button onclick="confirmReset()" style="padding:16px;border-radius:16px;background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.15);width:100%;color:var(--rose);font-size:14px;font-weight:700;font-family:'Syne',sans-serif;">Reset All Data</button>
         </div>
     </div>`;
+}
+
+function saveApiKey() {
+    localStorage.setItem('velto_gemini_key', document.getElementById('gemini-key').value.trim());
+    showToast('API Key Saved Successfully!');
 }
 
 function openProfileEdit() { document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">Edit Profile</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="p-name" class="input" placeholder="Your name" value="${state.user.name||''}"><input type="email" id="p-email" class="input" placeholder="Email" value="${state.user.email||''}"><input type="url" id="p-photo" class="input" placeholder="Photo URL (optional)" value="${state.user.photo||''}"><button onclick="saveProfile()" class="btn-primary">Save Profile</button></div>`; openSheet(); }
