@@ -441,8 +441,9 @@ Instructions:
    \`\`\`
    Note: Try your best to match the requested wallet and category to the available IDs in the Data Context.`;
 
+        // FIXED: systemInstruction instead of system_instruction
         const reqBody = {
-            system_instruction: { parts: [{ text: sysPrompt }] },
+            systemInstruction: { parts: [{ text: sysPrompt }] },
             contents: [
                 ...chatHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })),
                 { role: 'user', parts: [{ text }] }
@@ -453,7 +454,11 @@ Instructions:
             method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody)
         });
         
-        if (!response.ok) throw new Error('API Request Failed');
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error?.message || `HTTP Error ${response.status}`);
+        }
+        
         const data = await response.json();
         let botText = data.candidates[0].content.parts[0].text;
         
@@ -484,7 +489,9 @@ Instructions:
         
     } catch (err) {
         document.getElementById(loadingId)?.remove();
-        chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--rose);">حصلت مشكلة في الاتصال. اتأكد إن الـ API Key صحيح وإنك متصل بالإنترنت.</div>`;
+        console.error("Chat API Error:", err);
+        chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--rose);">حصلت مشكلة: ${err.message}</div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 }
 
