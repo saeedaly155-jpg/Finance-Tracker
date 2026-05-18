@@ -185,15 +185,16 @@
 </script>
 
 <script>
-// ─── DEFAULT DATA ────────────────────────────────────────────────────
+// ─── DEFAULT DATA (FINE TECH COLORS) ─────────────────────────────────
 const DEFAULT_STATE = {
     user: { name: 'Saeed', email: 'saeed@example.com', photo: null },
     currency: { code: 'EGP', symbol: 'E£' },
     wallets: [
-        { id: 1, name: 'Cash', balance: 5000, icon: 'wallet', color: '#10b981', currency: 'EGP' },
-        { id: 2, name: 'USD Account', balance: 1200, icon: 'landmark', color: '#3b82f6', currency: 'USD' },
-        { id: 3, name: 'Fawry Visa', balance: 3200, icon: 'banknote', color: '#f59e0b', currency: 'EGP' }
+        { id: 1, name: 'Main Account', balance: 5000, icon: 'wallet', color: '#212121', currency: 'EGP' }, // Dark Charcoal
+        { id: 2, name: 'USD Savings', balance: 1200, icon: 'landmark', color: '#4A1525', currency: 'USD' }, // Rich Burgundy
+        { id: 3, name: 'Virtual Visa', balance: 3200, icon: 'credit-card', color: '#1A1C29', currency: 'EGP' } // Deep Navy
     ],
+
     categories: {
         expense: [
             { id: 'food', name: 'Food', icon: 'utensils', color: '#f59e0b' },
@@ -235,6 +236,19 @@ const SUPPORTED_CURRENCIES = [
     { code: 'GBP', symbol: '£', name: 'British Pound' },
     { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
     { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' }
+];
+
+const TECH_COLORS = [
+    '#212121', // Dark Charcoal (أسود رصاصي)
+    '#1A1C29', // Deep Navy (كحلي غامق)
+    '#4A1525', // Rich Burgundy (عنابي فخم)
+    '#13332A', // Forest Green (أخضر غابات)
+    '#2D2342', // Deep Indigo (نيلي مطفي)
+    '#422006', // Dark Bronze (برونزي غامق)
+    '#27272A', // Gunmetal (رمادي معدني)
+    '#0F172A', // Midnight Slate (سليت ليلي)
+    '#31102A', // Deep Plum (برقوقي داكن)
+    '#121212'  // Obsidian Black (أسود صريح)
 ];
 
 // ─── STATE & PERSISTENCE ────────────────────────────────────────────
@@ -683,7 +697,7 @@ function renderHome() {
         <div style="display:flex;gap:16px;overflow-x:auto;padding:10px 0 24px;margin-bottom:14px;" class="scroll-hide">
             ${state.wallets.map(w => {
                 const wCurr = w.currency || state.currency.code;
-                return `<div onclick="openWalletTransactions(${w.id})" style="flex-shrink:0; width:280px; height:160px; border-radius:24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}99); position:relative; overflow:hidden; padding:20px; box-shadow: 0 12px 24px ${w.color}40; border: 1px solid rgba(255,255,255,0.2); display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
+                return `<div onclick="switchTab('wallets')" style="flex-shrink:0; width:280px; height:160px; border-radius:24px; background: linear-gradient(135deg, ${w.color}, ${w.color}cc); position:relative; overflow:hidden; padding:20px; box-shadow: 0 12px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
                     <div style="position:absolute; top:-20px; right:-20px; width:120px; height:120px; background:rgba(255,255,255,0.1); border-radius:50%; pointer-events:none; filter:blur(5px);"></div>
                     <div style="position:absolute; bottom:-30px; left:-10px; width:100px; height:100px; background:rgba(0,0,0,0.1); border-radius:50%; pointer-events:none; filter:blur(5px);"></div>
                     
@@ -920,7 +934,6 @@ function deleteBudget(id) { state.budgets = state.budgets.filter(b => b.id !== i
 function openGoalForm(editId = null) {
     const g = editId ? state.goals.find(x => x.id === editId) : null;
     const icons = ['shield','car','plane','home','laptop','graduation-cap','heart','umbrella','gamepad-2'];
-    const colors = ['#3b82f6','#10b981','#f59e0b','#ec4899','#8b5cf6','#06b6d4','#f43f5e','#84cc16'];
     document.getElementById('sheet-content').innerHTML = `
         <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${g ? 'Edit' : 'Add'} Goal</h2>
         <div style="display:flex;flex-direction:column;gap:12px;">
@@ -941,9 +954,9 @@ function openGoalForm(editId = null) {
             <div>
                 <p class="section-title">Color</p>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                    ${colors.map(c => `<button onclick="document.querySelectorAll('.g-color-opt').forEach(b=>b.style.outline='');this.style.outline='3px solid white';document.getElementById('g-color').value='${c}'" class="g-color-opt" style="width:32px;height:32px;border-radius:10px;background:${c};outline:${g?.color===c?'3px solid white':'none'};"></button>`).join('')}
+                    ${TECH_COLORS.map(c => `<button onclick="document.querySelectorAll('.g-color-opt').forEach(b=>b.style.outline='');this.style.outline='3px solid white';document.getElementById('g-color').value='${c}'" class="g-color-opt" style="width:32px;height:32px;border-radius:10px;background:${c};outline:${g?.color===c?'3px solid white':'none'};"></button>`).join('')}
                 </div>
-                <input type="hidden" id="g-color" value="${g?.color||colors[0]}">
+                <input type="hidden" id="g-color" value="${g?.color||TECH_COLORS[0]}">
             </div>
             <div style="display:${g?'grid':'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
                 ${g ? `<button onclick="deleteGoal(${g.id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;font-family:'Syne',sans-serif;">Delete</button>` : ''}
@@ -1581,11 +1594,12 @@ function payInstallment(id) {
 function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchTab('debts'); showToast('Removed'); }
 
 // ─── APPLE WALLET STYLE STACKED WALLETS ───────────────────────
+
 function renderWallets() {
     ui.currentTab = 'wallets';
     
-    let html = `<div class="fade-up" style="padding-bottom: 40px; overflow-x: hidden; min-height: 100vh;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px; position:relative;">
+    let html = `<div class="fade-up" style="padding-bottom: 10px; overflow-x: hidden; min-height: 100vh;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; position:relative;">
             <div style="width:42px;"></div> <h2 class="syne" style="font-size:20px;font-weight:700;">Cards</h2>
             <button onclick="openWalletForm()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--text);"><i data-lucide="plus" style="width:20px;height:20px;"></i></button>
         </div>
@@ -1598,20 +1612,23 @@ function renderWallets() {
         <div class="wallet-card-wrapper stacked" 
              id="wallet-card-${w.id}" 
              onclick="toggleWalletCard(${w.id})"
-             style="top: ${index * 65}px; z-index: ${index + 1};">
+             style="top: ${index * 50}px; z-index: ${index + 1};">
              
-            <div style="height: 220px; border-radius: 24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}aa); padding: 26px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+            <div style="height: 220px; border-radius: 24px; background: linear-gradient(135deg, ${w.color}, #0a0a0c); padding: 26px; box-shadow: 0 12px 32px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+                
+                <div style="position:absolute; top:0; left:0; right:0; height:100%; background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0) 100%); pointer-events:none;"></div>
+
                 <div style="display:flex;justify-content:space-between;align-items:start; z-index: 2;">
                     <div>
-                        <p style="color:rgba(255,255,255,0.8);font-size:12px;margin-bottom:2px;font-weight:500;">Total Balance</p>
-                        <h2 class="syne" style="font-size:36px;font-weight:800;color:#fff;line-height:1.1;text-shadow:0 2px 8px rgba(0,0,0,0.3);">${wCurr} ${fmtNum(w.balance)}</h2>
+                        <p class="syne" style="color:#ffffff;font-size:16px;margin-bottom:2px;font-weight:700;letter-spacing:0.5px;">${w.name}</p>
+                        <h2 class="syne" style="font-size:34px;font-weight:800;color:#fff;line-height:1.1;text-shadow:0 2px 4px rgba(0,0,0,0.8);">${wCurr} ${fmtNum(w.balance)}</h2>
                     </div>
-                    <div style="width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,0.2);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;">
-                        <i data-lucide="${w.icon}" style="color:#fff;width:22px;height:22px;"></i>
+                    <div style="width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,0.08);border: 1px solid rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;">
+                        <i data-lucide="${w.icon}" style="color:#ffffff;width:22px;height:22px;"></i>
                     </div>
                 </div>
                 <div style="z-index: 2;">
-                    <p class="syne" style="font-size:18px;font-weight:800;color:#fff;letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.3);">${w.name}</p>
+                    <p style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:1px;">Total Balance</p>
                 </div>
             </div>
             
@@ -1638,7 +1655,7 @@ function toggleWalletCard(walletId) {
         
         allCards.forEach((card, index) => {
             card.classList.remove('expanded', 'hidden-down');
-            card.style.top = `${index * 65}px`;
+            card.style.top = `${index * 50}px`;
         });
         
         detailsContainer.classList.remove('active');
@@ -1670,13 +1687,8 @@ function renderWalletDetails(walletId) {
     const txs = state.transactions.filter(t => t.walletId === walletId).sort((a,b) => new Date(b.date) - new Date(a.date));
     
     let html = `
-        <div style="display:flex; align-items:center; margin-bottom: 16px; padding: 0 4px;">
-            <button onclick="toggleWalletCard(${walletId})" style="display:flex; align-items:center; gap: 8px; color: var(--text); font-weight: 700; font-family: 'Syne', sans-serif; background: rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 14px; border: 1px solid var(--border); backdrop-filter: blur(10px); transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" ontouchstart="this.style.transform='scale(0.95)'" ontouchend="this.style.transform='scale(1)'">
-                <i data-lucide="arrow-left" style="width:18px;height:18px;color:var(--emerald);"></i> Back to Cards
-            </button>
-        </div>
-        <div style="display:flex; gap: 10px; margin-bottom: 24px; padding: 0 4px;">
-            <button class="btn-primary" onclick="openWalletForm(${walletId})" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); backdrop-filter: blur(10px);">Edit Card</button>
+                <div style="display:flex; gap: 10px; margin-bottom: 24px; padding: 0 4px;">
+            <button class="btn-primary" onclick="openWalletForm(${walletId})" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); backdrop-filter: blur(10px);">  Edit Card</button>
             <button class="btn-primary" onclick="openTransferForm()" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); backdrop-filter: blur(10px);"><i data-lucide="arrow-right-left" style="width:16px;height:16px;display:inline;margin-right:6px;vertical-align:-3px;"></i>Transfer</button>
             <button class="btn-primary" onclick="openTransactionForm({type:'expense', walletId:${walletId}})" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border); backdrop-filter: blur(10px);">+ Record</button>
         </div>
@@ -1717,7 +1729,7 @@ function renderWalletDetails(walletId) {
 function openWalletForm(id = null) {
     const w = id ? state.wallets.find(x => x.id === id) : null;
     const icons = ['wallet','landmark','credit-card','banknote','piggy-bank','briefcase','building-2','coins','shopping-bag','truck'];
-    const colors = ['#10b981','#3b82f6','#f59e0b','#ec4899','#8b5cf6','#06b6d4','#f43f5e','#84cc16','#fb923c','#a78bfa'];
+    
     document.getElementById('sheet-content').innerHTML = `
         <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${w ? 'Edit' : 'Add'} Wallet</h2>
         <div style="display:flex;flex-direction:column;gap:12px;">
@@ -1737,8 +1749,8 @@ function openWalletForm(id = null) {
             <div>
                 <p class="section-title">Color</p>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                    ${colors.map(c => `<button onclick="document.querySelectorAll('.w-color-opt').forEach(b=>b.style.outline='');this.style.outline='3px solid white';document.getElementById('w-color').value='${c}'" class="w-color-opt" style="width:32px;height:32px;border-radius:10px;background:${c};outline:${w?.color===c?'3px solid white':'none'};"></button>`).join('')}
-                </div><input type="hidden" id="w-color" value="${w?.color||colors[0]}">
+                    ${TECH_COLORS.map(c => `<button onclick="document.querySelectorAll('.w-color-opt').forEach(b=>b.style.outline='');this.style.outline='3px solid white';document.getElementById('w-color').value='${c}'" class="w-color-opt" style="width:32px;height:32px;border-radius:10px;background:${c};outline:${w?.color===c?'3px solid white':'none'};"></button>`).join('')}
+                </div><input type="hidden" id="w-color" value="${w?.color||TECH_COLORS[0]}">
             </div>
             <div style="display:${w?'grid':'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
                 ${w ? `<button onclick="deleteWallet(${id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;font-family:'Syne',sans-serif;">Delete</button>` : ''}
