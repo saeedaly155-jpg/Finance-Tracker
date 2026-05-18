@@ -146,7 +146,7 @@
 
     <div id="overlay" onclick="closeSheet()" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:30;"></div>
 
-    <div id="bottom-sheet" class="sheet" style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#12121a;border-radius:32px 32px 0 0;border-top:1px solid var(--border);z-index:40;max-height:92vh;overflow-y:auto;" class="scroll-hide">
+    <div id="bottom-sheet" class="sheet scroll-hide" style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#12121a;border-radius:32px 32px 0 0;border-top:1px solid var(--border);z-index:40;max-height:92vh;overflow-y:auto;">
         <div style="width:36px;height:4px;background:rgba(255,255,255,0.12);border-radius:4px;margin:14px auto 0;"></div>
         <div id="sheet-content" style="padding: 20px 24px 40px;"></div>
     </div>
@@ -1320,8 +1320,7 @@ function receiveIncome(id) {
 
 function fmtDate(iso) { if (!iso) return '—'; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }); }
 
-
-    function openWalletTransactions(walletId) {
+function openWalletTransactions(walletId) {
     const wallet = state.wallets.find(w => w.id === walletId);
     if (!wallet) return;
 
@@ -1344,14 +1343,14 @@ function fmtDate(iso) { if (!iso) return '—'; const d = new Date(iso + 'T00:00
         <div style="display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;" class="scroll-hide">
             ${sorted.map(t => {
                 const cat = getCat(t.categoryId, t.type);
-                return \`<div class="tx-row" onclick="openEditTransaction(\${t.id})">
-                    <div class="icon-box" style="background:\${cat.color}18;"><i data-lucide="\${cat.icon}" style="width:16px;height:16px;color:\${cat.color};"></i></div>
+                return `<div class="tx-row" onclick="openEditTransaction(${t.id})">
+                    <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:16px;height:16px;color:${cat.color};"></i></div>
                     <div style="flex:1;min-width:0;">
-                        <p style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\${t.name}</p>
-                        <p style="font-size:10px;color:var(--muted);">\${cat.name} · \${dateLabel(t.date)}</p>
+                        <p style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</p>
+                        <p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p>
                     </div>
-                    <p class="syne" style="font-size:13px;font-weight:700;color:\${t.type==='expense'?'var(--rose)':'var(--emerald)'};">\${t.type==='expense'?'-':'+'} \${wCurr} \${fmtNum(t.amount)}</p>
-                </div>\`;
+                    <p class="syne" style="font-size:13px;font-weight:700;color:${t.type==='expense'?'var(--rose)':'var(--emerald)'};">${t.type==='expense'?'-':'+'} ${wCurr} ${fmtNum(t.amount)}</p>
+                </div>`;
             }).join('')}
             ${sorted.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px;">No transactions yet for this wallet.</p>' : ''}
         </div>`;
