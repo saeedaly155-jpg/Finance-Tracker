@@ -680,7 +680,8 @@ function renderHome() {
         <div style="display:flex;gap:16px;overflow-x:auto;padding:10px 0 24px;margin-bottom:14px;" class="scroll-hide">
             ${state.wallets.map(w => {
                 const wCurr = w.currency || state.currency.code;
-                return `<div onclick="switchTab('wallets')" style="flex-shrink:0; width:280px; height:160px; border-radius:24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}99); position:relative; overflow:hidden; padding:20px; box-shadow: 0 12px 24px ${w.color}40; border: 1px solid rgba(255,255,255,0.2); display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
+                // 🚀 NEW: غيرنا هنا عشان ينادي دالة المعاملات بدل ما ينقلنا للتاب التاني
+                return `<div onclick="openWalletTransactions(${w.id})" style="flex-shrink:0; width:280px; height:160px; border-radius:24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}99); position:relative; overflow:hidden; padding:20px; box-shadow: 0 12px 24px ${w.color}40; border: 1px solid rgba(255,255,255,0.2); display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
                     <div style="position:absolute; top:-20px; right:-20px; width:120px; height:120px; background:rgba(255,255,255,0.1); border-radius:50%; pointer-events:none; filter:blur(5px);"></div>
                     <div style="position:absolute; bottom:-30px; left:-10px; width:100px; height:100px; background:rgba(0,0,0,0.1); border-radius:50%; pointer-events:none; filter:blur(5px);"></div>
                     
@@ -1319,6 +1320,45 @@ function receiveIncome(id) {
 
 function fmtDate(iso) { if (!iso) return '—'; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }); }
 
+
+    function openWalletTransactions(walletId) {
+    const wallet = state.wallets.find(w => w.id === walletId);
+    if (!wallet) return;
+
+    const wCurr = wallet.currency || state.currency.code;
+    const wTxs = state.transactions.filter(t => t.walletId === walletId);
+    const sorted = wTxs.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+            <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg, ${wallet.color}ee, ${wallet.color}88);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 16px ${wallet.color}40; border: 1px solid rgba(255,255,255,0.2);">
+                <i data-lucide="${wallet.icon}" style="color:#fff; width:24px; height:24px;"></i>
+            </div>
+            <div>
+                <h2 class="syne" style="font-size:20px;font-weight:800;margin:0;">${wallet.name}</h2>
+                <p style="font-size:12px;color:var(--muted);">Total: ${wCurr} ${fmtNum(wallet.balance)}</p>
+            </div>
+        </div>
+        
+        <p class="section-title" style="margin-bottom:8px;">Wallet Transactions</p>
+        <div style="display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;" class="scroll-hide">
+            ${sorted.map(t => {
+                const cat = getCat(t.categoryId, t.type);
+                return \`<div class="tx-row" onclick="openEditTransaction(\${t.id})">
+                    <div class="icon-box" style="background:\${cat.color}18;"><i data-lucide="\${cat.icon}" style="width:16px;height:16px;color:\${cat.color};"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\${t.name}</p>
+                        <p style="font-size:10px;color:var(--muted);">\${cat.name} · \${dateLabel(t.date)}</p>
+                    </div>
+                    <p class="syne" style="font-size:13px;font-weight:700;color:\${t.type==='expense'?'var(--rose)':'var(--emerald)'};">\${t.type==='expense'?'-':'+'} \${wCurr} \${fmtNum(t.amount)}</p>
+                </div>\`;
+            }).join('')}
+            ${sorted.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px;">No transactions yet for this wallet.</p>' : ''}
+        </div>`;
+    openSheet();
+    lucide.createIcons();
+}
+
 // ─── DEBTS TAB ────────────────────────────────────────────────────────
 function renderDebts() {
     const totalInstall = state.debts.installments.reduce((s, d) => s + convertCurrency(d.amount, (state.wallets.find(w=>w.id===d.walletId)||{currency:state.currency.code}).currency, state.currency.code), 0);
@@ -1556,7 +1596,7 @@ function renderWallets() {
                 const conv = wCurr !== state.currency.code ? `<span style="font-size:11px;color:rgba(255,255,255,0.7); display:block; margin-top:4px;">≈ ${fmt(convertCurrency(w.balance, wCurr, state.currency.code))}</span>` : '';
                 
                 return `
-                <div style="position:relative;">
+                <div style="position:relative; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''" onclick="openWalletTransactions(${w.id})">
                     <div style="width:100%; height:180px; border-radius:24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}88); position:relative; overflow:hidden; padding:24px; box-shadow: 0 16px 32px ${w.color}33; border: 1px solid rgba(255,255,255,0.25); display:flex; flex-direction:column; justify-content:space-between;">
                         <div style="position:absolute; top:-30px; right:-20px; width:150px; height:150px; background:rgba(255,255,255,0.15); border-radius:50%; pointer-events:none; filter:blur(10px);"></div>
                         <div style="position:absolute; bottom:-40px; left:-20px; width:120px; height:120px; background:rgba(0,0,0,0.15); border-radius:50%; pointer-events:none; filter:blur(10px);"></div>
@@ -1569,8 +1609,8 @@ function renderWallets() {
                                 <p style="font-size:18px; font-weight:700; color:#fff; letter-spacing:0.5px;">${w.name}</p>
                             </div>
                             <div style="display:flex; gap:8px;">
-                                <button onclick="openWalletForm(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(255,255,255,0.2); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="edit-3" style="width:16px; height:16px;"></i></button>
-                                <button onclick="deleteWallet(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(244,63,94,0.3); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(244,63,94,0.4); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="trash-2" style="width:16px; height:16px;"></i></button>
+                                <button onclick="event.stopPropagation(); openWalletForm(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(255,255,255,0.2); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="edit-3" style="width:16px; height:16px;"></i></button>
+                                <button onclick="event.stopPropagation(); deleteWallet(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(244,63,94,0.3); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(244,63,94,0.4); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="trash-2" style="width:16px; height:16px;"></i></button>
                             </div>
                         </div>
                         
