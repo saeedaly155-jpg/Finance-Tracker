@@ -407,25 +407,39 @@ async function sendChatMessage() {
     try {
         const apiKey = localStorage.getItem('velto_gemini_key');
         
-        // Build Financial Context for AI
-        const wData = state.wallets.map(w => `{id:${w.id}, name:"${w.name}", balance:${w.balance}, currency:"${w.currency||state.currency.code}"}`).join(', ');
-        const cExp = state.categories.expense.map(c => `{id:"${c.id}", name:"${c.name}"}`).join(', ');
-        const cInc = state.categories.income.map(c => `{id:"${c.id}", name:"${c.name}"}`).join(', ');
-        const recentTx = state.transactions.slice(0, 10).map(t => `{date:"${t.date}", name:"${t.name}", amount:${t.amount}, type:"${t.type}"}`).join(', ');
+        // 🚀 NEW: تجميع كل بيانات التطبيق للذكاء الاصطناعي
+        const aiState = {
+            currentDate: today(),
+            baseCurrency: state.currency.code,
+            wallets: state.wallets.map(({id, name, balance, currency}) => ({id, name, balance, currency})),
+            categories: {
+                expense: state.categories.expense.map(({id, name}) => ({id, name})),
+                income: state.categories.income.map(({id, name}) => ({id, name}))
+            },
+            // بنبعت كل المعاملات بعد ما نشيل منها الداتا اللي ملهاش لازمة زي الألوان
+            transactions: state.transactions.map(({id, name, amount, type, categoryId, walletId, date}) => ({id, name, amount, type, categoryId, walletId, date})),
+            budgets: state.budgets.map(b => {
+                const catName = getCat(b.categoryId).name;
+                return { category: catName, limit: b.limit, currentlySpent: getCurrentMonthSpend(b.categoryId) };
+            }),
+            goals: state.goals.map(({name, target, saved, deadline}) => ({name, target, saved, deadline})),
+            debts: {
+                installments: state.debts.installments.map(({name, amount, left, total, paidAmount}) => ({name, monthlyAmount: amount, monthsLeft: left, totalMonths: total, paidSoFar: paidAmount})),
+                iOwe: state.debts.oweTo.map(({name, amount, date}) => ({name, amount, date})),
+                owedToMe: state.debts.owedToMe.map(({name, amount, date}) => ({name, amount, date}))
+            },
+            expectedIncomeSources: state.incomeSources.map(({name, amount, frequency}) => ({name, amount, frequency}))
+        };
         
-        const sysPrompt = `You are a helpful AI financial assistant embedded within a user's local finance tracking app. You speak mostly in friendly Egyptian Arabic, or English if asked. Be concise.
+        const sysPrompt = `You are a highly intelligent financial assistant embedded in a user's local finance app. Speak in friendly Egyptian Arabic (always use masculine pronouns, e.g., "يا صاحبي", "بطل"). Be concise, analytical, and directly helpful.
 
-Data Context:
-- Base Currency: ${state.currency.code}
-- Active Wallets: [${wData}]
-- Expense Categories: [${cExp}]
-- Income Categories: [${cInc}]
-- Recent Transactions (Last 10): [${recentTx}]
+Here is the COMPLETE DATA of the user's finances in JSON format:
+${JSON.stringify(aiState)}
 
 Instructions:
-1. If the user asks for analysis, use the data context to answer them naturally.
-2. If the user commands you to RECORD or ADD a transaction:
-   You MUST output your response EXACTLY as a JSON block wrapped in standard markdown syntax anywhere in your response. Do not use complex formatting. Example:
+1. READ EVERYTHING: If the user asks for analysis (e.g., "what did I spend most on?", "how are my budgets?", "what's my progress on the car goal?", "how much debts do I have left?"), use the JSON data to give a very precise, mathematically accurate answer based on the current date.
+2. ADDING TRANSACTIONS: If the user commands you to RECORD or ADD a new transaction (expense or income):
+   You MUST output your response EXACTLY as a JSON block wrapped in standard markdown syntax anywhere in your response. Example:
    \`\`\`json
    {
      "execute": true,
@@ -436,10 +450,10 @@ Instructions:
        "categoryId": "food",
        "walletId": 1
      },
-     "message": "Friendly confirmation message in Arabic"
+     "message": "تم تسجيل المعاملة بنجاح يا صاحبي ✅"
    }
    \`\`\`
-   Note: Try your best to match the requested wallet and category to the available IDs in the Data Context.`;
+   Match requested wallets and categories to the IDs provided in the JSON. If not specified, intelligently guess the most logical ones.`;
 
         const reqBody = {
             systemInstruction: { parts: [{ text: sysPrompt }] },
@@ -463,14 +477,14 @@ Instructions:
         
         document.getElementById(loadingId).remove();
         
-        // Detect Execution JSON (using specific regex to avoid escaping issues)
+        // Detect Execution JSON 
         const jsonMatch = botText.match(/`{3}json\s*([\s\S]*?)\s*`{3}/);
         if (jsonMatch) {
             try {
                 const action = JSON.parse(jsonMatch[1]);
                 if (action.execute && action.transaction) {
                     executeAITransaction(action.transaction);
-                    botText = action.message || 'تم تسجيل المعاملة بنجاح! ✅';
+                    botText = action.message || 'تمت الإضافة يا صاحبي! ✅';
                 }
             } catch(e) {
                 console.error('AI JSON Parsing Error', e);
@@ -493,7 +507,6 @@ Instructions:
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 }
-
 function executeAITransaction(txData) {
     const wallet = state.wallets.find(w => w.id === txData.walletId) || state.wallets[0];
     let catArray = state.categories[txData.type] || state.categories['expense'];
