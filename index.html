@@ -1657,6 +1657,82 @@ function saveWallet(editId) {
 }
 function deleteWallet(id) { if (state.wallets.length <= 1) return showToast("Can't delete last wallet"); state.wallets = state.wallets.filter(w => w.id !== id); saveState(); closeSheet(); switchTab('wallets'); showToast('Wallet removed'); }
 
+function openTransferForm() {
+    if (state.wallets.length < 2) return showToast('You need at least 2 wallets to transfer', 'warn');
+    
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+            <div style="width:40px; height:40px; border-radius:14px; background:rgba(59, 130, 246, 0.1); display:flex; align-items:center; justify-content:center;">
+                <i data-lucide="arrow-right-left" style="color:#3b82f6;"></i>
+            </div>
+            <h2 class="syne" style="font-size:20px;font-weight:800;margin:0;">Transfer Money</h2>
+        </div>
+        
+        <div style="display:flex;flex-direction:column;gap:16px;">
+            <div style="text-align:center;padding:10px 0;">
+                <input type="number" id="tr-amount" class="input" placeholder="0.00" style="font-size:36px;font-weight:800;font-family:'Syne',sans-serif;text-align:center;width:100%;border:none;background:transparent;padding:0;color:var(--text);" inputmode="decimal">
+                <p style="font-size:11px;color:var(--muted);margin-top:4px;">Amount to transfer</p>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px; align-items:end;">
+                <div>
+                    <p class="section-title">From Wallet</p>
+                    <select id="tr-from" class="input">
+                        ${state.wallets.map(w => `<option value="${w.id}">${w.name} (${w.currency||state.currency.code} ${fmtNum(w.balance)})</option>`).join('')}
+                    </select>
+                </div>
+                <div>
+                    <p class="section-title">To Wallet</p>
+                    <select id="tr-to" class="input">
+                        ${state.wallets.map(w => `<option value="${w.id}">${w.name}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="processTransfer()" class="btn-primary" style="background:#3b82f6;color:#fff;margin-top:10px;">Confirm Transfer</button>
+        </div>`;
+    openSheet();
+    lucide.createIcons();
+}
+
+function processTransfer() {
+    const fromId = parseInt(document.getElementById('tr-from').value);
+    const toId = parseInt(document.getElementById('tr-to').value);
+    const amount = parseFloat(document.getElementById('tr-amount').value);
+
+    if (fromId === toId) return showToast('Please select different wallets', 'error');
+    if (!amount || amount <= 0) return showToast('Enter a valid amount', 'error');
+
+    const wFrom = state.wallets.find(w => w.id === fromId);
+    const wTo = state.wallets.find(w => w.id === toId);
+
+    if (wFrom.balance < amount) return showToast('Insufficient balance in source wallet', 'error');
+
+    // 🚀 NEW: لو المحافظ عملاتها مختلفة، الكود بيحول الفلوس أوتوماتيك للعملة التانية بالسعر الحي
+    const fromCurr = wFrom.currency || state.currency.code;
+    const toCurr = wTo.currency || state.currency.code;
+    const convertedAmount = convertCurrency(amount, fromCurr, toCurr);
+
+    // سحب من المحفظة الأولى وإيداع في المحفظة التانية
+    wFrom.balance -= amount;
+    wTo.balance += convertedAmount;
+
+    // تسجيل المعاملتين عشان الكاش فلو يفضل مظبوط
+    const dateStr = today();
+    state.transactions.unshift({
+        id: genId(), name: `Transfer to ${wTo.name}`, categoryId: 'other', type: 'expense', amount: amount, walletId: wFrom.id, date: dateStr, note: 'Internal Transfer Out'
+    });
+    
+    // بندي ID مختلف شوية للمعاملة التانية
+    state.transactions.unshift({
+        id: genId() + 1, name: `Transfer from ${wFrom.name}`, categoryId: 'other', type: 'income', amount: convertedAmount, walletId: wTo.id, date: dateStr, note: 'Internal Transfer In'
+    });
+
+    saveState(); closeSheet(); switchTab('wallets'); showToast('Transfer Successful! 💸');
+}
+
+
+    
 // ─── SETTINGS ───────────────────────────────────────────────────────
 function renderSettings() {
     const photo = state.user.photo || ''; const initial = (state.user.name || 'U').charAt(0).toUpperCase();
