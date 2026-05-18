@@ -1578,51 +1578,6 @@ function payInstallment(id) {
 }
 function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchTab('debts'); showToast('Removed'); }
 
-// ─── NEW FIGMA-STYLE WALLETS ────────────────────────────────────────
-function renderWallets() {
-    return `<div class="fade-up" style="padding-bottom: 20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h2 class="syne" style="font-size:24px;font-weight:800;">Saved Wallets</h2>
-            <div style="display:flex; gap:8px;">
-                <button onclick="openTransferForm()" style="width:42px;height:42px;background:rgba(59, 130, 246, 0.1);border:1px solid rgba(59, 130, 246, 0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#3b82f6; transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="arrow-right-left" style="width:20px;height:20px;"></i></button>
-                <button onclick="openWalletForm()" style="width:42px;height:42px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--emerald);"><i data-lucide="plus" style="width:20px;height:20px;"></i></button>
-            </div>
-        </div>
-        
-        <div style="display:flex;flex-direction:column;gap:16px;">
-            ${state.wallets.map(w => {
-                const wCurr = w.currency || state.currency.code;
-                const conv = wCurr !== state.currency.code ? `<span style="font-size:11px;color:rgba(255,255,255,0.7); display:block; margin-top:4px;">≈ ${fmt(convertCurrency(w.balance, wCurr, state.currency.code))}</span>` : '';
-                
-                return `
-                <div style="position:relative; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''" onclick="openWalletTransactions(${w.id})">
-                    <div style="width:100%; height:180px; border-radius:24px; background: linear-gradient(135deg, ${w.color}ee, ${w.color}88); position:relative; overflow:hidden; padding:24px; box-shadow: 0 16px 32px ${w.color}33; border: 1px solid rgba(255,255,255,0.25); display:flex; flex-direction:column; justify-content:space-between;">
-                        <div style="position:absolute; top:-30px; right:-20px; width:150px; height:150px; background:rgba(255,255,255,0.15); border-radius:50%; pointer-events:none; filter:blur(10px);"></div>
-                        <div style="position:absolute; bottom:-40px; left:-20px; width:120px; height:120px; background:rgba(0,0,0,0.15); border-radius:50%; pointer-events:none; filter:blur(10px);"></div>
-                        
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative; z-index:2;">
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <div style="width:40px; height:40px; border-radius:12px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.3);">
-                                    <i data-lucide="${w.icon}" style="width:20px; height:20px; color:#fff;"></i>
-                                </div>
-                                <p style="font-size:18px; font-weight:700; color:#fff; letter-spacing:0.5px;">${w.name}</p>
-                            </div>
-                            <div style="display:flex; gap:8px;">
-                                <button onclick="event.stopPropagation(); openWalletForm(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,0.2); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(255,255,255,0.2); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="edit-3" style="width:16px; height:16px;"></i></button>
-                                <button onclick="event.stopPropagation(); deleteWallet(${w.id})" style="width:36px; height:36px; border-radius:10px; background:rgba(244,63,94,0.3); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:#fff; border:1px solid rgba(244,63,94,0.4); transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="trash-2" style="width:16px; height:16px;"></i></button>
-                            </div>
-                        </div>
-                        
-                        <div style="position:relative; z-index:2;">
-                            <p style="font-size:12px; color:rgba(255,255,255,0.8); margin-bottom:4px; text-transform:uppercase; letter-spacing:1px;">Total Balance</p>
-                            <p class="syne" style="font-size:32px; font-weight:800; color:#fff; text-shadow: 0 2px 8px rgba(0,0,0,0.2); line-height:1;">${wCurr} ${fmtNum(w.balance)}</p>
-                            ${conv}
-                        </div>
-                    </div>
-                </div>`;
-            }).join('')}
-        </div>
-    </div>`;
 }
 
 function openWalletForm(id = null) {
@@ -1657,6 +1612,155 @@ function openWalletForm(id = null) {
             </div>
         </div>`;
     openSheet(); lucide.createIcons();
+}
+
+    // ─── STACKED CARDS LOGIC & INTERACTIONS ─────────────────────────────
+
+function updateWalletStack(activeIndex) {
+    ui.activeWalletIndex = activeIndex;
+    const cards = document.querySelectorAll('.stacked-card');
+    
+    cards.forEach((card, i) => {
+        let diff = i - activeIndex;
+
+        if (diff === 0) {
+            // الكارت الأمامي المفعل
+            card.style.transform = `translateY(40px) scale(1)`;
+            card.style.zIndex = 10;
+            card.style.opacity = 1;
+            card.style.pointerEvents = 'auto';
+        } else if (diff < 0) {
+            // الكروت اللي ورا الكارت الأمامي (مرصوصة فوق بعض)
+            let absDiff = Math.abs(diff);
+            card.style.transform = `translateY(${40 - (absDiff * 20)}px) scale(${1 - absDiff * 0.05})`;
+            card.style.zIndex = 10 - absDiff;
+            card.style.opacity = 1 - (absDiff * 0.15);
+            card.style.pointerEvents = 'auto'; // عشان لو داس عليه يطلعه قدام
+        } else {
+            // الكروت اللي لسه مجاش دورها (بتنزل لتحت وتختفي)
+            card.style.transform = `translateY(150px) scale(0.85)`;
+            card.style.zIndex = 0;
+            card.style.opacity = 0;
+            card.style.pointerEvents = 'none';
+        }
+    });
+
+    // تحديث البيانات اللي تحت الكارت
+    renderActiveWalletData(activeIndex);
+}
+
+function renderActiveWalletData(index) {
+    const wallet = state.wallets[index];
+    const wCurr = wallet.currency || state.currency.code;
+    const wTxs = state.transactions.filter(t => t.walletId === wallet.id);
+    const sorted = wTxs.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3); // آخر 3 حركات
+
+    const container = document.getElementById('active-wallet-data');
+    if(!container) return;
+
+    // تأثير اختفاء وظهور ناعم
+    container.style.opacity = 0;
+
+    setTimeout(() => {
+        let html = `
+            <p class="section-title" style="margin-bottom:12px;">Quick Actions</p>
+            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:24px;">
+                <button onclick="openTransactionForm({type:'expense', walletId:${wallet.id}})" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <div style="width:100%; aspect-ratio:1; border-radius:14px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
+                        <i data-lucide="arrow-up-right" style="color:var(--rose);"></i>
+                    </div>
+                    <span style="font-size:10px; color:var(--text); font-weight:600;">Pay</span>
+                </button>
+                <button onclick="openTransactionForm({type:'income', walletId:${wallet.id}})" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <div style="width:100%; aspect-ratio:1; border-radius:14px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
+                        <i data-lucide="arrow-down-left" style="color:var(--emerald);"></i>
+                    </div>
+                    <span style="font-size:10px; color:var(--text); font-weight:600;">Topup</span>
+                </button>
+                <button onclick="openTransferForm()" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <div style="width:100%; aspect-ratio:1; border-radius:14px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
+                        <i data-lucide="arrow-right-left" style="color:#3b82f6;"></i>
+                    </div>
+                    <span style="font-size:10px; color:var(--text); font-weight:600;">Transfer</span>
+                </button>
+                <button onclick="openWalletForm(${wallet.id})" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                    <div style="width:100%; aspect-ratio:1; border-radius:14px; background:var(--surface2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
+                        <i data-lucide="settings" style="color:var(--muted);"></i>
+                    </div>
+                    <span style="font-size:10px; color:var(--text); font-weight:600;">Settings</span>
+                </button>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <p class="section-title" style="margin:0;">Recent Activity</p>
+                <button onclick="openWalletTransactions(${wallet.id})" style="font-size:10px;font-weight:700;color:var(--emerald);font-family:'Syne',sans-serif;">View All</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+        `;
+
+        if(sorted.length > 0) {
+            html += sorted.map(t => {
+                const cat = getCat(t.categoryId, t.type);
+                return `
+                <div class="tx-row" onclick="openEditTransaction(${t.id})">
+                    <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:16px;height:16px;color:${cat.color};"></i></div>
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</p>
+                        <p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p>
+                    </div>
+                    <p class="syne" style="font-size:13px;font-weight:700;color:${t.type==='expense'?'var(--rose)':'var(--emerald)'};">${t.type==='expense'?'-':'+'} ${wCurr} ${fmtNum(t.amount)}</p>
+                </div>`;
+            }).join('');
+        } else {
+            html += `<p style="text-align:center;color:var(--muted);padding:20px;font-size:12px;">No activity yet.</p>`;
+        }
+
+        html += `</div>`;
+
+        container.innerHTML = html;
+        lucide.createIcons();
+        container.style.opacity = 1;
+    }, 150);
+}
+
+// السحب والموبايل (Touch Events)
+let swiperStartY = 0;
+let isStackWheeling = false;
+
+function handleWalletTouchStart(e) {
+    swiperStartY = e.touches[0].clientY;
+}
+
+function handleWalletTouchEnd(e) {
+    let endY = e.changedTouches[0].clientY;
+    let deltaY = swiperStartY - endY;
+
+    if (deltaY > 40) { // سحب لفوق
+        if (ui.activeWalletIndex < state.wallets.length - 1) updateWalletStack(ui.activeWalletIndex + 1);
+    } else if (deltaY < -40) { // سحب لتحت
+        if (ui.activeWalletIndex > 0) updateWalletStack(ui.activeWalletIndex - 1);
+    }
+}
+
+// السكرول للكمبيوتر (Mouse Wheel)
+function handleWalletWheel(e) {
+    if (isStackWheeling || Math.abs(e.deltaY) < 10) return;
+    
+    isStackWheeling = true;
+    if (e.deltaY > 0) { // سكرول لتحت
+        if (ui.activeWalletIndex < state.wallets.length - 1) updateWalletStack(ui.activeWalletIndex + 1);
+    } else { // سكرول لفوق
+        if (ui.activeWalletIndex > 0) updateWalletStack(ui.activeWalletIndex - 1);
+    }
+    
+    setTimeout(() => isStackWheeling = false, 300); // Cooldown عشان السكرول ميبقاش سريع جداً
+}
+
+// الضغط على كارت عشان تجيبه قدام
+function handleWalletCardClick(index) {
+    if (ui.activeWalletIndex !== index) {
+        updateWalletStack(index);
+    }
 }
 
 function saveWallet(editId) {
