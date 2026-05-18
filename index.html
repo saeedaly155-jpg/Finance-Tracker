@@ -1544,7 +1544,10 @@ function renderWallets() {
     return `<div class="fade-up" style="padding-bottom: 20px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
             <h2 class="syne" style="font-size:24px;font-weight:800;">Saved Wallets</h2>
-            <button onclick="openWalletForm()" style="width:42px;height:42px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--emerald);"><i data-lucide="plus" style="width:20px;height:20px;"></i></button>
+            <div style="display:flex; gap:8px;">
+                <button onclick="openTransferForm()" style="width:42px;height:42px;background:rgba(59, 130, 246, 0.1);border:1px solid rgba(59, 130, 246, 0.2);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#3b82f6; transition: transform 0.15s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'"><i data-lucide="arrow-right-left" style="width:20px;height:20px;"></i></button>
+                <button onclick="openWalletForm()" style="width:42px;height:42px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--emerald);"><i data-lucide="plus" style="width:20px;height:20px;"></i></button>
+            </div>
         </div>
         
         <div style="display:flex;flex-direction:column;gap:16px;">
@@ -1618,12 +1621,39 @@ function openWalletForm(id = null) {
 }
 
 function saveWallet(editId) {
-    const name = document.getElementById('w-name').value.trim(); const balance = parseFloat(document.getElementById('w-balance').value) || 0;
-    const icon = document.getElementById('w-icon').value; const color = document.getElementById('w-color').value; const currency = document.getElementById('w-currency').value;
+    const name = document.getElementById('w-name').value.trim(); 
+    const balance = parseFloat(document.getElementById('w-balance').value) || 0;
+    const icon = document.getElementById('w-icon').value; 
+    const color = document.getElementById('w-color').value; 
+    const currency = document.getElementById('w-currency').value;
+    
     if (!name) return showToast('Enter wallet name');
-    if (editId) { const w = state.wallets.find(x => x.id === editId); if (w) { w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; } } 
-    else { state.wallets.push({ id: genId(), name, balance, icon, color, currency }); }
-    saveState(); closeSheet(); switchTab('wallets'); showToast(editId ? 'Updated!' : 'Wallet added!');
+    
+    if (editId) { 
+        const w = state.wallets.find(x => x.id === editId); 
+        if (w) { 
+            // 🚀 NEW: حساب فرق الرصيد وتسجيله كـ Transaction
+            const diff = balance - w.balance;
+            if (diff !== 0) {
+                const type = diff > 0 ? 'income' : 'expense';
+                state.transactions.unshift({
+                    id: genId(),
+                    name: `Wallet Adjustment`,
+                    categoryId: 'other', // ممكن تغيرها لو عامل تصنيف مخصوص للتسويات
+                    type: type,
+                    amount: Math.abs(diff),
+                    walletId: w.id,
+                    date: today(),
+                    note: 'Manual balance update'
+                });
+            }
+            w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; 
+        } 
+    } else { 
+        state.wallets.push({ id: genId(), name, balance, icon, color, currency }); 
+    }
+    
+    saveState(); closeSheet(); switchTab('wallets'); showToast(editId ? 'Wallet & Transactions Updated!' : 'Wallet added!');
 }
 function deleteWallet(id) { if (state.wallets.length <= 1) return showToast("Can't delete last wallet"); state.wallets = state.wallets.filter(w => w.id !== id); saveState(); closeSheet(); switchTab('wallets'); showToast('Wallet removed'); }
 
