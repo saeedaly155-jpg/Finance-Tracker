@@ -1414,7 +1414,7 @@ window.addEventListener('load', async () => {
     initGoogleDrive();
     switchTab('home');
 });
-    <script>
+ 
     function updateAppIcon() {
         // فحص هل النظام على الـ Dark Mode
         const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -1439,7 +1439,7 @@ window.addEventListener('load', async () => {
 
     // مراقبة أي تغيير يحصل في نظام المستخدم (لو قفل الدارك مود فجأة وهو فاتح الأبلكيشن)
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateAppIcon);
-</script>
+
 </script>
 </body>
 </html>
