@@ -7,7 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finance Pro">
     <meta name="theme-color" content="#07070a">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/128/3914/3914398.png">
+    <link id="app-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/64/3914/3914398.png">
+    <link id="app-apple-icon" rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/64/3914/3914398.png">
     
     <title>Finance Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1413,6 +1414,32 @@ window.addEventListener('load', async () => {
     initGoogleDrive();
     switchTab('home');
 });
+    <script>
+    function updateAppIcon() {
+        // فحص هل النظام على الـ Dark Mode
+        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const favicon = document.getElementById('app-favicon');
+        const appleIcon = document.getElementById('app-apple-icon');
+        
+        // حط هنا لينكات الأيقونات بتاعتك
+        const darkIconUrl = 'https://cdn-icons-png.flaticon.com/256/3914/3914398.png'; // الأيقونة اللي هتظهر في الدارك مود (غالباً بتكون ألوانها فاتحة)
+        const lightIconUrl = 'https://cdn-icons-png.flaticon.com/256/3135/3135679.png'; // الأيقونة اللي هتظهر في اللايت مود (غالباً بتكون ألوانها غامقة)
+        
+        if (favicon) favicon.href = isDarkMode ? darkIconUrl : lightIconUrl;
+        if (appleIcon) appleIcon.href = isDarkMode ? darkIconUrl : lightIconUrl;
+        
+        // تغيير لون شريط الحالة (Status bar) في الموبايل ليتناسب مع المود
+        const themeColor = document.querySelector('meta[name="theme-color"]');
+        if (themeColor) themeColor.setAttribute('content', isDarkMode ? '#07070a' : '#ffffff');
+    }
+
+    // تشغيل الدالة أول ما التطبيق يفتح
+    updateAppIcon();
+
+    // مراقبة أي تغيير يحصل في نظام المستخدم (لو قفل الدارك مود فجأة وهو فاتح الأبلكيشن)
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateAppIcon);
+</script>
 </script>
 </body>
 </html>
