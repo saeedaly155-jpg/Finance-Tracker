@@ -48,7 +48,23 @@
         .scroll-hide::-webkit-scrollbar { display: none; }
         .sheet { transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; }
         .sheet.open { transform: translateY(0); }
-        .glass { background: rgba(15,15,20,0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+       .glass { 
+    /* لون زجاجي خفيف جداً يميل للأزرق الرمادي البارد */
+    background: rgba(30, 35, 45, 0.2); 
+    
+    /* تمويه قوي مع تشبع لوني (السر بتاع أبل) */
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    
+    /* حافة خارجية دقيقة جداً ومائلة للبرودة */
+    border: 1px solid rgba(180, 200, 255, 0.08);
+    
+    /* السحر هنا: انعكاس الإضاءة الداخلي (Inner Highlight) وظل ناعم من تحت */
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.5), /* ظل عميق يبرز الطفو */
+        inset 0 1px 0 rgba(200, 220, 255, 0.2), /* لمعة الزجاج العلوية الباردة */
+        inset 0 -1px 0 rgba(255, 255, 255, 0.03); /* تحديد خفيف من تحت */
+}
         .nav-active { color: var(--emerald) !important; }
         .card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; }
         .btn-primary { background: var(--emerald); color: #000; font-weight: 700; border-radius: 16px; padding: 14px; width: 100%; font-size: 15px; transition: opacity 0.15s, transform 0.15s; font-family: var(--font-main); }
@@ -94,7 +110,7 @@
         .wallet-details.active { opacity: 1; transform: translateY(0); pointer-events: auto; display: block; margin-top: 240px; }
 
         /* AI FAB & Chat Styles */
-        .ai-fab { position: absolute; right: 20px; bottom: 104px; width: 56px; height: 56px; border-radius: 20px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(217, 70, 239, 0.4); z-index: 15; transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
+        .ai-fab { position: absolute; right: 20px; bottom: 124px; width: 56px; height: 56px; border-radius: 20px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(217, 70, 239, 0.4); z-index: 15; transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
         .ai-fab:active { transform: scale(0.9); }
         .chat-bubble { padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; max-width: 85%; font-family: var(--font-main); }
         .chat-user { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-bottom-right-radius: 4px; align-self: flex-end; }
@@ -174,39 +190,36 @@
         <i data-lucide="sparkles" style="width:24px;height:24px;color:#fff;"></i>
     </button>
 
-    <nav class="glass scroll-hide" style="border-top: 1px solid var(--border); position: absolute; bottom: 0; left: 0; right: 0; height: 88px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; z-index: 20; overflow-x: auto;">
-        <button onclick="switchTab('home')" id="nav-home" class="nav-active" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
-            <i data-lucide="layout-grid" style="width:20px;height:20px;"></i>
-            <span class="tag" style="letter-spacing:0.05em;">Home</span>
+    <nav class="glass" style="position: absolute; bottom: 24px; left: 20px; right: 20px; height: 76px; border-radius: 38px; display: flex; justify-content: space-around; align-items: center; z-index: 20; overflow: visible;">
+        
+        <button onclick="switchTab('home')" id="nav-home" class="nav-active" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);min-width:56px; background:none; border:none; padding:0;">
+            <i data-lucide="layout-grid" style="width:22px;height:22px;"></i>
+            <span class="tag" style="letter-spacing:0.05em;">HOME</span>
         </button>
-        <button onclick="switchTab('income')" id="nav-income" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
-            <i data-lucide="arrow-down-to-line" style="width:20px;height:20px;"></i>
-            <span class="tag" style="letter-spacing:0.05em;">Income</span>
-        </button>
-        <button onclick="switchTab('budgets')" id="nav-budgets" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
-            <i data-lucide="target" style="width:20px;height:20px;"></i>
-            <span class="tag" style="letter-spacing:0.05em;">Plan</span>
+
+        <button onclick="switchTab('budgets')" id="nav-budgets" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);min-width:56px; background:none; border:none; padding:0;">
+            <i data-lucide="pie-chart" style="width:22px;height:22px;"></i>
+            <span class="tag" style="letter-spacing:0.05em;">FINANCE</span>
         </button>
         
-        <div style="position:relative;top:-15px;flex-shrink:0;margin:0 2px;">
-            <button onclick="openTransactionForm()" style="width:48px;height:48px;background:var(--emerald);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(16,185,129,0.4);transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.92)'" ontouchend="this.style.transform=''">
-                <i data-lucide="plus" style="width:24px;height:24px;color:#000;stroke-width:3;"></i>
+        <div style="position:relative; top:-20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; z-index: 25;">
+            <button onclick="openTransactionForm()" style="width:58px;height:58px;background:var(--emerald);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(16,185,129,0.3); border:none; outline:none; transition:transform 0.15s;" onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform=''" ontouchstart="this.style.transform='scale(0.92)'" ontouchend="this.style.transform=''">
+                <i data-lucide="plus" style="width:28px;height:28px;color:#000;stroke-width:3;"></i>
             </button>
         </div>
         
-        <button onclick="switchTab('debts')" id="nav-debts" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
-            <i data-lucide="hand-coins" style="width:20px;height:20px;"></i>
-            <span class="tag" style="letter-spacing:0.05em;">Debts</span>
+        <button onclick="switchTab('wallets')" id="nav-wallets" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);min-width:56px; background:none; border:none; padding:0;">
+            <i data-lucide="wallet" style="width:22px;height:22px;"></i>
+            <span class="tag" style="letter-spacing:0.05em;">WALLETS</span>
         </button>
-        <button onclick="switchTab('wallets')" id="nav-wallets" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
-            <i data-lucide="wallet-cards" style="width:20px;height:20px;"></i>
-            <span class="tag" style="letter-spacing:0.05em;">Wallets</span>
+        
+        <button onclick="switchTab('settings')" id="nav-settings" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);min-width:56px; background:none; border:none; padding:0;">
+            <i data-lucide="user" style="width:22px;height:22px;"></i>
+            <span class="tag" style="letter-spacing:0.05em;">PROFILE</span>
         </button>
-        <button onclick="switchTab('settings')" id="nav-settings" style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);min-width:44px;">
-            <i data-lucide="user" style="width:20px;height:20px;"></i>
-            <span class="tag" style="letter-spacing:0.05em;">Profile</span>
-        </button>
+
     </nav>
+
 
     <div id="overlay" onclick="closeSheet()" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:30;"></div>
 
@@ -243,7 +256,7 @@
 <script>
 // ─── DEFAULT DATA ─────────────────────────────────────────────────────
 const DEFAULT_STATE = {
-    user: { name: 'Saeed', email: 'saeed@example.com', photo: null },
+    user: { name: 'Ahmed', email: 'ahmed@example.com', photo: null },
     currency: { code: 'EGP', symbol: 'E£' },
     wallets: [
         { id: 1, name: 'Main Account', balance: 5000, icon: 'wallet',
@@ -321,6 +334,7 @@ const GRADIENT_COLORS = [
 ];
 
 // ─── STATE & PERSISTENCE ─────────────────────────────────────────────
+const GEMINI_API_KEY = "AIzaSyBaUzYUCuoburjuE44IhIcqLmNmqs49-oM";
 let state;
 let charts = {};
 let liveRates = {};
@@ -355,7 +369,8 @@ function loadState() {
     } catch(e) {
         state = JSON.parse(JSON.stringify(DEFAULT_STATE));
     }
-    ui = { currentTab: 'home', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false };
+    // Added financeTab for the new combined page
+    ui = { currentTab: 'home', financeTab: 'budgets', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false };
 }
 
 function saveState() {
@@ -426,13 +441,12 @@ function getSortedWallets() {
     } else if (sort === 'name-asc') {
         wallets.sort((a, b) => a.name.localeCompare(b.name));
     }
-    // 'custom' → original order
     return wallets;
 }
 
 function openSortSheet() {
     const opts = [
-        { key: 'custom',       label: 'Custom Order',     desc: 'Drag to arrange manually',   icon: 'grip-vertical' },
+        { key: 'custom',       label: 'Custom Order',     desc: 'Drag to arrange manually',    icon: 'grip-vertical' },
         { key: 'balance-desc', label: 'Highest Balance',  desc: 'Most money first',            icon: 'arrow-down-wide-narrow' },
         { key: 'balance-asc',  label: 'Lowest Balance',   desc: 'Least money first',           icon: 'arrow-up-narrow-wide' },
         { key: 'name-asc',     label: 'Name A → Z',       desc: 'Alphabetical order',          icon: 'a-large-small' },
@@ -495,7 +509,7 @@ function dragDrop(e, targetIdx) {
     state.wallets.splice(targetIdx, 0, moved);
     dragSrcIndex = null;
     saveState();
-    openSortSheet(); // re-render the sort sheet
+    openSortSheet();
 }
 
 function applySortOrder(key) {
@@ -505,26 +519,73 @@ function applySortOrder(key) {
     switchTab('wallets');
 }
 
-// ─── TAB SWITCHING ────────────────────────────────────────────────────
+// ─── TAB SWITCHING & NEW FINANCE PAGE ─────────────────────────────────
 function switchTab(tabId) {
+    // Smart routing: Redirect old tabs to Finance page
+    if (['income', 'budgets', 'debts'].includes(tabId)) {
+        ui.financeTab = tabId;
+        tabId = 'finance';
+    }
+
     ui.currentTab = tabId;
     const main = document.getElementById('main-content');
     const title = document.getElementById('header-title');
-    document.querySelectorAll('nav button[id^="nav-"]').forEach(b => { b.classList.remove('nav-active'); b.style.color = 'var(--muted)'; });
+    
+    document.querySelectorAll('nav button[id^="nav-"]').forEach(b => { 
+        b.classList.remove('nav-active'); 
+        b.style.color = 'var(--muted)'; 
+    });
+    
     const activeBtn = document.getElementById(`nav-${tabId}`);
-    if (activeBtn) { activeBtn.classList.add('nav-active'); activeBtn.style.color = 'var(--emerald)'; }
+    if (activeBtn) { 
+        activeBtn.classList.add('nav-active'); 
+        activeBtn.style.color = 'var(--emerald)'; 
+    }
+    
     main.style.opacity = '0';
     Object.keys(charts).forEach(k => destroyChart(k));
+    
     setTimeout(() => {
-        const titles = { home: 'Dashboard', income: 'Income Sources', budgets: 'Budgets & Goals', debts: 'Debts & Loans', wallets: 'Wallets', settings: 'Profile' };
+        const titles = { home: 'Dashboard', finance: 'Finance', wallets: 'Wallets', settings: 'Profile' };
         title.textContent = titles[tabId] || 'Dashboard';
-        const renders = { home: renderHome, income: renderIncome, budgets: renderBudgets, debts: renderDebts, wallets: renderWallets, settings: renderSettings };
+        
+        const renders = { home: renderHome, finance: renderFinance, wallets: renderWallets, settings: renderSettings };
+        
         main.innerHTML = (renders[tabId] || renderHome)();
         lucide.createIcons();
         if (tabId === 'home') initCharts();
         updateHeaderAvatar();
         main.style.opacity = '1';
     }, 160);
+}
+
+function switchFinanceTab(tab) {
+    ui.financeTab = tab;
+    switchTab('finance');
+}
+
+function renderFinance() {
+    if (!ui.financeTab) ui.financeTab = 'budgets';
+    
+    const subNav = `
+        <div style="display:flex; background:rgba(22, 22, 30, 0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; padding:6px; margin-bottom:20px; gap:6px; position:sticky; top:0; z-index:10; animation: fade-up 0.35s ease both;">
+            <button onclick="switchFinanceTab('income')" style="flex:1; padding:10px 0; border-radius:12px; font-size:12px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'income' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Income</button>
+            <button onclick="switchFinanceTab('budgets')" style="flex:1; padding:10px 0; border-radius:12px; font-size:12px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'budgets' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Plan</button>
+            <button onclick="switchFinanceTab('debts')" style="flex:1; padding:10px 0; border-radius:12px; font-size:12px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'debts' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Debts</button>
+        </div>
+    `;
+    
+    let content = '';
+    
+    if (ui.financeTab === 'income') {
+        content = renderIncome().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+    } else if (ui.financeTab === 'budgets') {
+        content = renderBudgets().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+    } else if (ui.financeTab === 'debts') {
+        content = renderDebts().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+    }
+    
+    return subNav + content;
 }
 
 function updateHeaderAvatar() {
@@ -536,10 +597,8 @@ function updateHeaderAvatar() {
 
 // ─── AI CHAT ──────────────────────────────────────────────────────────
 function openAIChat() {
-    const apiKey = localStorage.getItem('velto_gemini_key');
-    if (!apiKey) {
-        switchTab('settings');
-        setTimeout(() => showToast('Please setup your Gemini API Key first', 'warn'), 200);
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'حط_الـAPI_KEY_بتاعك_هنا') {
+        showToast('Please set GEMINI_API_KEY in the code first', 'warn');
         return;
     }
     document.getElementById('sheet-content').innerHTML = `
@@ -585,7 +644,6 @@ async function sendChatMessage() {
     chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex; gap:6px; align-items:center;"><div class="sync-status-dot syncing" style="background:#8b5cf6;"></div> Thinking...</div>`;
     chatContainer.scrollTop = chatContainer.scrollHeight;
     try {
-        const apiKey = localStorage.getItem('velto_gemini_key');
         const aiState = {
             currentDate: today(), baseCurrency: state.currency.code,
             wallets: state.wallets.map(({id, name, balance, currency}) => ({id, name, balance, currency})),
@@ -599,7 +657,7 @@ async function sendChatMessage() {
             systemInstruction: { parts: [{ text: sysPrompt }] },
             contents: [ ...chatHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })), { role: 'user', parts: [{ text }] } ]
         };
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
         if (!response.ok) { const errData = await response.json(); throw new Error(errData.error?.message || `HTTP Error ${response.status}`); }
         const data = await response.json();
         let botText = data.candidates[0].content.parts[0].text;
@@ -886,9 +944,9 @@ function saveBudget() {
     const categoryId = document.getElementById('b-cat').value; const limit = parseFloat(document.getElementById('b-limit').value);
     if (!limit) return showToast('Enter limit'); const existing = state.budgets.findIndex(b => b.categoryId === categoryId);
     if (existing >= 0) state.budgets[existing].limit = limit; else state.budgets.push({ id: genId(), categoryId, limit, period: 'monthly' });
-    saveState(); closeSheet(); switchTab('budgets'); showToast('Budget saved!');
+    saveState(); closeSheet(); switchFinanceTab('budgets'); showToast('Budget saved!');
 }
-function deleteBudget(id) { state.budgets = state.budgets.filter(b => b.id !== id); saveState(); switchTab('budgets'); showToast('Budget removed'); }
+function deleteBudget(id) { state.budgets = state.budgets.filter(b => b.id !== id); saveState(); switchFinanceTab('budgets'); showToast('Budget removed'); }
 
 function openGoalForm(editId = null) {
     const g = editId ? state.goals.find(x => x.id === editId) : null;
@@ -916,9 +974,9 @@ function saveGoal(editId) {
     if (!name || !target) return showToast('Fill required fields');
     const item = { name, target, saved, deadline: document.getElementById('g-date').value, icon: document.getElementById('g-icon').value, color: '#3b82f6' };
     if (editId) { const idx = state.goals.findIndex(g => g.id === editId); if (idx >= 0) state.goals[idx] = { ...state.goals[idx], ...item }; } else { item.id = genId(); state.goals.push(item); }
-    saveState(); closeSheet(); switchTab('budgets'); showToast(editId ? 'Goal Updated' : 'Goal Created');
+    saveState(); closeSheet(); switchFinanceTab('budgets'); showToast(editId ? 'Goal Updated' : 'Goal Created');
 }
-function deleteGoal(id) { state.goals = state.goals.filter(g => g.id !== id); saveState(); closeSheet(); switchTab('budgets'); showToast('Goal removed'); }
+function deleteGoal(id) { state.goals = state.goals.filter(g => g.id !== id); saveState(); closeSheet(); switchFinanceTab('budgets'); showToast('Goal removed'); }
 
 function fundGoalPrompt(goalId) {
     const g = state.goals.find(x => x.id === goalId); if(!g) return;
@@ -950,7 +1008,7 @@ function processGoalFunding(goalId) {
     g.saved += addedToBase;
     const catId = state.categories.expense.find(c => c.id === 'savings')?.id || 'other';
     state.transactions.unshift({ id: genId(), name: `Goal: ${g.name}`, categoryId: catId, type: 'expense', amount, walletId: wallet.id, date: today(), note: 'Transferred to Savings Goal' });
-    saveState(); closeSheet(); switchTab('budgets'); showToast(`Added ${fmt(addedToBase)} to goal!`);
+    saveState(); closeSheet(); switchFinanceTab('budgets'); showToast(`Added ${fmt(addedToBase)} to goal!`);
 }
 
 // ─── TRANSACTION FORM ─────────────────────────────────────────────────
@@ -1075,16 +1133,16 @@ function saveIncomeSource(editId) {
     if (!name || !amount) return showToast('Fill all fields');
     const item = { name, amount, frequency: document.getElementById('inc-frequency').value, walletId: parseInt(document.getElementById('inc-wallet').value), icon: document.getElementById('inc-icon').value, date: today() };
     if (editId) { const idx = state.incomeSources.findIndex(i => i.id === editId); if (idx >= 0) state.incomeSources[idx] = { ...state.incomeSources[idx], ...item }; } else { item.id = genId(); state.incomeSources.push(item); }
-    saveState(); closeSheet(); switchTab('income'); showToast(editId ? 'Updated!' : 'Added!');
+    saveState(); closeSheet(); switchFinanceTab('income'); showToast(editId ? 'Updated!' : 'Added!');
 }
-function deleteIncomeSource(id) { state.incomeSources = state.incomeSources.filter(i => i.id !== id); saveState(); switchTab('income'); showToast('Deleted'); }
+function deleteIncomeSource(id) { state.incomeSources = state.incomeSources.filter(i => i.id !== id); saveState(); switchFinanceTab('income'); showToast('Deleted'); }
 function receiveIncome(id) {
     const item = state.incomeSources.find(i => i.id === id); if (!item) return;
     const wallet = state.wallets.find(w => w.id === item.walletId); if (!wallet) return showToast('Wallet not found', 'error');
     wallet.balance += item.amount;
     const catId = state.categories.income.find(c => c.name.toLowerCase().includes('salary'))?.id || state.categories.income[0]?.id || 'other';
     state.transactions.unshift({ id: genId(), name: `${item.name}`, categoryId: catId, type: 'income', amount: item.amount, walletId: item.walletId, date: today(), note: 'Received from sources' });
-    saveState(); showToast(`Received ${wallet.currency||state.currency.code} ${fmtNum(item.amount)}! 🎉`); switchTab('income');
+    saveState(); showToast(`Received ${wallet.currency||state.currency.code} ${fmtNum(item.amount)}! 🎉`); switchFinanceTab('income');
 }
 
 function fmtDate(iso) { if (!iso) return '—'; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }); }
@@ -1131,7 +1189,7 @@ function saveSimpleDebt(type, editId) {
     if(!name || !amount) return showToast('Fill all fields');
     const item = { name, amount, date };
     if (editId) { const idx = state.debts[type].findIndex(d => d.id === editId); if (idx >= 0) state.debts[type][idx] = { ...state.debts[type][idx], ...item }; } else { item.id = genId(); state.debts[type].push(item); }
-    saveState(); closeSheet(); switchTab('debts'); showToast(editId ? 'Updated!' : 'Added!');
+    saveState(); closeSheet(); switchFinanceTab('debts'); showToast(editId ? 'Updated!' : 'Added!');
 }
 function settleSimpleDebtPrompt(type, id) {
     const item = state.debts[type].find(d => d.id === id); if(!item) return; const isOwe = type === 'oweTo';
@@ -1144,7 +1202,7 @@ function processSettleDebt(type, id) {
     if(isOwe && wallet.balance < convAmount) return showToast('Insufficient funds', 'error');
     if(isOwe) { wallet.balance -= convAmount; state.transactions.unshift({ id: genId(), name: `Settled Debt: ${item.name}`, categoryId: 'other', type: 'expense', amount: convAmount, walletId: wallet.id, date: today(), note: 'Paid a debt' }); }
     else { wallet.balance += convAmount; state.transactions.unshift({ id: genId(), name: `Collected Debt: ${item.name}`, categoryId: 'other', type: 'income', amount: convAmount, walletId: wallet.id, date: today(), note: 'Received owed money' }); }
-    state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchTab('debts'); showToast('Settled successfully! 🎉');
+    state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Settled successfully! 🎉');
 }
 function openDebtForm(type, editId = null) {
     const item = editId ? state.debts[type].find(d => d.id === editId) : null;
@@ -1159,17 +1217,17 @@ function saveDebt(type, editId) {
     if (editId) { const existing = state.debts.installments.find(d => d.id === editId); if (existing) { left = existing.left !== undefined ? existing.left : total; paidAmount = existing.paidAmount || 0; } }
     const item = { name, amount, total, totalAmount, startDate, dueDate, date: startDate, left, paidAmount, walletId: parseInt(document.getElementById('d-wallet').value), icon: document.getElementById('d-icon').value };
     if (editId) { const idx = state.debts[type].findIndex(d => d.id === editId); if (idx >= 0) state.debts[type][idx] = { ...state.debts[type][idx], ...item }; } else { item.id = genId(); state.debts[type].push(item); }
-    saveState(); closeSheet(); switchTab('debts'); showToast(editId ? 'Updated!' : 'Added!');
+    saveState(); closeSheet(); switchFinanceTab('debts'); showToast(editId ? 'Updated!' : 'Added!');
 }
 function payInstallment(id) {
     const item = state.debts.installments.find(d => d.id === id); if (!item) return; if (item.left <= 0) return showToast('Already fully paid!', 'warn');
     const wallet = state.wallets.find(w => w.id === item.walletId); if (!wallet) return showToast('Wallet not found', 'error'); if (wallet.balance < item.amount) return showToast('Insufficient balance', 'error');
     wallet.balance -= item.amount; item.paidAmount = parseFloat(((item.paidAmount || 0) + item.amount).toFixed(2)); item.left = Math.max(0, item.left - 1);
     state.transactions.unshift({ id: genId(), name: `Payment: ${item.name}`, categoryId: 'bills', type: 'expense', amount: item.amount, walletId: item.walletId, date: today(), note: `Installment (${item.total - item.left}/${item.total})` });
-    if (item.left === 0) { state.debts.installments = state.debts.installments.filter(d => d.id !== id); saveState(); switchTab('debts'); return showToast(`${item.name} fully paid! 🎉`); }
-    saveState(); switchTab('debts'); showToast(`Paid! ${item.left} months left`);
+    if (item.left === 0) { state.debts.installments = state.debts.installments.filter(d => d.id !== id); saveState(); switchFinanceTab('debts'); return showToast(`${item.name} fully paid! 🎉`); }
+    saveState(); switchFinanceTab('debts'); showToast(`Paid! ${item.left} months left`);
 }
-function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchTab('debts'); showToast('Removed'); }
+function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Removed'); }
 
 // ─── WALLETS (with Sort button) ───────────────────────────────────────
 function renderWallets() {
@@ -1328,24 +1386,52 @@ function renderSettings() {
     const gd = gdrive; const driveStatusColor = (gd.autoSyncEnabled && gd.connected) ? 'var(--emerald)' : '#52525b';
     const driveStatusText = gd.syncing ? 'Syncing…' : (gd.autoSyncEnabled && gd.connected) ? 'Auto-sync active' : gd.autoSyncEnabled ? 'Session expired - Tap top sync' : 'Sync not enabled';
     const dotClass = gd.syncing ? 'syncing' : (gd.autoSyncEnabled && gd.connected) ? 'connected' : 'disconnected';
+
+    // حساب الـ Milestones
+    let milestonesHTML = '';
+    const allGoals = state.goals || [];
+    const allDebts = state.debts.installments || [];
+
+    if (allGoals.length > 0 || allDebts.length > 0) {
+        milestonesHTML += `<div class="card" style="padding:20px; margin-bottom: 24px; border:1px solid rgba(16,185,129,0.15); background: linear-gradient(135deg, rgba(16,185,129,0.03), transparent);">
+            <p class="section-title" style="margin-bottom: 20px; display:flex; align-items:center; gap:6px;">
+                <i data-lucide="award" style="width:16px;height:16px;color:var(--emerald);"></i> Milestones
+            </p>`;
+        
+        allGoals.forEach(g => {
+            const pct = Math.min(100, Math.round((g.saved / g.target) * 100)) || 0;
+            milestonesHTML += generateMilestoneTrack(g.name, pct, g.color || 'var(--emerald)', 'Savings Goal');
+        });
+
+        allDebts.forEach(d => {
+            const paidAmount = d.paidAmount || 0; 
+            const totalAmount = d.totalAmount || (d.amount * d.total);
+            const pct = Math.min(100, Math.round((paidAmount / totalAmount) * 100)) || 0;
+            milestonesHTML += generateMilestoneTrack(d.name, pct, '#3b82f6', 'Debt Payoff'); 
+        });
+
+        milestonesHTML += `</div>`;
+    }
+
     return `<div class="fade-up">
         <div style="text-align:center;padding:10px 0 24px;">
             <div onclick="openProfileEdit()" style="width:80px;height:80px;border-radius:50%;background:var(--surface2);border:2px solid rgba(16,185,129,0.3);overflow:hidden;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;">${photo ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">` : `<span class="syne" style="font-size:28px;font-weight:800;">${initial}</span>`}<div style="position:absolute;bottom:0;right:0;width:22px;height:22px;background:var(--emerald);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);"><i data-lucide="pencil" style="width:10px;height:10px;color:#000;"></i></div></div>
             <h2 class="syne" style="font-size:20px;font-weight:800;">${state.user.name}</h2><p style="font-size:12px;color:var(--muted);">${state.user.email}</p>
         </div>
+        
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;">
             <div class="card" style="padding:12px;text-align:center;"><p class="syne" style="font-size:18px;font-weight:800;color:var(--emerald);">${state.transactions.length}</p><p style="font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Transactions</p></div>
             <div class="card" style="padding:12px;text-align:center;"><p class="syne" style="font-size:18px;font-weight:800;color:var(--emerald);">${state.wallets.length}</p><p style="font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Wallets</p></div>
             <div class="card" style="padding:12px;text-align:center;"><p class="syne" style="font-size:18px;font-weight:800;color:var(--emerald);">${state.budgets.length}</p><p style="font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Budgets</p></div>
         </div>
-        <div class="card" style="padding:16px; margin-bottom: 8px;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><div style="width:36px;height:36px;border-radius:11px;background:rgba(139, 92, 246, 0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="sparkles" style="width:16px;height:16px;color:#8b5cf6;"></i></div><div><p style="font-size:14px;font-weight:600;">Gemini AI Setup</p><p style="font-size:11px;color:var(--muted);">Add API key for smart assistant</p></div></div>
-            <div style="display:flex; gap:8px;"><input type="password" id="gemini-key" class="input" placeholder="Enter Gemini API Key" value="${localStorage.getItem('velto_gemini_key')||''}" style="flex:1;"><button onclick="saveApiKey()" style="padding:0 16px; border-radius:12px; background:#8b5cf6; color:#fff; font-weight:700;">Save</button></div>
-        </div>
+
+        ${milestonesHTML}
+
         <div class="card ${gd.connected ? 'gdrive-connected' : ''}" style="padding:0;overflow:hidden;margin-bottom:8px;border-color:${gd.connected ? 'rgba(16,185,129,0.25)' : 'var(--border)'};">
             <div style="padding:16px;display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:11px;background:rgba(66,133,244,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg></div><div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:700;">Google Drive Sync</p><div style="display:flex;align-items:center;gap:6px;margin-top:2px;"><span class="sync-status-dot ${dotClass}"></span><p style="font-size:11px;color:${driveStatusColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${driveStatusText}</p></div></div></div>
             ${gd.autoSyncEnabled ? `<div style="padding:10px 16px;background:rgba(16,185,129,0.04);display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);"><span style="font-size:10px;color:var(--muted);">All changes save automatically</span><button onclick="handleTopSyncClick()" style="font-size:10px;font-weight:700;color:var(--emerald);">Force Sync</button></div>` : `<div style="padding:10px 16px;background:rgba(245,158,11,0.04);border-top:1px solid var(--border);"><p style="font-size:10px;color:#f59e0b;">Tap the Sync Icon at the top to enable</p></div>`}
         </div>
+        
         <div style="display:flex;flex-direction:column;gap:8px;">
             <div class="card" style="overflow:hidden;">
                 <button onclick="openProfileEdit()" style="width:100%;padding:16px;display:flex;align-items:center;gap:12px;text-align:left;border-bottom:1px solid var(--border);"><div style="width:36px;height:36px;border-radius:11px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="user" style="width:16px;height:16px;color:var(--emerald);"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">Edit Profile</p><p style="font-size:11px;color:var(--muted);">Name, email</p></div><i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--muted);"></i></button>
@@ -1360,6 +1446,39 @@ function renderSettings() {
     </div>`;
 }
 
+function generateMilestoneTrack(title, pct, color, subtitle) {
+    const m25 = pct >= 25 ? color : 'rgba(255,255,255,0.06)';
+    const m50 = pct >= 50 ? color : 'rgba(255,255,255,0.06)';
+    const m75 = pct >= 75 ? color : 'rgba(255,255,255,0.06)';
+    const m100 = pct >= 100 ? color : 'rgba(255,255,255,0.06)';
+    
+    return `
+    <div style="margin-bottom: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+            <div>
+                <p style="font-size:13px; font-weight:700; color:var(--text);">${title}</p>
+                <p style="font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">${subtitle}</p>
+            </div>
+            <span class="syne" style="font-size:14px; font-weight:800; color:${color};">${pct}%</span>
+        </div>
+        <div style="position:relative; height:12px; display:flex; align-items:center;">
+            <div style="position:absolute; width:100%; height:4px; background:rgba(255,255,255,0.04); border-radius:4px; z-index:1;"></div>
+            <div style="position:absolute; width:${pct}%; height:4px; background:linear-gradient(90deg, ${color}66, ${color}); border-radius:4px; z-index:2; transition: width 0.8s ease;"></div>
+            <div style="width:100%; display:flex; justify-content:space-between; position:relative; z-index:3;">
+                <div style="width:12px; height:12px; border-radius:50%; background:${m25}; border:2px solid var(--surface2); box-shadow:0 0 8px ${pct>=25?color+'66':'transparent'}; transition:all 0.3s;"></div>
+                <div style="width:12px; height:12px; border-radius:50%; background:${m50}; border:2px solid var(--surface2); box-shadow:0 0 8px ${pct>=50?color+'66':'transparent'}; transition:all 0.3s;"></div>
+                <div style="width:12px; height:12px; border-radius:50%; background:${m75}; border:2px solid var(--surface2); box-shadow:0 0 8px ${pct>=75?color+'66':'transparent'}; transition:all 0.3s;"></div>
+                <div style="width:14px; height:14px; border-radius:50%; background:${m100}; border:2px solid var(--surface2); box-shadow:0 0 12px ${pct>=100?color+'88':'transparent'}; transition:all 0.3s; transform:translateY(-1px);"></div>
+            </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:9px; color:var(--muted); font-weight:700;">
+            <span style="color:${pct>=25?color:'var(--muted)'}">25%</span>
+            <span style="color:${pct>=50?color:'var(--muted)'}">50%</span>
+            <span style="color:${pct>=75?color:'var(--muted)'}">75%</span>
+            <span style="color:${pct>=100?color:'var(--muted)'}">Done</span>
+        </div>
+    </div>`;
+}
 function saveApiKey() { localStorage.setItem('velto_gemini_key', document.getElementById('gemini-key').value.trim()); showToast('API Key Saved!'); }
 function openProfileEdit() { document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">Edit Profile</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="p-name" class="input" placeholder="Your name" value="${state.user.name||''}"><input type="email" id="p-email" class="input" placeholder="Email" value="${state.user.email||''}"><input type="url" id="p-photo" class="input" placeholder="Photo URL (optional)" value="${state.user.photo||''}"><button onclick="saveProfile()" class="btn-primary">Save Profile</button></div>`; openSheet(); }
 function saveProfile() { state.user.name = document.getElementById('p-name').value.trim() || 'User'; state.user.email = document.getElementById('p-email').value.trim(); state.user.photo = document.getElementById('p-photo').value.trim() || null; saveState(); closeSheet(); switchTab('settings'); showToast('Profile updated!'); }
@@ -1414,31 +1533,73 @@ window.addEventListener('load', async () => {
     initGoogleDrive();
     switchTab('home');
 });
- 
-    function updateAppIcon() {
-        // فحص هل النظام على الـ Dark Mode
-        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        const favicon = document.getElementById('app-favicon');
-        const appleIcon = document.getElementById('app-apple-icon');
-        
-        // حط هنا لينكات الأيقونات بتاعتك
-        const darkIconUrl = 'https://cdn-icons-png.flaticon.com/32/3914/3914398.png'; // الأيقونة اللي هتظهر في الدارك مود (غالباً بتكون ألوانها فاتحة)
-        const lightIconUrl = 'https://cdn-icons-png.flaticon.com/32/3135/3135679.png'; // الأيقونة اللي هتظهر في اللايت مود (غالباً بتكون ألوانها غامقة)
-        
-        if (favicon) favicon.href = isDarkMode ? darkIconUrl : lightIconUrl;
-        if (appleIcon) appleIcon.href = isDarkMode ? darkIconUrl : lightIconUrl;
-        
-        // تغيير لون شريط الحالة (Status bar) في الموبايل ليتناسب مع المود
-        const themeColor = document.querySelector('meta[name="theme-color"]');
-        if (themeColor) themeColor.setAttribute('content', isDarkMode ? '#07070a' : '#ffffff');
+
+// ─── SWIPE TO CLOSE POPUP (BOTTOM SHEET) ─────────────────────────────
+const bottomSheet = document.getElementById('bottom-sheet');
+let dragStartY = 0;
+let currentDragY = 0;
+let isDraggingSheet = false;
+
+bottomSheet.addEventListener('touchstart', (e) => {
+    // مش هنبدأ السحب غير لو المحتوى بتاع الـ popup معموله سكرول لفوق خالص
+    if (bottomSheet.scrollTop <= 0) {
+        dragStartY = e.touches[0].clientY;
+        isDraggingSheet = true;
+        // بنوقف الـ Animation مؤقتاً عشان الـ popup يتحرك مع صباعك بالمللي
+        bottomSheet.style.transition = 'none'; 
     }
+}, { passive: true });
 
-    // تشغيل الدالة أول ما التطبيق يفتح
-    updateAppIcon();
+bottomSheet.addEventListener('touchmove', (e) => {
+    if (!isDraggingSheet) return;
+    
+    currentDragY = e.touches[0].clientY;
+    const deltaY = currentDragY - dragStartY;
 
-    // مراقبة أي تغيير يحصل في نظام المستخدم (لو قفل الدارك مود فجأة وهو فاتح الأبلكيشن)
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateAppIcon);
+    // بنسمح بالسحب لتحت بس (قيمة موجبة)
+    if (deltaY > 0) {
+        // بنمنع الشاشة اللي ورا إنها تتحرك
+        if (e.cancelable) e.preventDefault(); 
+        bottomSheet.style.transform = `translateY(${deltaY}px)`;
+    }
+}, { passive: false });
+
+bottomSheet.addEventListener('touchend', (e) => {
+    if (!isDraggingSheet) return;
+    isDraggingSheet = false;
+    
+    // بنرجع الـ Animation تاني عشان يقفل بنعومة أو يرجع مكانه
+    bottomSheet.style.transition = 'transform 0.38s cubic-bezier(0.32, 0.72, 0, 1)';
+    
+    const deltaY = currentDragY - dragStartY;
+    
+    // لو سحب مسافة أكتر من 120 بيكسل، اقفل الـ Popup
+    if (deltaY > 120) {
+        closeSheet();
+    }
+    
+    // في كل الحالات بنشيل الـ transform المكتوب عشان الـ CSS الأساسي يشتغل
+    bottomSheet.style.transform = ''; 
+    currentDragY = 0;
+});
+ 
+function updateAppIcon() {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const favicon = document.getElementById('app-favicon');
+    const appleIcon = document.getElementById('app-apple-icon');
+    
+    const darkIconUrl = 'https://cdn-icons-png.flaticon.com/32/3914/3914398.png';
+    const lightIconUrl = 'https://cdn-icons-png.flaticon.com/32/3135/3135679.png';
+    
+    if (favicon) favicon.href = isDarkMode ? darkIconUrl : lightIconUrl;
+    if (appleIcon) appleIcon.href = isDarkMode ? darkIconUrl : lightIconUrl;
+    
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.setAttribute('content', isDarkMode ? '#07070a' : '#ffffff');
+}
+
+updateAppIcon();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateAppIcon);
 
 </script>
 </body>
