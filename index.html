@@ -46,25 +46,1630 @@
         .app { max-width: 430px; margin: 0 auto; height: 100vh; background: var(--surface); position: relative; display: flex; flex-direction: column; overflow: hidden; }
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scroll-hide::-webkit-scrollbar { display: none; }
+        .sheet { transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; z-index: 100; }
+        .sheet.open { transform: translateY(0); }
+     <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Finance Pro">
+    <meta name="theme-color" content="#07070a">
+    <link id="app-favicon" rel="icon" href="https://cdn-icons-png.flaticon.com/32/3914/3914398.png">
+    <link id="app-apple-icon" rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/32/3914/3914398.png">
+    
+    <title>Finance Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <!-- Google Sans Flex — variable font with full optical size + weight axes -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..900&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --emerald: #10b981;
+            --rose: #f43f5e;
+            --bg: #07070a;
+            --surface: #0f0f14;
+            --surface2: #16161e;
+            --border: rgba(255,255,255,0.06);
+            --text: #f4f4f5;
+            --muted: #52525b;
+            --amber: #f59e0b;
+            --font-main: 'Google Sans Flex', 'Google Sans', sans-serif;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: var(--font-main);
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+        }
+        h1, h2, h3, .syne { 
+            font-family: var(--font-main);
+            font-weight: 800;
+        }
+        .app { max-width: 430px; margin: 0 auto; height: 100vh; background: var(--surface); position: relative; display: flex; flex-direction: column; overflow: hidden; }
+        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scroll-hide::-webkit-scrollbar { display: none; }
         .sheet { transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; }
         .sheet.open { transform: translateY(0); }
+      /* ── Apple iOS 26 / VisionOS Glass Effect ── */
        .glass { 
-    /* لون زجاجي خفيف جداً يميل للأزرق الرمادي البارد */
-    background: rgba(30, 35, 45, 0.2); 
-    
-    /* تمويه قوي مع تشبع لوني (السر بتاع أبل) */
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    
-    /* حافة خارجية دقيقة جداً ومائلة للبرودة */
-    border: 1px solid rgba(180, 200, 255, 0.08);
-    
-    /* السحر هنا: انعكاس الإضاءة الداخلي (Inner Highlight) وظل ناعم من تحت */
-    box-shadow: 
-        0 30px 60px rgba(0, 0, 0, 0.5), /* ظل عميق يبرز الطفو */
-        inset 0 1px 0 rgba(200, 220, 255, 0.2), /* لمعة الزجاج العلوية الباردة */
-        inset 0 -1px 0 rgba(255, 255, 255, 0.03); /* تحديد خفيف من تحت */
+            /* خلفية متدرجة بتدي إحساس إن الإزاز مقوس أو منفوخ */
+                       
+            /* تمويه قوي مع تشبع لوني عالي */
+            backdrop-filter: blur(10px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            
+            /* إطار خارجي شفاف جداً */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            
+            /* السحر بتاع الـ Liquid هنا: 
+               1. خط أبيض حاد جداً من فوق (بيعمل لمعة سطح الماية)
+               2. انعكاس خفيف من تحت
+               3. ظل عميق جداً عشان يبرز الـ Nav bar
+            */
+            box-shadow: 
+                inset 0 2px 2px -1px rgba(255, 255, 255, 0.6), /* اللمعة العلوية الحادة */
+                inset 0 -2px 4px -1px rgba(255, 255, 255, 0.15), /* الانعكاس السفلي */
+                0 20px 40px -10px rgba(0, 0, 0, 0.8); /* الظل الخارجي */
+        }
+        .nav-active { color: var(--emerald) !important; }
+        .card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; }
+        .btn-primary { background: var(--emerald); color: #000; font-weight: 700; border-radius: 16px; padding: 14px; width: 100%; font-size: 15px; transition: opacity 0.15s, transform 0.15s; font-family: var(--font-main); }
+        .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
+        .input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; color: var(--text); font-size: 15px; font-family: var(--font-main); outline: none; transition: border-color 0.2s; }
+        .input:focus { border-color: var(--emerald); }
+        .tab-pill { padding: 6px 14px; border-radius: 10px; font-size: 11px; font-weight: 700; font-family: var(--font-main); letter-spacing: 0.04em; transition: all 0.2s; }
+        .tag { font-size: 9px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; font-family: var(--font-main); }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-up { animation: fade-up 0.35s ease both; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(-10px) scale(0.9); } to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } }
+        .toast-anim { animation: toast-in 0.25s ease; }
+        .wallet-chip { padding: 8px 16px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 12px; font-weight: 700; font-family: var(--font-main); transition: all 0.2s; color: var(--muted); white-space: nowrap; }
+        .wallet-chip.selected { border-color: var(--emerald); background: rgba(16,185,129,0.1); color: var(--emerald); }
+        .cat-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 8px; border-radius: 16px; border: 1.5px solid transparent; transition: all 0.2s; }
+        .cat-btn.selected { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+        .delete-badge { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; background: var(--rose); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-weight: 900; cursor: pointer; }
+        .progress-bar { height: 4px; border-radius: 4px; background: rgba(255,255,255,0.06); overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--emerald), #34d399); transition: width 0.6s ease; }
+        .tx-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 18px; background: var(--surface2); border: 1px solid var(--border); transition: background 0.15s; cursor: pointer; }
+        .tx-row:active { background: rgba(255,255,255,0.04); }
+        .icon-box { width: 42px; height: 42px; border-radius: 13px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        select.input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+        select.input option { background: #1c1c24; }
+        .section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-family: var(--font-main); margin-bottom: 12px; }
+        .manage-ring { outline: 1.5px dashed rgba(255,255,255,0.15); outline-offset: 2px; }
+        .main-scroll { flex: 1; overflow-y: auto; padding: 0 20px 120px; }
+        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 70% { box-shadow: 0 0 0 8px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
+        .gdrive-connected { animation: pulse-ring 2s ease-out 1; }
+        .sync-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .sync-status-dot.connected { background: var(--emerald); box-shadow: 0 0 6px rgba(16,185,129,0.6); }
+        .sync-status-dot.disconnected { background: var(--muted); }
+        .sync-status-dot.syncing { background: #f59e0b; animation: spin 1s linear infinite; border-radius: 0; clip-path: polygon(50% 0%,100% 50%,50% 100%,0% 50%); }
+
+/* تأثير الـ Hover لأيقونات الـ Nav Bar */
+.nav-icon-btn {
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform: scale(1);
+    filter: brightness(0.7); /* في الحالة العادية الأيقونة باهتة شوية */
 }
+
+.nav-icon-btn:hover {
+    transform: scale(1.1); /* تكبير خفيف */
+    filter: brightness(1.2); /* تنوير الأيقونة */
+    color: var(--emerald) !important; /* لمسة اللون الأساسي */
+}
+
+/* تأثير عند الضغط (للموبايل) */
+.nav-icon-btn:active {
+    transform: scale(0.9);
+}
+
+        /* Apple Wallet Card Stack */
+        .wallet-container { position: relative; padding-top: 10px; height: 100%; min-height: 80vh; }
+        .wallet-card-wrapper { position: absolute; width: 100%; transition: all 0.5s cubic-bezier(0.32, 0.72, 0, 1); left: 0; cursor: pointer; will-change: transform, top; }
+        .wallet-card-wrapper.expanded { top: 10px !important; z-index: 50 !important; transform: translateY(0) scale(1) !important; }
+        .wallet-card-wrapper.hidden-down { transform: translateY(120vh) scale(0.9) !important; opacity: 0; pointer-events: none; }
+        .wallet-details { opacity: 0; transform: translateY(30px); transition: all 0.4s ease; transition-delay: 0.15s; pointer-events: none; display: none; padding-bottom: 120px; }
+        .wallet-details.active { opacity: 1; transform: translateY(0); pointer-events: auto; display: block; margin-top: 240px; }
+
+        /* AI FAB & Chat Styles */
+        .ai-fab { position: absolute; right: 20px; bottom: 124px; width: 56px; height: 56px; border-radius: 50px; background: linear-gradient(135deg, #8b5cf6, #d946ef); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(217, 70, 239, 0.4); z-index: 15; transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; }
+        .ai-fab:active { transform: scale(0.9); }
+        .chat-bubble { padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; max-width: 85%; font-family: var(--font-main); }
+        .chat-user { background: var(--surface2); color: var(--text); border: 1px solid var(--border); border-bottom-right-radius: 4px; align-self: flex-end; }
+        .chat-bot { background: rgba(139, 92, 246, 0.15); color: #fff; border: 1px solid rgba(139, 92, 246, 0.3); border-bottom-left-radius: 4px; align-self: flex-start; }
+
+        /* ── Wallet Card: clean minimal text ── */
+        .wcard-label {
+            font-family: var(--font-main);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 3px;
+        }
+        .wcard-name {
+            font-family: var(--font-main);
+            font-size: 15px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            letter-spacing: 0.01em;
+        }
+        .wcard-balance {
+            font-family: var(--font-main);
+            font-size: 30px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+        .wcard-sub {
+            font-family: var(--font-main);
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.55);
+            margin-top: 3px;
+        }
+
+        /* Sort sheet styles */
+        .sort-opt { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--border); transition: all 0.18s; cursor: pointer; }
+        .sort-opt.active { border-color: var(--emerald); background: rgba(16,185,129,0.07); }
+        .sort-opt p { font-size: 14px; font-weight: 600; }
+        .sort-opt span { font-size: 11px; color: var(--muted); }
+
+        /* Drag handle for sorting */
+        .drag-handle { cursor: grab; color: var(--muted); display: flex; align-items: center; padding: 4px; }
+        .drag-handle:active { cursor: grabbing; }
+        .dragging { opacity: 0.5; border: 1.5px dashed var(--emerald) !important; }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+
+    <header style="padding: 20px 20px 12px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; z-index: 10;">
+        <div>
+            <p class="tag" style="color: var(--muted);">Finance Tracker</p>
+            <h1 id="header-title" class="syne" style="font-size: 26px; font-weight: 800; margin-top: 2px; color: var(--text);">Dashboard</h1>
+        </div>
+        
+        <div style="display:flex; align-items:center; gap: 8px;">
+            <button onclick="openSearch()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                <i data-lucide="search" style="width:18px;height:18px;color:var(--text);"></i>
+            </button>
+            <button id="top-sync-btn" onclick="handleTopSyncClick()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+                <i data-lucide="refresh-cw" id="sync-icon" style="width:18px;height:18px;color:var(--muted);"></i>
+            </button>
+            <button onclick="switchTab('settings')" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;">
+                <img id="header-avatar" src="" alt="U" style="width:100%;height:100%;object-fit:cover;display:none;" onerror="this.style.display='none'">
+                <span id="header-initials" class="syne" style="font-size:14px;font-weight:800;color:var(--text);">?</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
+
+    <button id="ai-fab" class="ai-fab" onclick="openAIChat()">
+        <i data-lucide="sparkles" style="width:24px;height:24px;color:#fff;"></i>
+    </button>
+
+  <nav class="glass" style="position: fixed; bottom: 24px; left: 20px; right: 20px; height: 76px; border-radius: 38px; display: grid; grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr; align-items: center; z-index: 20;">
+    
+    <button onclick="switchTab('home')" class="nav-icon-btn" style="background:none; border:none; display:flex; flex-direction:column; align-items:center;">
+    <i data-lucide="layout-grid"></i>
+</button>
+
+    <button onclick="switchTab('budgets')" class="nav-icon-btn" style="background:none; border:none; display:flex; flex-direction:column; align-items:center;">
+     <i data-lucide="pie-chart"></i>
+    </button>
+    
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <button onclick="openTransactionForm()" style="width: 62px; height: 62px; background: #10b981; border-radius: 50px; border: 0px solid #07070a; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); margin-top: 0px; transition: 0.3s;">
+            <i data-lucide="plus" style="width: 30px; height: 30px; color: #000; stroke-width: 3;"></i>
+        </button>
+    </div>
+    
+    <button onclick="switchTab('wallets')" class="nav-icon-btn" style="background:none; border:none; display:flex; flex-direction:column; align-items:center;">
+ <i data-lucide="wallet"></i>
+    </button>
+    <button onclick="switchTab('settings')" class="nav-icon-btn" style="background:none; border:none; display:flex; flex-direction:column; align-items:center;">
+ <i data-lucide="user"></i>
+    </button>
+</nav>
+
+
+    <div id="overlay" onclick="closeSheet()" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:30;"></div>
+
+    <div id="bottom-sheet" class="sheet scroll-hide" style="position:fixed;bottom:0;left:0;right:0;max-width:430px;margin:0 auto;background:#12121a;border-radius:32px 32px 0 0;border-top:1px solid var(--border);z-index:40;max-height:92vh;overflow-y:auto;">
+        <div style="width:36px;height:4px;background:rgba(255,255,255,0.12);border-radius:4px;margin:14px auto 0;"></div>
+        <div id="sheet-content" style="padding: 20px 24px 40px;"></div>
+    </div>
+</div>
+
+<script>
+    (function initPWA() {
+        const manifest = {
+            name: "Finance Pro", short_name: "FinancePro", display: "standalone",
+            background_color: "#07070a", theme_color: "#07070a",
+            icons: [{ src: "https://cdn-icons-png.flaticon.com/512/3135/3135679.png", sizes: "512x512", type: "image/png" }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+        document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
+
+        const swCode = `
+            self.addEventListener('install', e => self.skipWaiting());
+            self.addEventListener('activate', e => self.clients.claim());
+            self.addEventListener('fetch', e => {
+                e.respondWith(fetch(e.request).catch(() => new Response('Offline Mode Active', {headers: {'Content-Type': 'text/plain'}})));
+            });
+        `;
+        if ('serviceWorker' in navigator) {
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>console.log("SW bypass"));
+        }
+    })();
+</script>
+
+<script>
+// ─── DEFAULT DATA ─────────────────────────────────────────────────────
+const DEFAULT_STATE = {
+    user: { name: 'Ahmed', email: 'ahmed@example.com', photo: null },
+    currency: { code: 'EGP', symbol: 'E£' },
+    wallets: [
+        { id: 1, name: 'Main Account', balance: 5000, icon: 'wallet',
+          color: 'linear-gradient(135deg, #1a4a3a 0%, #0e7f8a 40%, #1a2d6b 100%)', currency: 'EGP' },
+        { id: 2, name: 'USD Savings', balance: 1200, icon: 'landmark',
+          color: 'linear-gradient(135deg, #2d1b69 0%, #0a6b7a 50%, #1a4a3a 100%)', currency: 'USD' },
+        { id: 3, name: 'Virtual Visa', balance: 3200, icon: 'credit-card',
+          color: 'linear-gradient(135deg, #0a2d4a 0%, #0e6b8a 45%, #3d1b6b 100%)', currency: 'EGP' }
+    ],
+    categories: {
+        expense: [
+            { id: 'food', name: 'Food', icon: 'utensils', color: '#f59e0b' },
+            { id: 'transport', name: 'Transport', icon: 'car', color: '#3b82f6' },
+            { id: 'shopping', name: 'Shopping', icon: 'shopping-bag', color: '#ec4899' },
+            { id: 'bills', name: 'Bills', icon: 'zap', color: '#f43f5e' },
+            { id: 'health', name: 'Health', icon: 'heart-pulse', color: '#ef4444' },
+            { id: 'entertainment', name: 'Fun', icon: 'gamepad-2', color: '#8b5cf6' },
+            { id: 'savings', name: 'Savings', icon: 'piggy-bank', color: '#10b981'}
+        ],
+        income: [
+            { id: 'salary', name: 'Salary', icon: 'briefcase', color: '#10b981' },
+            { id: 'freelance', name: 'Freelance', icon: 'code-2', color: '#06b6d4' },
+            { id: 'gift', name: 'Gift', icon: 'gift', color: '#ec4899' },
+            { id: 'investment', name: 'Invest', icon: 'trending-up', color: '#f59e0b' }
+        ]
+    },
+    transactions: [
+        { id: 101, name: 'Salary', categoryId: 'salary', type: 'income', amount: 25000, walletId: 2, date: new Date().toISOString().split('T')[0], note: 'Monthly salary' },
+        { id: 102, name: 'Groceries', categoryId: 'food', type: 'expense', amount: 850, walletId: 1, date: new Date().toISOString().split('T')[0], note: '' }
+    ],
+    debts: { installments: [], oweTo: [], owedToMe: [] },
+    budgets: [
+        { id: 1, categoryId: 'food', limit: 3000, period: 'monthly' }
+    ],
+    incomeSources: [
+        { id: 1, name: 'Main Salary', amount: 25000, frequency: 'monthly', date: new Date().toISOString().split('T')[0], walletId: 1, icon: 'briefcase' }
+    ],
+    goals: [
+        { id: 1, name: 'Emergency Fund', target: 50000, saved: 15000, color: '#3b82f6', icon: 'shield', deadline: '2027-01-01' },
+        { id: 2, name: 'New Laptop', target: 45000, saved: 10000, color: '#f59e0b', icon: 'laptop', deadline: '2026-10-01' }
+    ],
+    walletSortOrder: 'custom' // 'custom' | 'balance-desc' | 'balance-asc' | 'name-asc'
+};
+
+const SUPPORTED_CURRENCIES = [
+    { code: 'EGP', symbol: 'E£', name: 'Egyptian Pound' },
+    { code: 'USD', symbol: '$', name: 'US Dollar' },
+    { code: 'EUR', symbol: '€', name: 'Euro' },
+    { code: 'GBP', symbol: '£', name: 'British Pound' },
+    { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
+    { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' }
+];
+
+const GRADIENT_COLORS = [
+    'radial-gradient(ellipse at 20% 50%, #6b21a8 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, #db2777 0%, transparent 55%), radial-gradient(ellipse at 60% 80%, #7c3aed 0%, transparent 50%), #1a0a2e',
+    'radial-gradient(ellipse at 20% 50%, #4f46e5 0%, transparent 60%), radial-gradient(ellipse at 75% 45%, #06b6d4 0%, transparent 50%), radial-gradient(ellipse at 55% 60%, #65a30d 0%, transparent 40%), #0f1a3d',
+    'radial-gradient(ellipse at 30% 40%, #1d4ed8 0%, transparent 60%), radial-gradient(ellipse at 70% 55%, #0891b2 0%, transparent 50%), radial-gradient(ellipse at 50% 70%, #059669 0%, transparent 45%), #071428',
+    'radial-gradient(ellipse at 25% 45%, #ea580c 0%, transparent 55%), radial-gradient(ellipse at 75% 30%, #db2777 0%, transparent 50%), radial-gradient(ellipse at 55% 75%, #7c3aed 0%, transparent 45%), #1f0a1a',
+    'radial-gradient(ellipse at 20% 60%, #3730a3 0%, transparent 55%), radial-gradient(ellipse at 70% 35%, #0e7490 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, #67e8f9 0%, transparent 35%), #0a1628',
+    'radial-gradient(ellipse at 30% 50%, #1e3a8a 0%, transparent 60%), radial-gradient(ellipse at 70% 40%, #6d28d9 0%, transparent 50%), radial-gradient(ellipse at 55% 70%, #be185d 0%, transparent 40%), #080818',
+    'radial-gradient(ellipse at 25% 55%, #14532d 0%, transparent 55%), radial-gradient(ellipse at 72% 38%, #0f766e 0%, transparent 50%), radial-gradient(ellipse at 50% 65%, #a16207 0%, transparent 40%), #050f0a',
+    'radial-gradient(ellipse at 35% 45%, #581c87 0%, transparent 60%), radial-gradient(ellipse at 68% 55%, #1e40af 0%, transparent 50%), radial-gradient(ellipse at 50% 30%, #0f766e 0%, transparent 45%), #0d0822',
+    'radial-gradient(ellipse at 30% 50%, #7f1d1d 0%, transparent 55%), radial-gradient(ellipse at 70% 35%, #be123c 0%, transparent 50%), radial-gradient(ellipse at 52% 68%, #b45309 0%, transparent 40%), #1a0808',
+    'radial-gradient(ellipse at 20% 60%, #052e16 0%, transparent 55%), radial-gradient(ellipse at 75% 40%, #065f46 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, #164e63 0%, transparent 40%), #020b06',
+    'radial-gradient(ellipse at 28% 48%, #500724 0%, transparent 58%), radial-gradient(ellipse at 73% 38%, #86198f 0%, transparent 50%), radial-gradient(ellipse at 52% 72%, #4c1d95 0%, transparent 42%), #120510',
+    'radial-gradient(ellipse at 22% 55%, #0c4a6e 0%, transparent 60%), radial-gradient(ellipse at 72% 42%, #155e75 0%, transparent 50%), radial-gradient(ellipse at 50% 62%, #3f6212 0%, transparent 38%), #030e18',
+    'radial-gradient(ellipse at 25% 52%, #431407 0%, transparent 58%), radial-gradient(ellipse at 70% 36%, #9a3412 0%, transparent 50%), radial-gradient(ellipse at 53% 70%, #7f1d1d 0%, transparent 42%), #150502',
+    'radial-gradient(ellipse at 30% 50%, #1e1b4b 0%, transparent 60%), radial-gradient(ellipse at 68% 38%, #4338ca 0%, transparent 50%), radial-gradient(ellipse at 52% 65%, #a5b4fc 0%, transparent 35%), #0a0918',
+    'radial-gradient(ellipse at 28% 55%, #14532d 0%, transparent 58%), radial-gradient(ellipse at 70% 40%, #4d7c0f 0%, transparent 50%), radial-gradient(ellipse at 50% 60%, #0e7490 0%, transparent 40%), #050f05',
+    'radial-gradient(ellipse at 32% 48%, #4c1d95 0%, transparent 60%), radial-gradient(ellipse at 68% 35%, #9d174d 0%, transparent 50%), radial-gradient(ellipse at 52% 68%, #1e3a8a 0%, transparent 42%), #0f0520',
+    'radial-gradient(ellipse at 25% 50%, #134e4a 0%, transparent 58%), radial-gradient(ellipse at 72% 42%, #4c1d95 0%, transparent 50%), radial-gradient(ellipse at 52% 70%, #92400e 0%, transparent 40%), #080e12',
+    'radial-gradient(ellipse at 30% 45%, #1e3a8a 0%, transparent 55%), radial-gradient(ellipse at 65% 55%, #065f46 0%, transparent 48%), radial-gradient(ellipse at 50% 30%, #9d174d 0%, transparent 40%), #080818',
+    'radial-gradient(ellipse at 35% 50%, #0f172a 0%, transparent 50%), radial-gradient(ellipse at 65% 45%, #1e40af 0%, transparent 55%), radial-gradient(ellipse at 50% 70%, #0891b2 0%, transparent 40%), #030712',
+    'radial-gradient(ellipse at 28% 52%, #2e1065 0%, transparent 60%), radial-gradient(ellipse at 70% 38%, #5b21b6 0%, transparent 50%), radial-gradient(ellipse at 52% 65%, #0e7490 0%, transparent 38%), #080410',
+];
+
+// ─── STATE & PERSISTENCE ─────────────────────────────────────────────
+const GEMINI_API_KEY = "AIzaSyBaUzYUCuoburjuE44IhIcqLmNmqs49-oM";
+let state;
+let charts = {};
+let liveRates = {};
+let chatHistory = [];
+
+async function fetchRates() {
+    try {
+        const res = await fetch('https://open.er-api.com/v6/latest/USD');
+        const data = await res.json();
+        if(data && data.rates) {
+            liveRates = data.rates;
+            if(ui.currentTab === 'home' || ui.currentTab === 'wallets') switchTab(ui.currentTab);
+        }
+    } catch(e) { console.log("Exchange rates offline"); }
+}
+
+function loadState() {
+    try {
+        const saved = localStorage.getItem('velto_state_v4');
+        if (saved) {
+            state = JSON.parse(saved);
+            if (!state.budgets) state.budgets = DEFAULT_STATE.budgets;
+            if (!state.incomeSources) state.incomeSources = DEFAULT_STATE.incomeSources;
+            if (!state.goals) state.goals = DEFAULT_STATE.goals;
+            if (!state.debts.oweTo) state.debts.oweTo = [];
+            if (!state.debts.owedToMe) state.debts.owedToMe = [];
+            if (!state.walletSortOrder) state.walletSortOrder = 'custom';
+            state.wallets.forEach(w => { if(!w.currency) w.currency = state.currency.code; });
+        } else {
+            state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+        }
+    } catch(e) {
+        state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    }
+    // Added financeTab for the new combined page
+    ui = { currentTab: 'home', financeTab: 'budgets', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false };
+}
+
+function saveState() {
+    try { localStorage.setItem('velto_state_v4', JSON.stringify(state)); } catch(e) {}
+}
+
+let ui = {};
+
+// ─── HELPERS ─────────────────────────────────────────────────────────
+const fmtNum = (n) => Math.abs(n).toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const fmt = (n) => `${state.currency.symbol}${fmtNum(n)}`;
+const today = () => new Date().toISOString().split('T')[0];
+
+function convertCurrency(amount, fromCode, toCode) {
+    if (fromCode === toCode || !liveRates[fromCode] || !liveRates[toCode]) return amount;
+    const inUSD = amount / liveRates[fromCode];
+    return inUSD * liveRates[toCode];
+}
+
+function getCat(id, type) {
+    const all = [...state.categories.expense, ...state.categories.income];
+    return all.find(c => c.id === id) || { id: 'other', name: 'Other', icon: 'circle', color: '#52525b' };
+}
+
+function dateLabel(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const t = new Date(); t.setHours(0,0,0,0);
+    const diff = Math.round((t - d) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+}
+
+function getCurrentMonthSpend(categoryId) {
+    const now = new Date();
+    const month = now.getMonth(); const year = now.getFullYear();
+    return state.transactions.filter(t => {
+        const d = new Date(t.date);
+        return t.type === 'expense' && t.categoryId === categoryId && d.getMonth() === month && d.getFullYear() === year;
+    }).reduce((s, t) => {
+        const w = state.wallets.find(x => x.id === t.walletId) || { currency: state.currency.code };
+        return s + convertCurrency(t.amount, w.currency, state.currency.code);
+    }, 0);
+}
+
+function genId() { return Date.now() + Math.floor(Math.random() * 1000); }
+
+function destroyChart(key) {
+    if (charts[key]) { try { charts[key].destroy(); } catch(e) {} charts[key] = null; }
+}
+
+// ─── WALLET SORTING ───────────────────────────────────────────────────
+function getSortedWallets() {
+    const wallets = [...state.wallets];
+    const sort = state.walletSortOrder || 'custom';
+    if (sort === 'balance-desc') {
+        wallets.sort((a, b) => {
+            const bv = convertCurrency(b.balance, b.currency || state.currency.code, state.currency.code);
+            const av = convertCurrency(a.balance, a.currency || state.currency.code, state.currency.code);
+            return bv - av;
+        });
+    } else if (sort === 'balance-asc') {
+        wallets.sort((a, b) => {
+            const av = convertCurrency(a.balance, a.currency || state.currency.code, state.currency.code);
+            const bv = convertCurrency(b.balance, b.currency || state.currency.code, state.currency.code);
+            return av - bv;
+        });
+    } else if (sort === 'name-asc') {
+        wallets.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return wallets;
+}
+
+function openSortSheet() {
+    const opts = [
+        { key: 'custom',       label: 'Custom Order',     desc: 'Drag to arrange manually',    icon: 'grip-vertical' },
+        { key: 'balance-desc', label: 'Highest Balance',  desc: 'Most money first',            icon: 'arrow-down-wide-narrow' },
+        { key: 'balance-asc',  label: 'Lowest Balance',   desc: 'Least money first',           icon: 'arrow-up-narrow-wide' },
+        { key: 'name-asc',     label: 'Name A → Z',       desc: 'Alphabetical order',          icon: 'a-large-small' },
+    ];
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:16px;">
+            <div style="width:40px;height:40px;border-radius:14px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;">
+                <i data-lucide="arrow-up-down" style="color:var(--emerald);width:18px;height:18px;"></i>
+            </div>
+            <div>
+                <h2 class="syne" style="font-size:18px;font-weight:800;margin:0;">Sort Cards</h2>
+                <p style="font-size:11px;color:var(--muted);">Choose how to order your wallets</p>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            ${opts.map(o => `
+                <div class="sort-opt ${state.walletSortOrder === o.key ? 'active' : ''}" onclick="applySortOrder('${o.key}')">
+                    <div style="width:38px;height:38px;border-radius:12px;background:${state.walletSortOrder===o.key?'rgba(16,185,129,0.12)':'rgba(255,255,255,0.04)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i data-lucide="${o.icon}" style="width:16px;height:16px;color:${state.walletSortOrder===o.key?'var(--emerald)':'var(--muted)'};"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <p style="font-size:14px;font-weight:600;color:${state.walletSortOrder===o.key?'var(--text)':'var(--text)'};">${o.label}</p>
+                        <span>${o.desc}</span>
+                    </div>
+                    ${state.walletSortOrder === o.key ? `<i data-lucide="check-circle-2" style="width:18px;height:18px;color:var(--emerald);flex-shrink:0;"></i>` : ''}
+                </div>
+            `).join('')}
+        </div>
+        ${state.walletSortOrder === 'custom' ? `
+        <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+            <p class="section-title">Drag to Reorder</p>
+            <div id="drag-list" style="display:flex;flex-direction:column;gap:8px;">
+                ${state.wallets.map((w, i) => `
+                    <div class="tx-row" draggable="true" data-wallet-id="${w.id}"
+                         ondragstart="dragStart(event,${i})" ondragover="dragOver(event)" ondrop="dragDrop(event,${i})"
+                         style="cursor:default;user-select:none;">
+                        <div class="drag-handle"><i data-lucide="grip-vertical" style="width:16px;height:16px;"></i></div>
+                        <div style="width:32px;height:32px;border-radius:10px;background:${w.color};flex-shrink:0;"></div>
+                        <div style="flex:1;">
+                            <p style="font-size:14px;font-weight:600;">${w.name}</p>
+                            <p style="font-size:10px;color:var(--muted);">${w.currency||state.currency.code} ${fmtNum(w.balance)}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>` : ''}
+    `;
+    openSheet();
+    lucide.createIcons();
+}
+
+let dragSrcIndex = null;
+function dragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); }
+function dragOver(e) { e.preventDefault(); }
+function dragDrop(e, targetIdx) {
+    e.preventDefault();
+    document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+    if (dragSrcIndex === null || dragSrcIndex === targetIdx) return;
+    const moved = state.wallets.splice(dragSrcIndex, 1)[0];
+    state.wallets.splice(targetIdx, 0, moved);
+    dragSrcIndex = null;
+    saveState();
+    openSortSheet();
+}
+
+function applySortOrder(key) {
+    state.walletSortOrder = key;
+    saveState();
+    closeSheet();
+    switchTab('wallets');
+}
+
+// ─── TAB SWITCHING & NEW FINANCE PAGE ─────────────────────────────────
+function switchTab(tabId) {
+    // Smart routing: Redirect old tabs to Finance page
+    if (['income', 'budgets', 'debts'].includes(tabId)) {
+        ui.financeTab = tabId;
+        tabId = 'finance';
+    }
+
+    ui.currentTab = tabId;
+    const main = document.getElementById('main-content');
+    const title = document.getElementById('header-title');
+    
+    document.querySelectorAll('nav button[id^="nav-"]').forEach(b => { 
+        b.classList.remove('nav-active'); 
+        b.style.color = 'var(--muted)'; 
+    });
+    
+    const activeBtn = document.getElementById(`nav-${tabId}`);
+    if (activeBtn) { 
+        activeBtn.classList.add('nav-active'); 
+        activeBtn.style.color = 'var(--emerald)'; 
+    }
+    
+    main.style.opacity = '0';
+    Object.keys(charts).forEach(k => destroyChart(k));
+    
+    setTimeout(() => {
+        const titles = { home: 'Dashboard', finance: 'Finance', wallets: 'Wallets', settings: 'Profile' };
+        title.textContent = titles[tabId] || 'Dashboard';
+        
+        const renders = { home: renderHome, finance: renderFinance, wallets: renderWallets, settings: renderSettings };
+        
+        main.innerHTML = (renders[tabId] || renderHome)();
+        lucide.createIcons();
+        if (tabId === 'home') initCharts();
+        updateHeaderAvatar();
+        main.style.opacity = '1';
+    }, 160);
+}
+
+function switchFinanceTab(tab) {
+    ui.financeTab = tab;
+    switchTab('finance');
+}
+
+function renderFinance() {
+    if (!ui.financeTab) ui.financeTab = 'budgets';
+    
+    const subNav = `
+        <div style="display:flex; background:rgba(22, 22, 30, 0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border); border-radius:16px; padding:6px; margin-bottom:20px; gap:6px; position:sticky; top:0; z-index:10; animation: fade-up 0.35s ease both;">
+            <button onclick="switchFinanceTab('income')" style="flex:1; padding:10px 0; border-radius:12px; font-size:12px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'income' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Income</button>
+            <button onclick="switchFinanceTab('budgets')" style="flex:1; padding:10px 0; border-radius:12px; font-size:12px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'budgets' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Plan</button>
+            <button onclick="switchFinanceTab('debts')" style="flex:1; padding:10px 0; border-radius:12px; font-size:12px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'debts' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Debts</button>
+        </div>
+    `;
+    
+    let content = '';
+    
+    if (ui.financeTab === 'income') {
+        content = renderIncome().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+    } else if (ui.financeTab === 'budgets') {
+        content = renderBudgets().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+    } else if (ui.financeTab === 'debts') {
+        content = renderDebts().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+    }
+    
+    return subNav + content;
+}
+
+function updateHeaderAvatar() {
+    const img = document.getElementById('header-avatar');
+    const initials = document.getElementById('header-initials');
+    if (state.user.photo) { img.src = state.user.photo; img.style.display = 'block'; initials.style.display = 'none'; }
+    else { img.style.display = 'none'; initials.style.display = 'block'; initials.textContent = (state.user.name || 'U').charAt(0).toUpperCase(); }
+}
+
+// ─── AI CHAT ──────────────────────────────────────────────────────────
+function openAIChat() {
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'حط_الـAPI_KEY_بتاعك_هنا') {
+        showToast('Please set GEMINI_API_KEY in the code first', 'warn');
+        return;
+    }
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:16px;">
+            <div style="width:40px; height:40px; border-radius:14px; background:linear-gradient(135deg, #8b5cf6, #d946ef); display:flex; align-items:center; justify-content:center;">
+                <i data-lucide="sparkles" style="color:#fff;"></i>
+            </div>
+            <div>
+                <h2 class="syne" style="font-size:18px; font-weight:800; margin:0;">Smart Assistant</h2>
+                <p style="font-size:11px; color:var(--emerald);">Online & Ready</p>
+            </div>
+        </div>
+        <div id="chat-messages" style="display:flex; flex-direction:column; gap:12px; max-height:50vh; overflow-y:auto; padding-bottom:10px; margin-bottom:16px;" class="scroll-hide">
+            ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">أهلاً بك! اقدر أحلل مصاريفك أو أسجل معاملاتك (مثال: خصم 200 جنيه أوبر من محفظة الكاش). إزاي أقدر أساعدك؟ 😊</div>` : ''}
+        </div>
+        <div style="display:flex; gap:8px; align-items:flex-end;">
+            <textarea id="chat-input" class="input scroll-hide" placeholder="E.g., I just paid 150 for gas..." style="flex:1; resize:none; min-height:52px; max-height:100px; padding:16px; border-radius:18px;" onkeydown="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendChatMessage(); }"></textarea>
+            <button onclick="sendChatMessage()" style="width:52px; height:52px; border-radius:18px; background:var(--emerald); color:#000; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                <i data-lucide="send" style="width:20px; height:20px;"></i>
+            </button>
+        </div>
+    `;
+    openSheet();
+    lucide.createIcons();
+    setTimeout(() => document.getElementById('chat-input').focus(), 100);
+    const chatContainer = document.getElementById('chat-messages');
+    chatHistory.forEach(msg => {
+        chatContainer.innerHTML += `<div class="chat-bubble ${msg.role === 'user' ? 'chat-user' : 'chat-bot'}">${msg.text}</div>`;
+    });
+    if(chatHistory.length > 0) chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+async function sendChatMessage() {
+    const inputEl = document.getElementById('chat-input');
+    const text = inputEl.value.trim();
+    if (!text) return;
+    const chatContainer = document.getElementById('chat-messages');
+    chatContainer.innerHTML += `<div class="chat-bubble chat-user">${text}</div>`;
+    chatHistory.push({role: 'user', text});
+    inputEl.value = '';
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    const loadingId = 'loading-' + Date.now();
+    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex; gap:6px; align-items:center;"><div class="sync-status-dot syncing" style="background:#8b5cf6;"></div> Thinking...</div>`;
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+    try {
+        const aiState = {
+            currentDate: today(), baseCurrency: state.currency.code,
+            wallets: state.wallets.map(({id, name, balance, currency}) => ({id, name, balance, currency})),
+            categories: { expense: state.categories.expense.map(({id, name}) => ({id, name})), income: state.categories.income.map(({id, name}) => ({id, name})) },
+            transactions: state.transactions.map(({id, name, amount, type, categoryId, walletId, date}) => ({id, name, amount, type, categoryId, walletId, date})),
+            budgets: state.budgets.map(b => { const catName = getCat(b.categoryId).name; return { category: catName, limit: b.limit, currentlySpent: getCurrentMonthSpend(b.categoryId) }; }),
+            goals: state.goals.map(({name, target, saved, deadline}) => ({name, target, saved, deadline})),
+        };
+        const sysPrompt = `You are a highly intelligent financial assistant embedded in a user's local finance app. Speak in friendly Egyptian Arabic. Be concise and helpful.\n\nUser finances:\n${JSON.stringify(aiState)}\n\nIf adding a transaction, output JSON:\n\`\`\`json\n{"execute":true,"transaction":{"name":"...","amount":100,"type":"expense","categoryId":"food","walletId":1},"message":"تم ✅"}\n\`\`\``;
+        const reqBody = {
+            systemInstruction: { parts: [{ text: sysPrompt }] },
+            contents: [ ...chatHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })), { role: 'user', parts: [{ text }] } ]
+        };
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_API_KEY, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
+        if (!response.ok) { const errData = await response.json(); throw new Error(errData.error?.message || `HTTP Error ${response.status}`); }
+        const data = await response.json();
+        let botText = data.candidates[0].content.parts[0].text;
+        document.getElementById(loadingId).remove();
+        const jsonMatch = botText.match(/`{3}json\s*([\s\S]*?)\s*`{3}/);
+        if (jsonMatch) {
+            try {
+                const action = JSON.parse(jsonMatch[1]);
+                if (action.execute && action.transaction) { executeAITransaction(action.transaction); botText = action.message || 'تمت الإضافة ✅'; }
+            } catch(e) { botText = 'فهمت إنك عايز تسجل معاملة، بس في حاجة غلط. ممكن توضح تاني؟'; }
+        }
+        botText = botText.replace(/`{3}json\s*([\s\S]*?)\s*`{3}/, '').trim();
+        chatContainer.innerHTML += `<div class="chat-bubble chat-bot">${botText.replace(/\n/g, '<br>')}</div>`;
+        chatHistory.push({role: 'bot', text: botText});
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+        lucide.createIcons();
+    } catch (err) {
+        document.getElementById(loadingId)?.remove();
+        chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--rose);">حصلت مشكلة: ${err.message}</div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+}
+
+function executeAITransaction(txData) {
+    const wallet = state.wallets.find(w => w.id === txData.walletId) || state.wallets[0];
+    let catArray = state.categories[txData.type] || state.categories['expense'];
+    const cat = catArray.find(c => c.id === txData.categoryId) || catArray[0];
+    const tx = { id: genId(), name: txData.name, categoryId: cat.id, type: txData.type, amount: txData.amount, walletId: wallet.id, date: today(), note: 'Added via Smart Assistant' };
+    state.transactions.unshift(tx);
+    wallet.balance += txData.type === 'expense' ? -txData.amount : txData.amount;
+    saveState();
+    if (ui.currentTab === 'home') { document.getElementById('main-content').innerHTML = renderHome(); initCharts(); }
+    else if (ui.currentTab === 'wallets') { document.getElementById('main-content').innerHTML = renderWallets(); }
+}
+
+// ─── SEARCH ───────────────────────────────────────────────────────────
+function openSearch() {
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="position:sticky;top:0;background:#12121a;padding-bottom:14px;z-index:10;border-bottom:1px solid var(--border);">
+            <div style="display:flex;gap:12px;align-items:center;">
+                <div style="flex:1;position:relative;">
+                    <i data-lucide="search" style="position:absolute;left:14px;top:14px;width:18px;height:18px;color:var(--muted);"></i>
+                    <input type="search" id="search-input" class="input" placeholder="Find anywhere in the app..." oninput="handleSearch()" style="padding-left:42px;background:var(--surface2);">
+                </div>
+                <button onclick="closeSheet()" style="color:var(--muted);font-size:13px;font-weight:700;">Cancel</button>
+            </div>
+        </div>
+        <div id="search-results" style="display:flex;flex-direction:column;gap:8px;margin-top:16px;max-height:60vh;overflow-y:auto;" class="scroll-hide">
+            <div style="text-align:center;padding:40px 20px;color:var(--muted);">
+                <i data-lucide="search" style="width:32px;height:32px;margin:0 auto 10px;opacity:0.5;"></i>
+                <p style="font-size:13px;">Find transactions, wallets, goals & more</p>
+            </div>
+        </div>`;
+    openSheet();
+    lucide.createIcons();
+    setTimeout(() => document.getElementById('search-input').focus(), 100);
+}
+
+function handleSearch() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    const resDiv = document.getElementById('search-results');
+    if (!query) { resDiv.innerHTML = '<p style="text-align:center;color:var(--muted);padding:30px;font-size:13px;">Find anywhere in the app...</p>'; return; }
+    let html = '';
+    const wallets = state.wallets.filter(w => w.name.toLowerCase().includes(query) || (w.currency && w.currency.toLowerCase().includes(query)));
+    if (wallets.length) { html += '<p class="section-title" style="margin-top:10px;">Wallets</p>'; html += wallets.map(w => `<div class="tx-row" onclick="closeSheet(); switchTab('wallets');"><div class="icon-box" style="background:rgba(255,255,255,0.05);"><i data-lucide="${w.icon}" style="color:var(--muted);"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${w.name}</p><p style="font-size:10px;color:var(--muted);">${w.currency||state.currency.code} ${fmtNum(w.balance)}</p></div></div>`).join(''); }
+    const goals = state.goals.filter(g => g.name.toLowerCase().includes(query));
+    if (goals.length) { html += '<p class="section-title" style="margin-top:10px;">Goals</p>'; html += goals.map(g => `<div class="tx-row" onclick="openGoalForm(${g.id})"><div class="icon-box" style="background:${g.color}18;"><i data-lucide="${g.icon}" style="color:${g.color};"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${g.name}</p><p style="font-size:10px;color:var(--muted);">${fmt(g.saved)} / ${fmt(g.target)}</p></div></div>`).join(''); }
+    const txs = state.transactions.filter(t => { const cat = getCat(t.categoryId); return t.name.toLowerCase().includes(query) || (t.note && t.note.toLowerCase().includes(query)) || cat.name.toLowerCase().includes(query); });
+    if (txs.length) {
+        html += '<p class="section-title" style="margin-top:10px;">Transactions</p>';
+        html += txs.map(t => { const cat = getCat(t.categoryId); const wallet = state.wallets.find(w => w.id === t.walletId) || {}; const wCurr = wallet.currency || state.currency.code; return `<div class="tx-row" onclick="openEditTransaction(${t.id})"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div><div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div><div style="text-align:right;"><p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type==='expense'?'-':'+'} ${wCurr} ${fmtNum(t.amount)}</p></div></div>`; }).join('');
+    }
+    if (!html) { resDiv.innerHTML = '<p style="text-align:center;color:var(--muted);padding:30px;font-size:13px;">No results found</p>'; return; }
+    resDiv.innerHTML = html;
+    lucide.createIcons();
+}
+
+// ─── HOME ─────────────────────────────────────────────────────────────
+function renderHome() {
+    let total = 0;
+    state.wallets.forEach(w => { total += convertCurrency(w.balance, w.currency, state.currency.code); });
+    const now = new Date(); const month = now.getMonth(); const year = now.getFullYear();
+    const monthTx = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth() === month && d.getFullYear() === year; });
+    let monthIn = 0; let monthOut = 0;
+    monthTx.forEach(t => { const w = state.wallets.find(x => x.id === t.walletId) || {currency: state.currency.code}; const converted = convertCurrency(t.amount, w.currency, state.currency.code); if (t.type === 'income') monthIn += converted; else monthOut += converted; });
+    const recent = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 8);
+    const alerts = state.budgets.filter(b => getCurrentMonthSpend(b.categoryId) >= b.limit * 0.8);
+
+    return `<div class="fade-up">
+        <div style="background:linear-gradient(135deg,#12181e,#0d1a14);border:1px solid rgba(16,185,129,0.15);border-radius:24px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(16,185,129,0.06);border-radius:50%;filter:blur(20px);"></div>
+            <p class="tag" style="color:var(--muted);">Total Balance ${Object.keys(liveRates).length>0?'· Live rates':''}</p>
+            <h2 class="syne" style="font-size:38px;font-weight:800;color:var(--text);margin-bottom:20px;letter-spacing:-1px;">${fmt(total)}</h2>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="background:rgba(16,185,129,0.08);border-radius:14px;padding:12px;">
+                    <p class="tag" style="color:var(--emerald);margin-bottom:4px;">Income</p>
+                    <p class="syne" style="font-size:16px;font-weight:700;color:var(--text);">${fmt(monthIn)}</p>
+                </div>
+                <div style="background:rgba(244,63,94,0.08);border-radius:14px;padding:12px;">
+                    <p class="tag" style="color:var(--rose);margin-bottom:4px;">Expenses</p>
+                    <p class="syne" style="font-size:16px;font-weight:700;color:var(--text);">${fmt(monthOut)}</p>
+                </div>
+            </div>
+        </div>
+
+        ${alerts.length ? `<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:16px;padding:14px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+            <i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f59e0b;flex-shrink:0;"></i>
+            <div><p class="tag" style="color:#f59e0b;margin-bottom:2px;">Budget Alert</p><p style="font-size:12px;color:var(--muted);">${alerts.map(a => { const c = getCat(a.categoryId); const s = getCurrentMonthSpend(a.categoryId); return `${c.name}: ${fmt(s)} / ${fmt(a.limit)}`; }).join(' · ')}</p></div>
+        </div>` : ''}
+
+        <div style="display:flex;gap:16px;overflow-x:auto;padding:10px 0 24px;margin-bottom:14px;" class="scroll-hide">
+            ${getSortedWallets().map(w => {
+                const wCurr = w.currency || state.currency.code;
+                const mainCurr = state.currency.code;
+                let conversionHTML = '';
+                if (wCurr !== mainCurr) {
+                    const convertedVal = convertCurrency(w.balance, wCurr, mainCurr);
+                    conversionHTML = `<p class="wcard-sub">≈ ${state.currency.symbol} ${fmtNum(convertedVal)}</p>`;
+                }
+                const bgStyle = (w.color && w.color.includes('gradient')) ? w.color : `linear-gradient(135deg, ${w.color || '#212121'}, #0a0a0c)`;
+                return `<div onclick="switchTab('wallets')" style="flex-shrink:0; width:280px; height:160px; border-radius:24px; background: ${bgStyle}; position:relative; overflow:hidden; padding:20px 22px; box-shadow: 0 12px 32px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition: transform 0.2s;" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform=''">
+                    <div style="position:absolute; top:0; right:0; width:140px; height:140px; background:rgba(255,255,255,0.06); border-radius:50%; transform:translate(40px,-40px); pointer-events:none;"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; position:relative; z-index:2;">
+                        <p class="wcard-name">${w.name}</p>
+                        <div style="width:32px;height:32px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                            <i data-lucide="${w.icon}" style="width:15px;height:15px;color:rgba(255,255,255,0.9);"></i>
+                        </div>
+                    </div>
+                    <div style="position:relative; z-index:2;">
+                        <p class="wcard-label">Balance</p>
+                        <p class="wcard-balance">${wCurr} ${fmtNum(w.balance)}</p>
+                        ${conversionHTML}
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+
+        <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+            <p class="section-title" style="margin:0;">Cash Flow</p>
+            <div style="display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px;border:1px solid var(--border);">
+                ${['7d','30d','3m'].map(p => `<button onclick="setChartPeriod('${p}')" id="period-${p}" class="tab-pill" style="${ui.chartPeriod===p ? 'background:var(--surface2);color:var(--text);' : 'color:var(--muted);'}">${p}</button>`).join('')}
+            </div>
+        </div>
+        <div class="card" style="padding:16px;margin-bottom:24px;"><canvas id="cashFlowChart" height="180"></canvas></div>
+
+        <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;">
+            <div class="card" style="padding:16px;">
+                <p class="section-title">Spending Breakdown</p>
+                <div style="position:relative;height:140px;display:flex;align-items:center;justify-content:center;">
+                    <canvas id="donutChart"></canvas>
+                    <div style="position:absolute;text-align:center;pointer-events:none;">
+                        <p class="syne" style="font-size:15px;font-weight:800;color:var(--text);">${fmt(monthOut)}</p>
+                        <p style="font-size:10px;color:var(--muted);">this month</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <p class="section-title" style="margin:0;">Recent</p>
+            <button onclick="openAllTransactions()" style="font-size:10px;font-weight:700;color:var(--emerald);">View All</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            ${recent.map(t => {
+                const cat = getCat(t.categoryId, t.type);
+                const wallet = state.wallets.find(w => w.id === t.walletId) || {};
+                const wCurr = wallet.currency || state.currency.code;
+                return `<div class="tx-row" onclick="openEditTransaction(${t.id})">
+                    <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>
+                    <div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type==='expense'?'-':'+'} ${wCurr} ${fmtNum(t.amount)}</p>
+                        <p style="font-size:9px;color:var(--muted);">${wallet.name || ''}</p>
+                    </div>
+                </div>`;
+            }).join('')}
+        </div>
+    </div>`;
+}
+
+// ─── CHARTS ───────────────────────────────────────────────────────────
+function setChartPeriod(p) {
+    ui.chartPeriod = p;
+    document.querySelectorAll('[id^="period-"]').forEach(btn => { btn.style.background = ''; btn.style.color = 'var(--muted)'; });
+    const active = document.getElementById(`period-${p}`);
+    if (active) { active.style.background = 'var(--surface2)'; active.style.color = 'var(--text)'; }
+    destroyChart('cashFlow');
+    initCashFlowChart();
+}
+
+function initCharts() { initCashFlowChart(); initDonutChart(); }
+
+function initCashFlowChart() {
+    const canvas = document.getElementById('cashFlowChart');
+    if (!canvas) return;
+    const days = ui.chartPeriod === '7d' ? 7 : ui.chartPeriod === '30d' ? 30 : 90;
+    const labels = [], incomes = [], expenses = [];
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const ds = d.toISOString().split('T')[0];
+        const label = days <= 7 ? d.toLocaleDateString('en', { weekday: 'short' }) : d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+        labels.push(label);
+        const dayTx = state.transactions.filter(t => t.date === ds);
+        incomes.push(dayTx.filter(t => t.type === 'income').reduce((s, t) => s + convertCurrency(t.amount, (state.wallets.find(w=>w.id===t.walletId)||{}).currency, state.currency.code), 0));
+        expenses.push(dayTx.filter(t => t.type === 'expense').reduce((s, t) => s + convertCurrency(t.amount, (state.wallets.find(w=>w.id===t.walletId)||{}).currency, state.currency.code), 0));
+    }
+    destroyChart('cashFlow');
+    charts['cashFlow'] = new Chart(canvas, {
+        type: 'bar',
+        data: { labels, datasets: [ { label: 'Income', data: incomes, backgroundColor: '#10b981', borderRadius: 4 }, { label: 'Expense', data: expenses, backgroundColor: '#f43f5e', borderRadius: 4 } ] },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)}` } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#52525b', font: { size: 9, family: 'Google Sans Flex' } } },
+                y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#52525b', font: { size: 9, family: 'Google Sans Flex' }, callback: v => fmt(v) }, beginAtZero: true }
+            }
+        }
+    });
+}
+
+function initDonutChart() {
+    const canvas = document.getElementById('donutChart');
+    if (!canvas) return;
+    const now = new Date(); const month = now.getMonth(); const year = now.getFullYear();
+    const byCat = {};
+    state.transactions.filter(t => { const d = new Date(t.date); return t.type === 'expense' && d.getMonth() === month && d.getFullYear() === year; }).forEach(t => { const w = state.wallets.find(x => x.id === t.walletId) || {}; byCat[t.categoryId] = (byCat[t.categoryId] || 0) + convertCurrency(t.amount, w.currency, state.currency.code); });
+    const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    if (!entries.length) return;
+    destroyChart('donut');
+    charts['donut'] = new Chart(canvas, {
+        type: 'doughnut',
+        data: { labels: entries.map(([id]) => getCat(id).name), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([id]) => getCat(id).color), borderWidth: 0, hoverOffset: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)}` } } } }
+    });
+}
+
+// ─── BUDGETS & GOALS ──────────────────────────────────────────────────
+function renderBudgets() {
+    const totalSaved = state.goals.reduce((s, g) => s + g.saved, 0);
+    let html = `<div class="fade-up">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div><h2 class="syne" style="font-size:24px;font-weight:800;">Spending Budgets</h2><p style="font-size:12px;color:var(--muted);">Track your monthly limits</p></div>
+            <button onclick="openBudgetForm()" style="width:42px;height:42px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--emerald);"><i data-lucide="plus" style="width:20px;height:20px;"></i></button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            ${state.budgets.map(b => {
+                const cat = getCat(b.categoryId); const spent = getCurrentMonthSpend(b.categoryId); const pct = Math.min(100, Math.round(spent / b.limit * 100)); const over = spent >= b.limit; const remaining = b.limit - spent;
+                return `<div class="card" style="padding:20px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div style="display:flex;align-items:center;gap:12px;"><div class="icon-box" style="width:40px;height:40px;border-radius:12px;background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div><div><p style="font-size:15px;font-weight:700;">${cat.name}</p><p style="font-size:11px;color:var(--muted);">${fmt(spent)} spent of ${fmt(b.limit)}</p></div></div><button onclick="deleteBudget(${b.id})" style="width:32px;height:32px;border-radius:10px;background:rgba(244,63,94,0.08);color:var(--rose);display:flex;align-items:center;justify-content:center;"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div><div class="progress-bar" style="height:6px;margin-bottom:10px;"><div class="progress-fill" style="width:${pct}%;background:${over?'var(--rose)':'linear-gradient(90deg,var(--emerald),#34d399)'};"></div></div><div style="display:flex;justify-content:space-between;font-size:11px;"><span style="color:${over?'var(--rose)':'var(--muted)'};font-weight:600;">${pct}% Used</span><span style="color:var(--text);font-weight:600;">${over ? 'Over by ' + fmt(Math.abs(remaining)) : fmt(remaining) + ' left'}</span></div></div>`;
+            }).join('')}
+            ${state.budgets.length===0 ? '<div class="card" style="padding:30px;text-align:center;color:var(--muted);"><p style="font-size:14px;font-weight:600;">No budgets set</p></div>' : ''}
+        </div>
+        <div style="height:1px; background:var(--border); margin: 36px 0;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div><h2 class="syne" style="font-size:24px;font-weight:800;">Savings Goals</h2><p style="font-size:12px;color:var(--muted);">${fmt(totalSaved)} saved across all targets</p></div>
+            <button onclick="openGoalForm()" style="width:42px;height:42px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--emerald);"><i data-lucide="plus" style="width:20px;height:20px;"></i></button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            ${state.goals.map(g => {
+                const pct = Math.min(100, Math.round((g.saved / g.target) * 100)) || 0;
+                const done = g.saved >= g.target;
+                return `<div class="card" style="padding:20px; border-color:${done ? g.color+'55' : 'var(--border)'};">
+                    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px;">
+                        <div style="display:flex;align-items:center;gap:12px;"><div class="icon-box" style="width:46px;height:46px;border-radius:14px;background:${g.color}18;"><i data-lucide="${g.icon}" style="width:20px;height:20px;color:${g.color};"></i></div><div><p style="font-size:16px;font-weight:700;">${g.name}</p><p style="font-size:11px;color:var(--muted);">Target: ${fmt(g.target)}</p></div></div>
+                        <div style="display:flex; gap: 6px;"><button onclick="fundGoalPrompt(${g.id})" style="padding:6px 12px;border-radius:10px;background:${g.color}18;color:${g.color};font-size:10px;font-weight:700;">Add Funds</button><button onclick="openGoalForm(${g.id})" style="color:var(--muted);padding:6px;"><i data-lucide="edit-3" style="width:14px;height:14px;"></i></button></div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span class="syne" style="font-size:22px;font-weight:800;color:var(--text);">${fmt(g.saved)}</span><span style="font-size:11px;color:${done?g.color:'var(--muted)'};font-weight:700;">${pct}%</span></div>
+                    <div class="progress-bar" style="height:8px;border-radius:8px;background:rgba(255,255,255,0.04);margin-bottom:12px;"><div class="progress-fill" style="width:${pct}%;background:${done ? g.color : `linear-gradient(90deg, ${g.color}88, ${g.color})`};"></div></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;color:var(--muted);">${g.deadline ? fmtDate(g.deadline) : 'No deadline'}</span>${done ? `<span style="font-size:10px;color:${g.color};font-weight:700;">Goal Reached! 🎉</span>` : `<span style="font-size:10px;color:var(--muted);">${fmt(g.target - g.saved)} left</span>`}</div>
+                </div>`;
+            }).join('')}
+            ${state.goals.length===0 ? '<div class="card" style="padding:40px 20px;text-align:center;color:var(--muted);"><p style="font-size:15px;font-weight:600;">No saving goals</p></div>' : ''}
+        </div>
+    </div>`;
+    return html;
+}
+
+function openBudgetForm() {
+    const catOpts = state.categories.expense.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">Set Budget</h2><div style="display:flex;flex-direction:column;gap:12px;"><select id="b-cat" class="input">${catOpts}</select><input type="number" id="b-limit" class="input" placeholder="Monthly limit (${state.currency.code})" inputmode="decimal"><button onclick="saveBudget()" class="btn-primary">Save Budget</button></div>`;
+    openSheet();
+}
+function saveBudget() {
+    const categoryId = document.getElementById('b-cat').value; const limit = parseFloat(document.getElementById('b-limit').value);
+    if (!limit) return showToast('Enter limit'); const existing = state.budgets.findIndex(b => b.categoryId === categoryId);
+    if (existing >= 0) state.budgets[existing].limit = limit; else state.budgets.push({ id: genId(), categoryId, limit, period: 'monthly' });
+    saveState(); closeSheet(); switchFinanceTab('budgets'); showToast('Budget saved!');
+}
+function deleteBudget(id) { state.budgets = state.budgets.filter(b => b.id !== id); saveState(); switchFinanceTab('budgets'); showToast('Budget removed'); }
+
+function openGoalForm(editId = null) {
+    const g = editId ? state.goals.find(x => x.id === editId) : null;
+    const icons = ['shield','car','plane','home','laptop','graduation-cap','heart','umbrella','gamepad-2'];
+    document.getElementById('sheet-content').innerHTML = `
+        <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${g ? 'Edit' : 'Add'} Goal</h2>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <input type="text" id="g-name" class="input" placeholder="Goal name" value="${g?.name||''}">
+            <input type="number" id="g-target" class="input" placeholder="Target Amount (${state.currency.code})" value="${g?.target||''}" inputmode="decimal">
+            <input type="number" id="g-saved" class="input" placeholder="Already saved (optional)" value="${g?.saved||''}" inputmode="decimal">
+            <div><p class="section-title">Target Date</p><input type="date" id="g-date" class="input" value="${g?.deadline||''}"></div>
+            <div><p class="section-title">Icon</p><div style="display:flex;flex-wrap:wrap;gap:8px;">${icons.map(i => `<button onclick="document.querySelectorAll('.g-icon-opt').forEach(b=>b.style.background='');this.style.background='rgba(255,255,255,0.1)';document.getElementById('g-icon').value='${i}'" class="g-icon-opt" style="width:40px;height:40px;border-radius:12px;background:${g?.icon===i?'rgba(255,255,255,0.1)':'var(--bg)'};border:1px solid var(--border);display:flex;align-items:center;justify-content:center;"><i data-lucide="${i}" style="width:16px;height:16px;color:var(--muted);"></i></button>`).join('')}</div><input type="hidden" id="g-icon" value="${g?.icon||'shield'}"></div>
+            <div style="display:${g?'grid':'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                ${g ? `<button onclick="deleteGoal(${g.id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button>` : ''}
+                <button onclick="saveGoal(${g?.id||'null'})" class="btn-primary">${g ? 'Save' : 'Create Goal'}</button>
+            </div>
+        </div>`;
+    openSheet(); lucide.createIcons();
+}
+
+function saveGoal(editId) {
+    const name = document.getElementById('g-name').value.trim();
+    const target = parseFloat(document.getElementById('g-target').value);
+    const saved = parseFloat(document.getElementById('g-saved').value) || 0;
+    if (!name || !target) return showToast('Fill required fields');
+    const item = { name, target, saved, deadline: document.getElementById('g-date').value, icon: document.getElementById('g-icon').value, color: '#3b82f6' };
+    if (editId) { const idx = state.goals.findIndex(g => g.id === editId); if (idx >= 0) state.goals[idx] = { ...state.goals[idx], ...item }; } else { item.id = genId(); state.goals.push(item); }
+    saveState(); closeSheet(); switchFinanceTab('budgets'); showToast(editId ? 'Goal Updated' : 'Goal Created');
+}
+function deleteGoal(id) { state.goals = state.goals.filter(g => g.id !== id); saveState(); closeSheet(); switchFinanceTab('budgets'); showToast('Goal removed'); }
+
+function fundGoalPrompt(goalId) {
+    const g = state.goals.find(x => x.id === goalId); if(!g) return;
+    document.getElementById('sheet-content').innerHTML = `
+        <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:6px;">Fund "${g.name}"</h2>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:20px;">Move money from a wallet into your goal.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:20px 0;">
+                <span class="syne" style="font-size:36px;font-weight:800;color:${g.color};">+</span>
+                <input type="number" id="fg-amount" class="input" placeholder="0" style="font-size:36px;font-weight:800;text-align:center;width:160px;border:none;background:transparent;padding:0;color:${g.color};" inputmode="decimal">
+            </div>
+            <div><p class="section-title">From Wallet</p><select id="fg-wallet" class="input">${state.wallets.map(w => `<option value="${w.id}">${w.name} (${w.currency||state.currency.code} ${fmtNum(w.balance)})</option>`).join('')}</select></div>
+            <button onclick="processGoalFunding(${g.id})" class="btn-primary" style="background:${g.color};color:#fff;margin-top:10px;">Transfer Funds</button>
+        </div>`;
+    openSheet();
+}
+
+function processGoalFunding(goalId) {
+    const g = state.goals.find(x => x.id === goalId);
+    const amount = parseFloat(document.getElementById('fg-amount').value);
+    const walletId = parseInt(document.getElementById('fg-wallet').value);
+    if (!amount || amount <= 0) return showToast('Invalid amount', 'error');
+    const wallet = state.wallets.find(w => w.id === walletId);
+    if (!wallet) return showToast('Wallet error', 'error');
+    if (wallet.balance < amount) return showToast('Insufficient funds', 'error');
+    wallet.balance -= amount;
+    const wCurr = wallet.currency || state.currency.code;
+    const addedToBase = convertCurrency(amount, wCurr, state.currency.code);
+    g.saved += addedToBase;
+    const catId = state.categories.expense.find(c => c.id === 'savings')?.id || 'other';
+    state.transactions.unshift({ id: genId(), name: `Goal: ${g.name}`, categoryId: catId, type: 'expense', amount, walletId: wallet.id, date: today(), note: 'Transferred to Savings Goal' });
+    saveState(); closeSheet(); switchFinanceTab('budgets'); showToast(`Added ${fmt(addedToBase)} to goal!`);
+}
+
+// ─── TRANSACTION FORM ─────────────────────────────────────────────────
+function openTransactionForm(prefill = null) {
+    if (prefill) { ui.editingTransaction = prefill.id; } else { ui.editingTransaction = null; }
+    const tx = prefill || { type: 'expense', walletId: ui.selectedWalletId || state.wallets[0]?.id, categoryId: 'food', amount: '', name: '', date: today(), note: '' };
+    ui.selectedType = tx.type;
+    ui.selectedWalletId = tx.walletId;
+    ui.selectedCategoryId = tx.categoryId;
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 class="syne" style="font-size:22px;font-weight:800;">${prefill && prefill.id ? 'Edit' : 'New'} Entry</h2>
+            <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:3px;gap:3px;">
+                <button onclick="setType('expense')" id="btn-expense" class="tab-pill" style="${tx.type==='expense' ? 'background:var(--rose);color:#fff;' : 'color:var(--muted);'}" >Expense</button>
+                <button onclick="setType('income')" id="btn-income" class="tab-pill" style="${tx.type==='income' ? 'background:var(--emerald);color:#000;' : 'color:var(--muted);'}">Income</button>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="text-align:center;padding:10px 0;">
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+                    <span id="sign-label" class="syne" style="font-size:36px;font-weight:800;color:${tx.type==='expense'?'var(--rose)':'var(--emerald)'};">${tx.type==='expense'?'-':'+'}</span>
+                    <input type="number" id="tx-amount" class="input" placeholder="0.00" value="${tx.amount||''}" style="font-size:32px;font-weight:800;text-align:center;width:160px;border:none;background:transparent;padding:0;" inputmode="decimal">
+                </div>
+                <p id="tx-currency-label" style="font-size:11px;color:var(--muted);margin-top:4px;">${state.currency.code}</p>
+            </div>
+            <input type="text" id="tx-name" class="input" placeholder="Description (optional)" value="${tx.name||''}">
+            <div><p class="section-title">Wallet</p><div id="wallet-chips" style="display:flex;flex-wrap:wrap;gap:8px;"></div></div>
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <p class="section-title" style="margin:0;">Category</p>
+                    <button onclick="toggleManage()" id="manage-btn" style="font-size:9px;font-weight:800;color:var(--emerald);letter-spacing:0.1em;text-transform:uppercase;">Manage</button>
+                </div>
+                <div id="cat-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div><p class="section-title">Date</p><input type="date" id="tx-date" class="input" value="${tx.date||today()}" style="font-size:13px;"></div>
+                <div><p class="section-title">Note</p><input type="text" id="tx-note" class="input" placeholder="Note" value="${tx.note||''}" style="font-size:13px;"></div>
+            </div>
+            ${prefill && prefill.id ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="deleteTransaction(${prefill.id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button><button onclick="saveTransaction()" class="btn-primary">Save</button></div>` : `<button onclick="saveTransaction()" class="btn-primary">Add Transaction</button>`}
+        </div>`;
+    renderWalletChips(); renderCatGrid(); updateTxCurrencyLabel(); openSheet();
+}
+
+function updateTxCurrencyLabel() { const w = state.wallets.find(x => x.id === ui.selectedWalletId); const lbl = document.getElementById('tx-currency-label'); if(lbl && w) lbl.textContent = w.currency || state.currency.code; }
+function openEditTransaction(id) { const tx = state.transactions.find(t => t.id === id); if (tx) openTransactionForm(tx); }
+function setType(type) {
+    ui.selectedType = type;
+    const sign = document.getElementById('sign-label'); const btnE = document.getElementById('btn-expense'); const btnI = document.getElementById('btn-income');
+    if (type === 'expense') { btnE.style.cssText = 'background:var(--rose);color:#fff;'; btnI.style.cssText = 'color:var(--muted);background:none;'; sign.style.color = 'var(--rose)'; sign.textContent = '-'; }
+    else { btnI.style.cssText = 'background:var(--emerald);color:#000;'; btnE.style.cssText = 'color:var(--muted);background:none;'; sign.style.color = 'var(--emerald)'; sign.textContent = '+'; }
+    ui.selectedCategoryId = state.categories[type][0]?.id; renderCatGrid();
+}
+function renderWalletChips() { const container = document.getElementById('wallet-chips'); if (!container) return; container.innerHTML = state.wallets.map(w => `<button onclick="selectWallet(${w.id})" style="${ui.selectedWalletId===w.id ? 'border-color:var(--emerald);background:rgba(16,185,129,0.1);color:var(--emerald);' : ''}" class="wallet-chip">${w.name}</button>`).join(''); }
+function selectWallet(id) { ui.selectedWalletId = id; renderWalletChips(); updateTxCurrencyLabel(); }
+function renderCatGrid() {
+    const grid = document.getElementById('cat-grid'); if (!grid) return;
+    const cats = state.categories[ui.selectedType];
+    grid.innerHTML = cats.map(c => `<button onclick="${ui.isManagingCategories ? `deleteCat('${c.id}','${ui.selectedType}')` : `selectCat('${c.id}')`}" class="cat-btn ${ui.selectedCategoryId===c.id ? 'selected' : ''} ${ui.isManagingCategories ? 'manage-ring' : ''}"><div style="width:40px;height:40px;border-radius:13px;background:${c.color}18;display:flex;align-items:center;justify-content:center;position:relative;"><i data-lucide="${c.icon}" style="width:18px;height:18px;color:${c.color};"></i>${ui.isManagingCategories ? `<span class="delete-badge">−</span>` : ''}</div><span style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;line-height:1;">${c.name}</span></button>`).join('') + (ui.isManagingCategories ? `<button onclick="addCategoryPrompt()" class="cat-btn" style="border:1.5px dashed rgba(255,255,255,0.1);"><div style="width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;"><i data-lucide="plus" style="width:18px;height:18px;color:var(--emerald);"></i></div><span style="font-size:9px;font-weight:700;color:var(--emerald);">New</span></button>` : '');
+    lucide.createIcons();
+}
+function selectCat(id) { ui.selectedCategoryId = id; renderCatGrid(); }
+function toggleManage() { ui.isManagingCategories = !ui.isManagingCategories; const btn = document.getElementById('manage-btn'); if (btn) btn.textContent = ui.isManagingCategories ? 'Done' : 'Manage'; renderCatGrid(); }
+function deleteCat(id, type) { state.categories[type] = state.categories[type].filter(c => c.id !== id); saveState(); if (ui.selectedCategoryId === id) ui.selectedCategoryId = state.categories[type][0]?.id; renderCatGrid(); }
+function addCategoryPrompt() {
+    const type = ui.selectedType;
+    document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">New Category</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="newcat-name" class="input" placeholder="Category name"><select id="newcat-icon" class="input">${['shopping-cart','coffee','heart','zap','music','book','globe','home','star','truck','scissors','camera','film','gift','pizza','dumbbell','briefcase','phone','sun','moon','piggy-bank'].map(i => `<option value="${i}">${i}</option>`).join('')}</select><input type="color" id="newcat-color" value="#10b981" style="width:100%;height:48px;border-radius:14px;border:1px solid var(--border);background:var(--bg);cursor:pointer;"><button onclick="saveNewCategory('${type}')" class="btn-primary">Add Category</button><button onclick="openTransactionForm()" style="padding:14px;color:var(--muted);font-weight:700;">Cancel</button></div>`;
+}
+function saveNewCategory(type) {
+    const name = document.getElementById('newcat-name').value.trim(); const icon = document.getElementById('newcat-icon').value; const color = document.getElementById('newcat-color').value;
+    if (!name) return showToast('Enter a name'); const id = name.toLowerCase().replace(/\s+/g, '-') + '_' + genId(); state.categories[type].push({ id, name, icon, color }); saveState(); openTransactionForm();
+}
+function saveTransaction() {
+    const amount = parseFloat(document.getElementById('tx-amount').value); if (!amount || amount <= 0) return showToast('Enter a valid amount');
+    const name = document.getElementById('tx-name').value || getCat(ui.selectedCategoryId).name;
+    const date = document.getElementById('tx-date').value || today(); const note = document.getElementById('tx-note').value;
+    const wallet = state.wallets.find(w => w.id === ui.selectedWalletId); if (!wallet) return showToast('Select a wallet');
+    if (ui.editingTransaction) {
+        const old = state.transactions.find(t => t.id === ui.editingTransaction);
+        if (old) { const oldWallet = state.wallets.find(w => w.id === old.walletId); if (oldWallet) oldWallet.balance -= old.type === 'expense' ? -old.amount : old.amount; old.name = name; old.amount = amount; old.type = ui.selectedType; old.categoryId = ui.selectedCategoryId; old.walletId = ui.selectedWalletId; old.date = date; old.note = note; wallet.balance += ui.selectedType === 'expense' ? -amount : amount; }
+    } else { const tx = { id: genId(), name, categoryId: ui.selectedCategoryId, type: ui.selectedType, amount, walletId: ui.selectedWalletId, date, note }; state.transactions.unshift(tx); wallet.balance += ui.selectedType === 'expense' ? -amount : amount; }
+    saveState(); closeSheet(); switchTab('home'); showToast(ui.editingTransaction ? 'Updated!' : 'Added!');
+}
+function deleteTransaction(id) {
+    const tx = state.transactions.find(t => t.id === id);
+    if (tx) { const wallet = state.wallets.find(w => w.id === tx.walletId); if (wallet) wallet.balance -= tx.type === 'expense' ? -tx.amount : tx.amount; state.transactions = state.transactions.filter(t => t.id !== id); saveState(); }
+    closeSheet(); switchTab('home'); showToast('Deleted');
+}
+function openAllTransactions() {
+    const sorted = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+    document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:16px;">All Transactions</h2><div style="display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow-y:auto;" class="scroll-hide">${sorted.map(t => { const cat = getCat(t.categoryId); const wallet = state.wallets.find(w => w.id === t.walletId) || {}; const wCurr = wallet.currency || state.currency.code; return `<div class="tx-row" onclick="openEditTransaction(${t.id});openSheet()"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:16px;height:16px;color:${cat.color};"></i></div><div style="flex:1;min-width:0;"><p style="font-size:13px;font-weight:600;">${t.name}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div><p class="syne" style="font-size:13px;font-weight:700;color:${t.type==='expense'?'var(--rose)':'var(--emerald)'};">${t.type==='expense'?'-':'+'} ${wCurr} ${fmtNum(t.amount)}</p></div>`; }).join('')}${sorted.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px;">No transactions</p>' : ''}</div>`;
+    openSheet(); lucide.createIcons();
+}
+
+// ─── INCOME ───────────────────────────────────────────────────────────
+function renderIncome() {
+    const totalExpected = state.incomeSources.reduce((s, i) => { const w = state.wallets.find(x => x.id === i.walletId) || {currency: state.currency.code}; return s + convertCurrency(i.amount, w.currency, state.currency.code); }, 0);
+    return `<div class="fade-up">
+        <div class="card" style="padding:24px;margin-bottom:20px;background:linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.02));border-color:rgba(16,185,129,0.2);">
+            <p class="tag" style="color:var(--emerald);margin-bottom:4px;">Expected Income</p>
+            <h2 class="syne" style="font-size:32px;font-weight:800;color:var(--text);">${fmt(totalExpected)}</h2>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <p class="section-title" style="margin:0;">Income Sources</p>
+            <button onclick="openIncomeSourceForm()" style="color:var(--emerald);"><i data-lucide="plus-circle" style="width:20px;height:20px;"></i></button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            ${state.incomeSources.map(inc => {
+                const wallet = state.wallets.find(w => w.id === inc.walletId) || {}; const wCurr = wallet.currency || state.currency.code;
+                return `<div class="card" style="padding:16px;"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;"><div style="display:flex;align-items:center;gap:10px;"><div class="icon-box" style="background:rgba(16,185,129,0.1);"><i data-lucide="${inc.icon||'briefcase'}" style="width:16px;height:16px;color:var(--emerald);"></i></div><div><p style="font-size:14px;font-weight:600;">${inc.name}</p><p style="font-size:10px;color:var(--muted);">${wallet.name||'Wallet'} · ${inc.frequency}</p></div></div><div style="display:flex; gap: 8px;"><button onclick="openIncomeSourceForm(${inc.id})" style="color:var(--muted);padding:4px;"><i data-lucide="edit-3" style="width:14px;height:14px;"></i></button><button onclick="deleteIncomeSource(${inc.id})" style="color:var(--rose);padding:4px;"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></div><div style="display:flex;justify-content:space-between;align-items:center;"><span class="syne" style="font-size:20px;font-weight:800;">${wCurr} ${fmtNum(inc.amount)}</span><button onclick="receiveIncome(${inc.id})" style="padding:8px 16px;border-radius:12px;background:rgba(16,185,129,0.12);color:var(--emerald);font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;"><i data-lucide="arrow-down-to-line" style="width:14px;height:14px;"></i> Receive</button></div></div>`;
+            }).join('')}
+        </div>
+    </div>`;
+}
+
+function openIncomeSourceForm(editId = null) {
+    const item = editId ? state.incomeSources.find(i => i.id === editId) : null;
+    document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${item ? 'Edit' : 'Add'} Income Source</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="inc-name" class="input" placeholder="Source name" value="${item?.name||''}"><input type="number" id="inc-amount" class="input" placeholder="Amount" value="${item?.amount||''}" inputmode="decimal"><select id="inc-frequency" class="input"><option value="monthly" ${item?.frequency==='monthly'?'selected':''}>Monthly</option><option value="weekly" ${item?.frequency==='weekly'?'selected':''}>Weekly</option><option value="one-time" ${item?.frequency==='one-time'?'selected':''}>One-time</option></select><select id="inc-wallet" class="input">${state.wallets.map(w => `<option value="${w.id}" ${item?.walletId===w.id?'selected':''}>${w.name}</option>`).join('')}</select><select id="inc-icon" class="input">${['briefcase','building','award','gift','banknote','coins','monitor','trending-up'].map(i => `<option value="${i}" ${item?.icon===i?'selected':''}>${i}</option>`).join('')}</select><button onclick="saveIncomeSource(${editId||'null'})" class="btn-primary">${item ? 'Save' : 'Add Source'}</button></div>`;
+    openSheet();
+}
+function saveIncomeSource(editId) {
+    const name = document.getElementById('inc-name').value.trim(); const amount = parseFloat(document.getElementById('inc-amount').value);
+    if (!name || !amount) return showToast('Fill all fields');
+    const item = { name, amount, frequency: document.getElementById('inc-frequency').value, walletId: parseInt(document.getElementById('inc-wallet').value), icon: document.getElementById('inc-icon').value, date: today() };
+    if (editId) { const idx = state.incomeSources.findIndex(i => i.id === editId); if (idx >= 0) state.incomeSources[idx] = { ...state.incomeSources[idx], ...item }; } else { item.id = genId(); state.incomeSources.push(item); }
+    saveState(); closeSheet(); switchFinanceTab('income'); showToast(editId ? 'Updated!' : 'Added!');
+}
+function deleteIncomeSource(id) { state.incomeSources = state.incomeSources.filter(i => i.id !== id); saveState(); switchFinanceTab('income'); showToast('Deleted'); }
+function receiveIncome(id) {
+    const item = state.incomeSources.find(i => i.id === id); if (!item) return;
+    const wallet = state.wallets.find(w => w.id === item.walletId); if (!wallet) return showToast('Wallet not found', 'error');
+    wallet.balance += item.amount;
+    const catId = state.categories.income.find(c => c.name.toLowerCase().includes('salary'))?.id || state.categories.income[0]?.id || 'other';
+    state.transactions.unshift({ id: genId(), name: `${item.name}`, categoryId: catId, type: 'income', amount: item.amount, walletId: item.walletId, date: today(), note: 'Received from sources' });
+    saveState(); showToast(`Received ${wallet.currency||state.currency.code} ${fmtNum(item.amount)}! 🎉`); switchFinanceTab('income');
+}
+
+function fmtDate(iso) { if (!iso) return '—'; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }); }
+
+// ─── DEBTS ────────────────────────────────────────────────────────────
+function renderDebts() {
+    const totalInstall = state.debts.installments.reduce((s, d) => s + convertCurrency(d.amount, (state.wallets.find(w=>w.id===d.walletId)||{currency:state.currency.code}).currency, state.currency.code), 0);
+    const totalOwe = state.debts.oweTo.reduce((s, d) => s + d.amount, 0);
+    const totalOwed = state.debts.owedToMe.reduce((s, d) => s + d.amount, 0);
+    let html = `<div class="fade-up">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><p class="section-title" style="margin:0;">Installments <span style="color:var(--rose);">${fmt(totalInstall)}/mo</span></p><button onclick="openDebtForm('installments')" style="color:var(--emerald);"><i data-lucide="plus-circle" style="width:20px;height:20px;"></i></button></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            ${state.debts.installments.map(item => {
+                const wallet = state.wallets.find(w => w.id === item.walletId) || {}; const wCurr = wallet.currency||state.currency.code;
+                const paidAmount = item.paidAmount || 0; const totalAmount = item.totalAmount || (item.amount * item.total); const pct = Math.round(paidAmount / totalAmount * 100);
+                return `<div class="card" style="padding:16px;"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;"><div style="display:flex;align-items:center;gap:10px;"><div class="icon-box"><i data-lucide="${item.icon||'credit-card'}" style="width:16px;height:16px;color:var(--muted);"></i></div><div><p style="font-size:14px;font-weight:600;">${item.name}</p><p style="font-size:10px;color:var(--muted);">${wallet.name||'Wallet'}</p></div></div><button onclick="openDebtForm('installments', ${item.id})" style="color:var(--muted);padding:4px;"><i data-lucide="edit-3" style="width:14px;height:14px;"></i></button></div><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;"><span class="syne" style="font-size:20px;font-weight:800;">${wCurr} ${fmtNum(item.amount)}<small style="font-size:10px;font-weight:400;color:var(--muted);">/mo</small></span><span style="font-size:11px;color:var(--muted);">${wCurr} ${fmtNum(paidAmount)} / ${fmtNum(totalAmount)}</span></div><div class="progress-bar" style="margin-bottom:6px;"><div class="progress-fill" style="width:${pct}%;"></div></div><div style="display:flex;justify-content:space-between;margin-bottom:12px;"><span style="font-size:9px;color:var(--muted);">${pct}% paid · ${item.left} of ${item.total} left</span><span style="font-size:9px;color:var(--emerald);font-weight:700;">${item.dueDate ? 'Due: ' + fmtDate(item.dueDate) : ''}</span></div><div style="display:flex;gap:8px;align-items:center;"><button onclick="payInstallment(${item.id})" style="flex:1;padding:10px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);color:var(--emerald);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i>Pay ${wCurr} ${fmtNum(item.amount)}</button><button onclick="deleteDebt('installments', ${item.id})" style="width:38px;height:38px;border-radius:12px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.15);display:flex;align-items:center;justify-content:center;color:var(--rose);flex-shrink:0;"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button></div></div>`;
+            }).join('')}
+            ${state.debts.installments.length===0 ? '<p style="text-align:center;font-size:12px;color:var(--muted);padding:10px;">No active installments</p>' : ''}
+        </div>
+        <div style="height:1px; background:var(--border); margin: 30px 0;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><p class="section-title" style="margin:0;">I Owe Someone <span style="color:var(--rose);">${fmt(totalOwe)}</span></p><button onclick="openSimpleDebtForm('oweTo')" style="color:var(--rose);"><i data-lucide="plus-circle" style="width:20px;height:20px;"></i></button></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            ${state.debts.oweTo.map(d => `<div class="card" style="padding:16px;"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;"><div style="display:flex;align-items:center;gap:10px;"><div class="icon-box" style="background:rgba(244,63,94,0.1);"><i data-lucide="arrow-up-right" style="width:16px;height:16px;color:var(--rose);"></i></div><div><p style="font-size:14px;font-weight:600;">${d.name}</p><p style="font-size:10px;color:var(--muted);">${fmtDate(d.date)}</p></div></div><button onclick="openSimpleDebtForm('oweTo', ${d.id})" style="color:var(--muted);padding:4px;"><i data-lucide="edit-3" style="width:14px;height:14px;"></i></button></div><div style="display:flex;justify-content:space-between;align-items:center;"><span class="syne" style="font-size:20px;font-weight:800;">${fmt(d.amount)}</span><button onclick="settleSimpleDebtPrompt('oweTo', ${d.id})" style="padding:8px 16px;border-radius:12px;background:rgba(244,63,94,0.12);color:var(--rose);font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i>Settle</button></div></div>`).join('')}
+            ${state.debts.oweTo.length===0 ? '<p style="text-align:center;font-size:12px;color:var(--muted);padding:10px;">You owe nothing. Great!</p>' : ''}
+        </div>
+        <div style="height:1px; background:var(--border); margin: 30px 0;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><p class="section-title" style="margin:0;">Someone Owes Me <span style="color:var(--emerald);">${fmt(totalOwed)}</span></p><button onclick="openSimpleDebtForm('owedToMe')" style="color:var(--emerald);"><i data-lucide="plus-circle" style="width:20px;height:20px;"></i></button></div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px;">
+            ${state.debts.owedToMe.map(d => `<div class="card" style="padding:16px;"><div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;"><div style="display:flex;align-items:center;gap:10px;"><div class="icon-box" style="background:rgba(16,185,129,0.1);"><i data-lucide="arrow-down-left" style="width:16px;height:16px;color:var(--emerald);"></i></div><div><p style="font-size:14px;font-weight:600;">${d.name}</p><p style="font-size:10px;color:var(--muted);">${fmtDate(d.date)}</p></div></div><button onclick="openSimpleDebtForm('owedToMe', ${d.id})" style="color:var(--muted);padding:4px;"><i data-lucide="edit-3" style="width:14px;height:14px;"></i></button></div><div style="display:flex;justify-content:space-between;align-items:center;"><span class="syne" style="font-size:20px;font-weight:800;">${fmt(d.amount)}</span><button onclick="settleSimpleDebtPrompt('owedToMe', ${d.id})" style="padding:8px 16px;border-radius:12px;background:rgba(16,185,129,0.12);color:var(--emerald);font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;"><i data-lucide="check-circle" style="width:14px;height:14px;"></i>Receive</button></div></div>`).join('')}
+            ${state.debts.owedToMe.length===0 ? '<p style="text-align:center;font-size:12px;color:var(--muted);padding:10px;">Nobody owes you money.</p>' : ''}
+        </div>
+    </div>`;
+    return html;
+}
+
+function openSimpleDebtForm(type, editId = null) {
+    const item = editId ? state.debts[type].find(d => d.id === editId) : null;
+    const isOwe = type === 'oweTo'; const title = isOwe ? 'I Owe Someone' : 'Someone Owes Me'; const btnColor = isOwe ? 'var(--rose)' : 'var(--emerald)'; const btnText = isOwe ? '#fff' : '#000';
+    document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${item ? 'Edit' : 'Add'} ${title}</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="sd-name" class="input" placeholder="Person / Entity Name" value="${item?.name||''}"><input type="number" id="sd-amount" class="input" placeholder="Amount (${state.currency.code})" value="${item?.amount||''}" inputmode="decimal"><div><p class="section-title">Date</p><input type="date" id="sd-date" class="input" value="${item?.date||today()}"></div><div style="display:${editId?'grid':'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">${editId ? `<button onclick="deleteDebt('${type}', ${editId})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button>` : ''}<button onclick="saveSimpleDebt('${type}', ${editId||'null'})" class="btn-primary" style="background:${btnColor}; color:${btnText}">${item ? 'Save' : 'Add'}</button></div></div>`;
+    openSheet();
+}
+function saveSimpleDebt(type, editId) {
+    const name = document.getElementById('sd-name').value.trim(); const amount = parseFloat(document.getElementById('sd-amount').value); const date = document.getElementById('sd-date').value || today();
+    if(!name || !amount) return showToast('Fill all fields');
+    const item = { name, amount, date };
+    if (editId) { const idx = state.debts[type].findIndex(d => d.id === editId); if (idx >= 0) state.debts[type][idx] = { ...state.debts[type][idx], ...item }; } else { item.id = genId(); state.debts[type].push(item); }
+    saveState(); closeSheet(); switchFinanceTab('debts'); showToast(editId ? 'Updated!' : 'Added!');
+}
+function settleSimpleDebtPrompt(type, id) {
+    const item = state.debts[type].find(d => d.id === id); if(!item) return; const isOwe = type === 'oweTo';
+    document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:6px;">Settle: ${item.name}</h2><p style="font-size:12px;color:var(--muted);margin-bottom:20px;">Amount: ${fmt(item.amount)}</p><div style="display:flex;flex-direction:column;gap:12px;"><div><p class="section-title">Select Wallet to ${isOwe ? 'Pay From' : 'Receive Into'}</p><select id="settle-wallet" class="input">${state.wallets.map(w => `<option value="${w.id}">${w.name} (${w.currency||state.currency.code} ${fmtNum(w.balance)})</option>`).join('')}</select></div><button onclick="processSettleDebt('${type}', ${id})" class="btn-primary" style="background:${isOwe?'var(--rose)':'var(--emerald)'};color:${isOwe?'#fff':'#000'};">Confirm Settlement</button></div>`;
+    openSheet();
+}
+function processSettleDebt(type, id) {
+    const item = state.debts[type].find(d => d.id === id); const walletId = parseInt(document.getElementById('settle-wallet').value); const wallet = state.wallets.find(w => w.id === walletId);
+    if(!wallet) return showToast('Wallet error', 'error'); const isOwe = type === 'oweTo'; const wCurr = wallet.currency || state.currency.code; const convAmount = convertCurrency(item.amount, state.currency.code, wCurr);
+    if(isOwe && wallet.balance < convAmount) return showToast('Insufficient funds', 'error');
+    if(isOwe) { wallet.balance -= convAmount; state.transactions.unshift({ id: genId(), name: `Settled Debt: ${item.name}`, categoryId: 'other', type: 'expense', amount: convAmount, walletId: wallet.id, date: today(), note: 'Paid a debt' }); }
+    else { wallet.balance += convAmount; state.transactions.unshift({ id: genId(), name: `Collected Debt: ${item.name}`, categoryId: 'other', type: 'income', amount: convAmount, walletId: wallet.id, date: today(), note: 'Received owed money' }); }
+    state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Settled successfully! 🎉');
+}
+function openDebtForm(type, editId = null) {
+    const item = editId ? state.debts[type].find(d => d.id === editId) : null;
+    document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${item ? 'Edit' : 'Add'} Installment</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="d-name" class="input" placeholder="Item name" value="${item?.name||''}"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input type="number" id="d-amount" class="input" placeholder="Monthly cost" value="${item?.amount||''}" inputmode="decimal"><input type="number" id="d-total" class="input" placeholder="Total months" value="${item?.total||''}"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div><p class="section-title">Start Date</p><input type="date" id="d-start-date" class="input" value="${item?.startDate||today()}"></div><div><p class="section-title">Due Date</p><input type="date" id="d-due-date" class="input" value="${item?.dueDate||''}"></div></div><select id="d-wallet" class="input">${state.wallets.map(w => `<option value="${w.id}" ${item?.walletId===w.id?'selected':''}>${w.name}</option>`).join('')}</select><select id="d-icon" class="input">${['smartphone','laptop','tv','car','home','watch','credit-card','package','shopping-cart','zap'].map(i => `<option value="${i}" ${item?.icon===i?'selected':''}>${i}</option>`).join('')}</select><div style="display:${editId?'grid':'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">${editId ? `<button onclick="deleteDebt('${type}', ${editId})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button>` : ''}<button onclick="saveDebt('${type}', ${editId||'null'})" class="btn-primary">${item ? 'Save' : 'Add'}</button></div></div>`;
+    openSheet();
+}
+function saveDebt(type, editId) {
+    const name = document.getElementById('d-name').value.trim(); const amount = parseFloat(document.getElementById('d-amount').value); const total = parseInt(document.getElementById('d-total').value);
+    if (!name || !amount || !total) return showToast('Fill all required fields');
+    const startDate = document.getElementById('d-start-date').value || today(); const dueDate = document.getElementById('d-due-date').value;
+    const totalAmount = amount * total; let left = total; let paidAmount = 0;
+    if (editId) { const existing = state.debts.installments.find(d => d.id === editId); if (existing) { left = existing.left !== undefined ? existing.left : total; paidAmount = existing.paidAmount || 0; } }
+    const item = { name, amount, total, totalAmount, startDate, dueDate, date: startDate, left, paidAmount, walletId: parseInt(document.getElementById('d-wallet').value), icon: document.getElementById('d-icon').value };
+    if (editId) { const idx = state.debts[type].findIndex(d => d.id === editId); if (idx >= 0) state.debts[type][idx] = { ...state.debts[type][idx], ...item }; } else { item.id = genId(); state.debts[type].push(item); }
+    saveState(); closeSheet(); switchFinanceTab('debts'); showToast(editId ? 'Updated!' : 'Added!');
+}
+function payInstallment(id) {
+    const item = state.debts.installments.find(d => d.id === id); if (!item) return; if (item.left <= 0) return showToast('Already fully paid!', 'warn');
+    const wallet = state.wallets.find(w => w.id === item.walletId); if (!wallet) return showToast('Wallet not found', 'error'); if (wallet.balance < item.amount) return showToast('Insufficient balance', 'error');
+    wallet.balance -= item.amount; item.paidAmount = parseFloat(((item.paidAmount || 0) + item.amount).toFixed(2)); item.left = Math.max(0, item.left - 1);
+    state.transactions.unshift({ id: genId(), name: `Payment: ${item.name}`, categoryId: 'bills', type: 'expense', amount: item.amount, walletId: item.walletId, date: today(), note: `Installment (${item.total - item.left}/${item.total})` });
+    if (item.left === 0) { state.debts.installments = state.debts.installments.filter(d => d.id !== id); saveState(); switchFinanceTab('debts'); return showToast(`${item.name} fully paid! 🎉`); }
+    saveState(); switchFinanceTab('debts'); showToast(`Paid! ${item.left} months left`);
+}
+function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Removed'); }
+
+// ─── WALLETS (with Sort button) ───────────────────────────────────────
+function renderWallets() {
+    ui.currentTab = 'wallets';
+    const sorted = getSortedWallets();
+
+    let html = `<div class="fade-up" style="padding-bottom: 10px; overflow-x: hidden; min-height: 100vh;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; position:relative;">
+            <button onclick="openSortSheet()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);" title="Sort cards">
+                <i data-lucide="arrow-up-down" style="width:18px;height:18px;"></i>
+            </button>
+            <h2 class="syne" style="font-size:20px;font-weight:700;">Cards</h2>
+            <button onclick="openWalletForm()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--text);">
+                <i data-lucide="plus" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+
+        <div class="wallet-container" id="wallet-stack">`;
+
+    sorted.forEach((w, index) => {
+        const wCurr = w.currency || state.currency.code;
+        const mainCurr = state.currency.code;
+        let conversionHTML = '';
+        if (wCurr !== mainCurr) {
+            const convertedVal = convertCurrency(w.balance, wCurr, mainCurr);
+            conversionHTML = `<p class="wcard-sub">≈ ${state.currency.symbol} ${fmtNum(convertedVal)}</p>`;
+        }
+
+        html += `
+        <div class="wallet-card-wrapper stacked"
+             id="wallet-card-${w.id}"
+             onclick="toggleWalletCard(event, ${w.id})"
+             style="top: ${index * 50}px; z-index: ${index + 1};">
+             
+            <div style="height: 220px; border-radius: 24px; background: ${w.color}; padding: 24px; box-shadow: 0 12px 32px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.07); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+                
+                <div style="position:absolute; top:0; right:0; width:160px; height:160px; background:rgba(255,255,255,0.05); border-radius:50%; transform:translate(40px,-40px); pointer-events:none;"></div>
+
+                <!-- TOP ROW: name + icon -->
+                <div style="display:flex;justify-content:space-between;align-items:center; z-index: 2; position:relative;">
+                    <p class="wcard-name">${w.name}</p>
+                    <div style="width:36px;height:36px;background:rgba(255,255,255,0.12);border-radius:10px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+                        <i data-lucide="${w.icon}" style="width:16px;height:16px;color:rgba(255,255,255,0.9);"></i>
+                    </div>
+                </div>
+
+                <!-- BOTTOM ROW: label + balance + conversion -->
+                <div style="position:relative; z-index:2;">
+                    <p class="wcard-label">Balance</p>
+                    <p class="wcard-balance">${wCurr} ${fmtNum(w.balance)}</p>
+                    ${conversionHTML}
+                </div>
+            </div>
+        </div>`;
+    });
+
+    html += `<div class="wallet-details" id="wallet-details-container"></div>`;
+    html += `</div></div>`;
+
+    ui.isWalletExpanded = false;
+    ui.expandedWalletId = null;
+
+    return html;
+}
+
+function toggleWalletCard(event, walletId) {
+    if (event.target.closest('button')) return;
+    const allCards = document.querySelectorAll('.wallet-card-wrapper');
+    const detailsContainer = document.getElementById('wallet-details-container');
+    if (ui.isWalletExpanded && ui.expandedWalletId === walletId) {
+        ui.isWalletExpanded = false; ui.expandedWalletId = null;
+        allCards.forEach((card, index) => { card.classList.remove('expanded', 'hidden-down'); card.style.top = `${index * 50}px`; });
+        detailsContainer.classList.remove('active');
+        setTimeout(() => { detailsContainer.innerHTML = ''; }, 300);
+    } else {
+        ui.isWalletExpanded = true; ui.expandedWalletId = walletId;
+        allCards.forEach((card) => {
+            const currentWalletId = parseInt(card.id.replace('wallet-card-', ''));
+            if (currentWalletId === walletId) { card.classList.remove('hidden-down'); card.classList.add('expanded'); }
+            else { card.classList.remove('expanded'); card.classList.add('hidden-down'); }
+        });
+        renderWalletDetails(walletId);
+    }
+}
+
+function renderWalletDetails(walletId) {
+    const detailsContainer = document.getElementById('wallet-details-container');
+    const wallet = state.wallets.find(w => w.id === walletId);
+    const txs = state.transactions.filter(t => t.walletId === walletId).sort((a,b) => new Date(b.date) - new Date(a.date));
+    let html = `<div style="display:flex; gap: 10px; margin-bottom: 24px; padding: 0 4px;">
+        <button class="btn-primary" onclick="event.stopPropagation(); openWalletForm(${walletId})" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border);">Edit Card</button>
+        <button class="btn-primary" onclick="event.stopPropagation(); openTransferForm()" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border);">Transfer</button>
+        <button class="btn-primary" onclick="event.stopPropagation(); openTransactionForm({type:'expense', walletId:${walletId}})" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border);">+ Record</button>
+    </div>
+    <div style="padding: 0 4px;"><p class="section-title">Card Activity</p><div style="display: flex; flex-direction: column; gap: 12px;">`;
+    if (txs.length === 0) { html += `<p style="text-align: center; color: var(--muted); padding: 30px; font-size: 13px;">No transactions yet.</p>`; }
+    else { txs.forEach(t => { const cat = getCat(t.categoryId, t.type); const isExp = t.type === 'expense'; html += `<div class="tx-row glass" style="border: 1px solid var(--border);" onclick="openEditTransaction(${t.id})"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${t.name}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div><div style="text-align:right;"><p class="syne" style="font-size:14px;font-weight:700;color:${isExp ? 'var(--rose)' : 'var(--emerald)'};">${isExp?'-':'+'} ${wallet.currency || state.currency.code} ${fmtNum(t.amount)}</p></div></div>`; }); }
+    html += `</div></div>`;
+    detailsContainer.innerHTML = html;
+    setTimeout(() => { detailsContainer.classList.add('active'); }, 50);
+    lucide.createIcons();
+}
+
+function openWalletForm(id = null) {
+    const w = id ? state.wallets.find(x => x.id === parseInt(id)) : null;
+    const icons = ['wallet','landmark','credit-card','banknote','piggy-bank','briefcase','building-2','coins','shopping-bag','truck'];
+    const currentColor = w?.color || GRADIENT_COLORS[0];
+    document.getElementById('sheet-content').innerHTML = `
+        <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${w ? 'Edit' : 'Add'} Wallet</h2>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <input type="text" id="w-name" class="input" placeholder="Wallet name" value="${w?.name||''}">
+            <div style="display:flex;gap:10px;"><input type="number" id="w-balance" class="input" placeholder="Starting balance" value="${w?.balance||0}" inputmode="decimal" style="flex:1;"><select id="w-currency" class="input" style="width:100px;">${SUPPORTED_CURRENCIES.map(c => `<option value="${c.code}" ${w?.currency===c.code||(!w&&state.currency.code===c.code)?'selected':''}>${c.code}</option>`).join('')}</select></div>
+            <div><p class="section-title">Icon</p><div style="display:flex;flex-wrap:wrap;gap:8px;">${icons.map(i => `<button onclick="document.querySelectorAll('.w-icon-opt').forEach(b=>b.style.background='var(--bg)');this.style.background='rgba(255,255,255,0.1)';document.getElementById('w-icon').value='${i}'" class="w-icon-opt" style="width:40px;height:40px;border-radius:12px;background:${w?.icon===i?'rgba(255,255,255,0.1)':'var(--bg)'};border:1px solid var(--border);display:flex;align-items:center;justify-content:center;"><i data-lucide="${i}" style="width:16px;height:16px;color:var(--muted);"></i></button>`).join('')}</div><input type="hidden" id="w-icon" value="${w?.icon||'wallet'}"></div>
+            <div><p class="section-title">Card Theme</p><div style="display:flex;flex-wrap:wrap;gap:8px;max-height:120px;overflow-y:auto;padding-bottom:10px;" class="scroll-hide">${GRADIENT_COLORS.map(c => `<button onclick="document.querySelectorAll('.w-color-opt').forEach(b=>b.style.outline='none');this.style.outline='3px solid white';document.getElementById('w-color').value='${c}'" class="w-color-opt" style="width:40px;height:40px;border-radius:12px;background:${c};outline:${currentColor === c ? '3px solid white' : 'none'};box-shadow: 0 4px 10px rgba(0,0,0,0.3);flex-shrink:0;border:none;"></button>`).join('')}</div><input type="hidden" id="w-color" value="${currentColor}"></div>
+            <div style="display:${w?'grid':'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">${w ? `<button onclick="deleteWallet(${w.id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button>` : ''}<button onclick="saveWallet(${w ? w.id : 'null'})" class="btn-primary">${w ? 'Save' : 'Add Wallet'}</button></div>
+        </div>`;
+    openSheet(); lucide.createIcons();
+}
+
+function saveWallet(editId) {
+    const id = editId ? parseInt(editId) : null;
+    const name = document.getElementById('w-name').value.trim(); const balance = parseFloat(document.getElementById('w-balance').value) || 0;
+    const icon = document.getElementById('w-icon').value; const color = document.getElementById('w-color').value; const currency = document.getElementById('w-currency').value;
+    if (!name) return showToast('Enter wallet name');
+    if (id) {
+        const w = state.wallets.find(x => x.id === id);
+        if (w) { const diff = balance - w.balance; if (diff !== 0) { const type = diff > 0 ? 'income' : 'expense'; state.transactions.unshift({ id: genId(), name: `Wallet Adjustment`, categoryId: 'other', type, amount: Math.abs(diff), walletId: w.id, date: today(), note: 'Manual balance update' }); } w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; }
+    } else { state.wallets.push({ id: genId(), name, balance, icon, color, currency }); }
+    saveState(); closeSheet(); switchTab('wallets'); showToast(id ? 'Wallet Updated!' : 'Wallet added!');
+}
+
+function deleteWallet(id) { if (state.wallets.length <= 1) return showToast("Can't delete last wallet"); state.wallets = state.wallets.filter(w => w.id !== id); saveState(); closeSheet(); switchTab('wallets'); showToast('Wallet removed'); }
+
+function openTransferForm() {
+    if (state.wallets.length < 2) return showToast('You need at least 2 wallets to transfer', 'warn');
+    document.getElementById('sheet-content').innerHTML = `<div style="display:flex; align-items:center; gap:10px; margin-bottom:20px;"><div style="width:40px; height:40px; border-radius:14px; background:rgba(59, 130, 246, 0.1); display:flex; align-items:center; justify-content:center;"><i data-lucide="arrow-right-left" style="color:#3b82f6;"></i></div><h2 class="syne" style="font-size:20px;font-weight:800;margin:0;">Transfer Money</h2></div><div style="display:flex;flex-direction:column;gap:16px;"><div style="text-align:center;padding:10px 0;"><input type="number" id="tr-amount" class="input" placeholder="0.00" style="font-size:36px;font-weight:800;text-align:center;width:100%;border:none;background:transparent;padding:0;color:var(--text);" inputmode="decimal"><p style="font-size:11px;color:var(--muted);margin-top:4px;">Amount to transfer</p></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px; align-items:end;"><div><p class="section-title">From Wallet</p><select id="tr-from" class="input">${state.wallets.map(w => `<option value="${w.id}">${w.name} (${w.currency||state.currency.code} ${fmtNum(w.balance)})</option>`).join('')}</select></div><div><p class="section-title">To Wallet</p><select id="tr-to" class="input">${state.wallets.map(w => `<option value="${w.id}">${w.name}</option>`).join('')}</select></div></div><button onclick="processTransfer()" class="btn-primary" style="background:#3b82f6;color:#fff;margin-top:10px;">Confirm Transfer</button></div>`;
+    openSheet(); lucide.createIcons();
+}
+
+function processTransfer() {
+    const fromId = parseInt(document.getElementById('tr-from').value); const toId = parseInt(document.getElementById('tr-to').value); const amount = parseFloat(document.getElementById('tr-amount').value);
+    if (fromId === toId) return showToast('Please select different wallets', 'error'); if (!amount || amount <= 0) return showToast('Enter a valid amount', 'error');
+    const wFrom = state.wallets.find(w => w.id === fromId); const wTo = state.wallets.find(w => w.id === toId);
+    if (wFrom.balance < amount) return showToast('Insufficient balance', 'error');
+    const fromCurr = wFrom.currency || state.currency.code; const toCurr = wTo.currency || state.currency.code; const convertedAmount = convertCurrency(amount, fromCurr, toCurr);
+    wFrom.balance -= amount; wTo.balance += convertedAmount;
+    const dateStr = today();
+    state.transactions.unshift({ id: genId(), name: `Transfer to ${wTo.name}`, categoryId: 'other', type: 'expense', amount, walletId: wFrom.id, date: dateStr, note: 'Internal Transfer Out' });
+    state.transactions.unshift({ id: genId() + 1, name: `Transfer from ${wFrom.name}`, categoryId: 'other', type: 'income', amount: convertedAmount, walletId: wTo.id, date: dateStr, note: 'Internal Transfer In' });
+    saveState(); closeSheet(); switchTab('wallets'); showToast('Transfer Successful! 💸');
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────────
+function renderSettings() {
+    const photo = state.user.photo || ''; const initial = (state.user.name || 'U').charAt(0).toUpperCase();
+    const gd = gdrive; const driveStatusColor = (gd.autoSyncEnabled && gd.connected) ? 'var(--emerald)' : '#52525b';
+    const driveStatusText = gd.syncing ? 'Syncing…' : (gd.autoSyncEnabled && gd.connected) ? 'Auto-sync active' : gd.autoSyncEnabled ? 'Session expired - Tap top sync' : 'Sync not enabled';
+    const dotClass = gd.syncing ? 'syncing' : (gd.autoSyncEnabled && gd.connected) ? 'connected' : 'disconnected';
+
+    // حساب الـ Milestones
+    let milestonesHTML = '';
+    const allGoals = state.goals || [];
+    const allDebts = state.debts.installments || [];
+
+    if (allGoals.length > 0 || allDebts.length > 0) {
+        milestonesHTML += `<div class="card" style="padding:20px; margin-bottom: 24px; border:1px solid rgba(16,185,129,0.15); background: linear-gradient(135deg, rgba(16,185,129,0.03), transparent);">
+            <p class="section-title" style="margin-bottom: 20px; display:flex; align-items:center; gap:6px;">
+                <i data-lucide="award" style="width:16px;height:16px;color:var(--emerald);"></i> Milestones
+            </p>`;
+        
+        allGoals.forEach(g => {
+            const pct = Math.min(100, Math.round((g.saved / g.target) * 100)) || 0;
+            milestonesHTML += generateMilestoneTrack(g.name, pct, g.color || 'var(--emerald)', 'Savings Goal');
+        });
+
+        allDebts.forEach(d => {
+            const paidAmount = d.paidAmount || 0; 
+            const totalAmount = d.totalAmount || (d.amount * d.total);
+            const pct = Math.min(100, Math.round((paidAmount / totalAmount) * 100)) || 0;
+            milestonesHTML += generateMilestoneTrack(d.name, pct, '#3b82f6', 'Debt Payoff'); 
+        });
+
+        milestonesHTML += `</div>`;
+    }
+
+    return `<div class="fade-up">
+        <div style="text-align:center;padding:10px 0 24px;">
+            <div onclick="openProfileEdit()" style="width:80px;height:80px;border-radius:50%;background:var(--surface2);border:2px solid rgba(16,185,129,0.3);overflow:hidden;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;">${photo ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">` : `<span class="syne" style="font-size:28px;font-weight:800;">${initial}</span>`}<div style="position:absolute;bottom:0;right:0;width:22px;height:22px;background:var(--emerald);border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);"><i data-lucide="pencil" style="width:10px;height:10px;color:#000;"></i></div></div>
+            <h2 class="syne" style="font-size:20px;font-weight:800;">${state.user.name}</h2><p style="font-size:12px;color:var(--muted);">${state.user.email}</p>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px;">
+            <div class="card" style="padding:12px;text-align:center;"><p class="syne" style="font-size:18px;font-weight:800;color:var(--emerald);">${state.transactions.length}</p><p style="font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Transactions</p></div>
+            <div class="card" style="padding:12px;text-align:center;"><p class="syne" style="font-size:18px;font-weight:800;color:var(--emerald);">${state.wallets.length}</p><p style="font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Wallets</p></div>
+            <div class="card" style="padding:12px;text-align:center;"><p class="syne" style="font-size:18px;font-weight:800;color:var(--emerald);">${state.budgets.length}</p><p style="font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">Budgets</p></div>
+        </div>
+
+        ${milestonesHTML}
+
+        <div class="card ${gd.connected ? 'gdrive-connected' : ''}" style="padding:0;overflow:hidden;margin-bottom:8px;border-color:${gd.connected ? 'rgba(16,185,129,0.25)' : 'var(--border)'};">
+            <div style="padding:16px;display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:11px;background:rgba(66,133,244,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg></div><div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:700;">Google Drive Sync</p><div style="display:flex;align-items:center;gap:6px;margin-top:2px;"><span class="sync-status-dot ${dotClass}"></span><p style="font-size:11px;color:${driveStatusColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${driveStatusText}</p></div></div></div>
+            ${gd.autoSyncEnabled ? `<div style="padding:10px 16px;background:rgba(16,185,129,0.04);display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);"><span style="font-size:10px;color:var(--muted);">All changes save automatically</span><button onclick="handleTopSyncClick()" style="font-size:10px;font-weight:700;color:var(--emerald);">Force Sync</button></div>` : `<div style="padding:10px 16px;background:rgba(245,158,11,0.04);border-top:1px solid var(--border);"><p style="font-size:10px;color:#f59e0b;">Tap the Sync Icon at the top to enable</p></div>`}
+        </div>
+        
+        <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="card" style="overflow:hidden;">
+                <button onclick="openProfileEdit()" style="width:100%;padding:16px;display:flex;align-items:center;gap:12px;text-align:left;border-bottom:1px solid var(--border);"><div style="width:36px;height:36px;border-radius:11px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="user" style="width:16px;height:16px;color:var(--emerald);"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">Edit Profile</p><p style="font-size:11px;color:var(--muted);">Name, email</p></div><i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--muted);"></i></button>
+                <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:11px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="dollar-sign" style="width:16px;height:16px;color:#3b82f6;"></i></div><div><p style="font-size:14px;font-weight:600;">Main Currency</p><p style="font-size:11px;color:var(--muted);">${state.currency.name||state.currency.code}</p></div></div><select onchange="setCurrency(this.value)" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:6px 10px;color:var(--text);font-size:12px;font-weight:700;outline:none;">${SUPPORTED_CURRENCIES.map(c => `<option value="${c.code}" ${state.currency.code===c.code?'selected':''}>${c.code} ${c.symbol}</option>`).join('')}</select></div>
+            </div>
+            <div class="card" style="overflow:hidden;">
+                <button onclick="exportData()" style="width:100%;padding:16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border);"><div style="width:36px;height:36px;border-radius:11px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="download" style="width:16px;height:16px;color:var(--emerald);"></i></div><div style="flex:1;text-align:left;"><p style="font-size:14px;font-weight:600;">Export Data</p><p style="font-size:11px;color:var(--muted);">Download as JSON</p></div><i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--muted);"></i></button>
+                <button onclick="importDataPrompt()" style="width:100%;padding:16px;display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:11px;background:rgba(245,158,11,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="upload" style="width:16px;height:16px;color:#f59e0b;"></i></div><div style="flex:1;text-align:left;"><p style="font-size:14px;font-weight:600;">Import Data</p><p style="font-size:11px;color:var(--muted);">Restore from JSON</p></div><i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--muted);"></i></button>
+            </div>
+            <button onclick="confirmReset()" style="padding:16px;border-radius:16px;background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.15);width:100%;color:var(--rose);font-size:14px;font-weight:700;">Reset All Data</button>
+        </div>
+    </div>`;
+}
+
+function generateMilestoneTrack(title, pct, color, subtitle) {
+    const m25 = pct >= 25 ? color : 'rgba(255,255,255,0.06)';
+    const m50 = pct >= 50 ? color : 'rgba(255,255,255,0.06)';
+    const m75 = pct >= 75 ? color : 'rgba(255,255,255,0.06)';
+    const m100 = pct >= 100 ? color : 'rgba(255,255,255,0.06)';
+    
+    return `
+    <div style="margin-bottom: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;">
+            <div>
+                <p style="font-size:13px; font-weight:700; color:var(--text);">${title}</p>
+                <p style="font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em;">${subtitle}</p>
+            </div>
+            <span class="syne" style="font-size:14px; font-weight:800; color:${color};">${pct}%</span>
+        </div>
+        <div style="position:relative; height:12px; display:flex; align-items:center;">
+            <div style="position:absolute; width:100%; height:4px; background:rgba(255,255,255,0.04); border-radius:4px; z-index:1;"></div>
+            <div style="position:absolute; width:${pct}%; height:4px; background:linear-gradient(90deg, ${color}66, ${color}); border-radius:4px; z-index:2; transition: width 0.8s ease;"></div>
+            <div style="width:100%; display:flex; justify-content:space-between; position:relative; z-index:3;">
+                <div style="width:12px; height:12px; border-radius:50%; background:${m25}; border:2px solid var(--surface2); box-shadow:0 0 8px ${pct>=25?color+'66':'transparent'}; transition:all 0.3s;"></div>
+                <div style="width:12px; height:12px; border-radius:50%; background:${m50}; border:2px solid var(--surface2); box-shadow:0 0 8px ${pct>=50?color+'66':'transparent'}; transition:all 0.3s;"></div>
+                <div style="width:12px; height:12px; border-radius:50%; background:${m75}; border:2px solid var(--surface2); box-shadow:0 0 8px ${pct>=75?color+'66':'transparent'}; transition:all 0.3s;"></div>
+                <div style="width:14px; height:14px; border-radius:50%; background:${m100}; border:2px solid var(--surface2); box-shadow:0 0 12px ${pct>=100?color+'88':'transparent'}; transition:all 0.3s; transform:translateY(-1px);"></div>
+            </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:6px; font-size:9px; color:var(--muted); font-weight:700;">
+            <span style="color:${pct>=25?color:'var(--muted)'}">25%</span>
+            <span style="color:${pct>=50?color:'var(--muted)'}">50%</span>
+            <span style="color:${pct>=75?color:'var(--muted)'}">75%</span>
+            <span style="color:${pct>=100?color:'var(--muted)'}">Done</span>
+        </div>
+    </div>`;
+}
+function saveApiKey() { localStorage.setItem('velto_gemini_key', document.getElementById('gemini-key').value.trim()); showToast('API Key Saved!'); }
+function openProfileEdit() { document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">Edit Profile</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="p-name" class="input" placeholder="Your name" value="${state.user.name||''}"><input type="email" id="p-email" class="input" placeholder="Email" value="${state.user.email||''}"><input type="url" id="p-photo" class="input" placeholder="Photo URL (optional)" value="${state.user.photo||''}"><button onclick="saveProfile()" class="btn-primary">Save Profile</button></div>`; openSheet(); }
+function saveProfile() { state.user.name = document.getElementById('p-name').value.trim() || 'User'; state.user.email = document.getElementById('p-email').value.trim(); state.user.photo = document.getElementById('p-photo').value.trim() || null; saveState(); closeSheet(); switchTab('settings'); showToast('Profile updated!'); }
+function setCurrency(code) { state.currency = SUPPORTED_CURRENCIES.find(c => c.code === code) || SUPPORTED_CURRENCIES[0]; saveState(); showToast(`Base Currency: ${state.currency.code}`); }
+function exportData() { const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `velto-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Exported!'); }
+function importDataPrompt() { const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = e => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = evt => { try { const parsed = JSON.parse(evt.target.result); if (parsed.wallets && parsed.transactions) { state = parsed; saveState(); switchTab('home'); showToast('Data imported!'); } else showToast('Invalid file'); } catch { showToast('Failed to parse'); } }; reader.readAsText(file); }; input.click(); }
+function confirmReset() { document.getElementById('sheet-content').innerHTML = `<div style="text-align:center;padding:10px 0;"><div style="width:60px;height:60px;border-radius:20px;background:rgba(244,63,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i data-lucide="alert-triangle" style="width:28px;height:28px;color:var(--rose);"></i></div><h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:8px;">Reset Everything?</h2><p style="font-size:13px;color:var(--muted);margin-bottom:24px;">This will permanently delete all your data.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="closeSheet()" style="padding:14px;border-radius:16px;background:var(--surface2);color:var(--text);font-weight:700;">Cancel</button><button onclick="resetData()" style="padding:14px;border-radius:16px;background:var(--rose);color:#fff;font-weight:700;">Reset</button></div></div>`; openSheet(); lucide.createIcons(); }
+function resetData() { state = JSON.parse(JSON.stringify(DEFAULT_STATE)); saveState(); closeSheet(); switchTab('home'); showToast('Data reset'); }
+
+// ─── SHEET & TOAST ────────────────────────────────────────────────────
+function openSheet() { document.getElementById('bottom-sheet').classList.add('open'); document.getElementById('overlay').style.opacity = '1'; document.getElementById('overlay').style.pointerEvents = 'auto'; lucide.createIcons(); }
+function closeSheet() { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('overlay').style.opacity = '0'; document.getElementById('overlay').style.pointerEvents = 'none'; ui.isManagingCategories = false; ui.editingTransaction = null; }
+function showToast(msg, type = 'success') { const existing = document.querySelector('.toast-el'); if (existing) existing.remove(); const el = document.createElement('div'); el.className = 'toast-el toast-anim'; el.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--font-main);z-index:1000;pointer-events:none;white-space:nowrap;background:${type==='error'?'var(--rose)':type==='warn'?'#f59e0b':'var(--emerald)'};color:#000;`; el.textContent = msg; document.body.appendChild(el); setTimeout(() => { el.style.transition = 'opacity 0.3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2200); }
+
+// ─── GOOGLE DRIVE AUTO-SYNC ───────────────────────────────────────────
+const GDRIVE_CLIENT_ID = '608503657584-kk54fp09cl297frfnfro32g0m0tp7o5t.apps.googleusercontent.com';
+let gdrive = { connected: false, syncing: false, fileId: localStorage.getItem('velto_gdrive_fileId') || null, autoSyncEnabled: localStorage.getItem('velto_autosync') === 'true' };
+let tokenClient; let accessToken = null;
+
+function initGoogleDrive() {
+    if (typeof google === 'undefined') return;
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GDRIVE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file',
+        callback: (tokenResponse) => { if (tokenResponse && tokenResponse.access_token) { accessToken = tokenResponse.access_token; gdrive.connected = true; if (!gdrive.autoSyncEnabled) performFirstSync(); else { updateSyncButtonUI(); if(typeof showToast === 'function') showToast('Auto-sync connected ✓'); if(ui.currentTab === 'settings') switchTab('settings'); } } },
+    });
+    updateSyncButtonUI();
+}
+function handleTopSyncClick() { if (!accessToken) tokenClient.requestAccessToken(); else if (!gdrive.autoSyncEnabled) performFirstSync(); else { showToast('Syncing to Drive...'); silentAutoSync(); } }
+async function performFirstSync() {
+    setSyncingUI(true);
+    try { const file = await findDriveFile(); if (file) { await loadFromDrive(file.id); showToast('Data restored from Drive'); } else { await saveToDrive(); showToast('Initial backup saved to Drive'); } gdrive.autoSyncEnabled = true; localStorage.setItem('velto_autosync', 'true'); updateSyncButtonUI(); if(ui.currentTab === 'settings') switchTab('settings'); }
+    catch (error) { showToast('Sync failed: ' + error.message, 'error'); } finally { setSyncingUI(false); }
+}
+const originalSaveState = saveState;
+saveState = function() { originalSaveState(); if (gdrive.autoSyncEnabled && accessToken && !gdrive.syncing) silentAutoSync(); };
+let syncTimeout; function silentAutoSync() { clearTimeout(syncTimeout); syncTimeout = setTimeout(async () => { if (gdrive.syncing) return; setSyncingUI(true); try { await saveToDrive(); } catch (e) { console.error('Auto-sync error:', e); } finally { setSyncingUI(false); } }, 2500); }
+async function findDriveFile() { const resp = await fetch('https://www.googleapis.com/drive/v3/files?q=name="velto_backup.json" and trashed=false&spaces=drive', { headers: { 'Authorization': `Bearer ${accessToken}` } }); const data = await resp.json(); if (data.files && data.files.length > 0) { gdrive.fileId = data.files[0].id; localStorage.setItem('velto_gdrive_fileId', gdrive.fileId); return data.files[0]; } return null; }
+async function loadFromDrive(fileId) { const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers: { 'Authorization': `Bearer ${accessToken}` } }); const data = await resp.json(); if (data && data.wallets) { state = data; originalSaveState(); if(typeof switchTab === 'function') switchTab(ui.currentTab || 'home'); } }
+async function saveToDrive() {
+    const metadata = { name: 'velto_backup.json', mimeType: 'application/json' }; const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' })); form.append('file', new Blob([JSON.stringify(state)], { type: 'application/json' }));
+    let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart'; let method = 'POST';
+    if (gdrive.fileId) { url = `https://www.googleapis.com/upload/drive/v3/files/${gdrive.fileId}?uploadType=multipart`; method = 'PATCH'; }
+    const resp = await fetch(url, { method, headers: { 'Authorization': `Bearer ${accessToken}` }, body: form }); const result = await resp.json(); if (result.id) { gdrive.fileId = result.id; localStorage.setItem('velto_gdrive_fileId', result.id); }
+}
+function setSyncingUI(isSyncing) { gdrive.syncing = isSyncing; const icon = document.getElementById('sync-icon'); if (icon) { if (isSyncing) { icon.classList.add('spin'); icon.style.color = 'var(--emerald)'; } else { icon.classList.remove('spin'); updateSyncButtonUI(); } } }
+function updateSyncButtonUI() { const icon = document.getElementById('sync-icon'); const btn = document.getElementById('top-sync-btn'); if (icon && btn) { if (gdrive.autoSyncEnabled && accessToken) { icon.style.color = 'var(--emerald)'; btn.style.borderColor = 'rgba(16,185,129,0.3)'; } else if (gdrive.autoSyncEnabled && !accessToken) { icon.style.color = '#f59e0b'; btn.style.borderColor = 'rgba(245,158,11,0.3)'; } else { icon.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--border)'; } } }
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+loadState();
+window.addEventListener('load', async () => {
+    await fetchRates();
+    initGoogleDrive();
+    switchTab('home');
+});
+
+// ─── SWIPE TO CLOSE POPUP (BOTTOM SHEET) ─────────────────────────────
+const bottomSheet = document.getElementById('bottom-sheet');
+let dragStartY = 0;
+let currentDragY = 0;
+let isDraggingSheet = false;
+
+bottomSheet.addEventListener('touchstart', (e) => {
+    // مش هنبدأ السحب غير لو المحتوى بتاع الـ popup معموله سكرول لفوق خالص
+    if (bottomSheet.scrollTop <= 0) {
+        dragStartY = e.touches[0].clientY;
+        isDraggingSheet = true;
+        // بنوقف الـ Animation مؤقتاً عشان الـ popup يتحرك مع صباعك بالمللي
+        bottomSheet.style.transition = 'none'; 
+    }
+}, { passive: true });
+
+bottomSheet.addEventListener('touchmove', (e) => {
+    if (!isDraggingSheet) return;
+    
+    currentDragY = e.touches[0].clientY;
+    const deltaY = currentDragY - dragStartY;
+
+    // بنسمح بالسحب لتحت بس (قيمة موجبة)
+    if (deltaY > 0) {
+        // بنمنع الشاشة اللي ورا إنها تتحرك
+        if (e.cancelable) e.preventDefault(); 
+        bottomSheet.style.transform = `translateY(${deltaY}px)`;
+    }
+}, { passive: false });
+
+bottomSheet.addEventListener('touchend', (e) => {
+    if (!isDraggingSheet) return;
+    isDraggingSheet = false;
+    
+    // بنرجع الـ Animation تاني عشان يقفل بنعومة أو يرجع مكانه
+    bottomSheet.style.transition = 'transform 0.38s cubic-bezier(0.32, 0.72, 0, 1)';
+    
+    const deltaY = currentDragY - dragStartY;
+    
+    // لو سحب مسافة أكتر من 120 بيكسل، اقفل الـ Popup
+    if (deltaY > 120) {
+        closeSheet();
+    }
+    
+    // في كل الحالات بنشيل الـ transform المكتوب عشان الـ CSS الأساسي يشتغل
+    bottomSheet.style.transform = ''; 
+    currentDragY = 0;
+});
+ 
+function updateAppIcon() {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const favicon = document.getElementById('app-favicon');
+    const appleIcon = document.getElementById('app-apple-icon');
+    
+    const darkIconUrl = 'https://cdn-icons-png.flaticon.com/32/3914/3914398.png';
+    const lightIconUrl = 'https://cdn-icons-png.flaticon.com/32/3135/3135679.png';
+    
+    if (favicon) favicon.href = isDarkMode ? darkIconUrl : lightIconUrl;
+    if (appleIcon) appleIcon.href = isDarkMode ? darkIconUrl : lightIconUrl;
+    
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.setAttribute('content', isDarkMode ? '#07070a' : '#ffffff');
+}
+
+updateAppIcon();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateAppIcon);
+
+</script>
+</body>
+</html>
         .nav-active { color: var(--emerald) !important; }
         .card { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; }
         .btn-primary { background: var(--emerald); color: #000; font-weight: 700; border-radius: 16px; padding: 14px; width: 100%; font-size: 15px; transition: opacity 0.15s, transform 0.15s; font-family: var(--font-main); }
@@ -531,16 +2136,17 @@ function switchTab(tabId) {
     const main = document.getElementById('main-content');
     const title = document.getElementById('header-title');
     
-    document.querySelectorAll('nav button[id^="nav-"]').forEach(b => { 
-        b.classList.remove('nav-active'); 
-        b.style.color = 'var(--muted)'; 
+    document.querySelectorAll('.nav-icon-btn').forEach(btn => {
+        btn.classList.remove('nav-active');
+        btn.style.filter = 'brightness(0.7)'; // العودة للحالة الباهتة
     });
-    
-    const activeBtn = document.getElementById(`nav-${tabId}`);
-    if (activeBtn) { 
-        activeBtn.classList.add('nav-active'); 
-        activeBtn.style.color = 'var(--emerald)'; 
+
+    const activeBtn = document.querySelector(`[onclick="switchTab('${tabId}')"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('nav-active');
+        activeBtn.style.filter = 'brightness(1.5)'; // الأيقونة المختارة منورة دايماً
     }
+
     
     main.style.opacity = '0';
     Object.keys(charts).forEach(k => destroyChart(k));
