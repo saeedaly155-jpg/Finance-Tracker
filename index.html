@@ -1263,12 +1263,57 @@ function settleSimpleDebtPrompt(type, id) {
     openSheet();
 }
 function processSettleDebt(type, id) {
-    const item = state.debts[type].find(d => d.id === id); const walletId = parseInt(document.getElementById('settle-wallet').value); const wallet = state.wallets.find(w => w.id === walletId);
-    if(!wallet) return showToast('Wallet error', 'error'); const isOwe = type === 'oweTo'; const wCurr = wallet.currency || state.currency.code; const convAmount = convertCurrency(item.amount, state.currency.code, wCurr);
-    if(isOwe && wallet.balance < convAmount) return showToast('Insufficient funds', 'error');
-    if(isOwe) { wallet.balance -= convAmount; state.transactions.unshift({ id: genId(), name: `Settled Debt: ${item.name}`, categoryId: 'other', type: 'expense', amount: convAmount, walletId: wallet.id, date: today(), note: 'Paid a debt' }); }
-    else { wallet.balance += convAmount; state.transactions.unshift({ id: genId(), name: `Collected Debt: ${item.name}`, categoryId: 'other', type: 'income', amount: convAmount, walletId: wallet.id, date: today(), note: 'Received owed money' }); }
-    state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Settled successfully! 🎉');
+    const item = state.debts[type].find(d => d.id === id);
+    if (!item) return;
+
+    const isOwe = (type === 'oweTo');
+    const walletId = parseInt(document.getElementById('settle-wallet').value);
+    const wallet = state.wallets.find(w => w.id === walletId);
+    
+    if (!wallet) {
+        showToast('Wallet error', 'error');
+        return;
+    }
+
+    const wCurr = wallet.currency || state.currency.code;
+    const convAmount = convertCurrency(item.amount, state.currency.code, wCurr);
+
+    console.log(`Processing debt: ${type}, Amount: ${convAmount}, Current Balance: ${wallet.balance}`);
+
+    if (isOwe) {
+        // Paying a debt: Should be subtracted
+        wallet.balance -= convAmount;
+        state.transactions.unshift({
+            id: genId(),
+            name: `Settled Debt: ${item.name}`,
+            categoryId: 'other',
+            type: 'expense',
+            amount: convAmount,
+            walletId: wallet.id,
+            date: today(),
+            note: 'Paid a debt'
+        });
+    } else {
+        // Owed to me: Should be added
+        wallet.balance += convAmount;
+        console.log(`Adding ${convAmount} to wallet. New Balance: ${wallet.balance}`);
+        state.transactions.unshift({
+            id: genId(),
+            name: `Collected Debt: ${item.name}`,
+            categoryId: 'other',
+            type: 'income',
+            amount: convAmount,
+            walletId: wallet.id,
+            date: today(),
+            note: 'Received owed money'
+        });
+    }
+
+    state.debts[type] = state.debts[type].filter(d => d.id !== id);
+    saveState();
+    closeSheet();
+    switchFinanceTab('debts');
+    showToast('Settled successfully! 🎉');
 }
 function openDebtForm(type, editId = null) {
     const item = editId ? state.debts[type].find(d => d.id === editId) : null;
