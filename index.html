@@ -3118,24 +3118,24 @@ bottomSheet.addEventListener('touchend', (e) => {
     bottomSheet.style.transform = ''; 
     currentDragY = 0;
 });
- 
 function updateAppIcon() {
     const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const favicon = document.getElementById('app-favicon');
     const appleIcon = document.getElementById('app-apple-icon');
-    
-    const darkIconUrl = 'https://cdn-icons-png.flaticon.com/32/3914/3914398.png';
-    const lightIconUrl = 'https://cdn-icons-png.flaticon.com/32/3135/3135679.png';
-    
+
+    const darkIconUrl = 'https://flaticon.com';
+    const lightIconUrl = 'https://flaticon.com';
+
     if (favicon) favicon.href = isDarkMode ? darkIconUrl : lightIconUrl;
     if (appleIcon) appleIcon.href = isDarkMode ? darkIconUrl : lightIconUrl;
-    
+
     const themeColor = document.querySelector('meta[name="theme-color"]');
     if (themeColor) themeColor.setAttribute('content', isDarkMode ? '#07070a' : '#ffffff');
 }
 
 updateAppIcon();
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateAppIcon);
+
 
 </script>
 </body>
