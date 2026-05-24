@@ -1064,7 +1064,7 @@ function handleSearch() {
 // ─── HOME ─────────────────────────────────────────────────────────────
 function renderHome() {
     let total = 0;
-    state.wallets.forEach(w => { total += convertCurrency(w.balance, w.currency, state.currency.code); });
+    state.wallets.forEach(w => { if (!w.excludeFromTotal) total += convertCurrency(w.balance, w.currency, state.currency.code); });
     const now = new Date(); const month = now.getMonth(); const year = now.getFullYear();
     const monthTx = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth() === month && d.getFullYear() === year; });
     let monthIn = 0; let monthOut = 0;
@@ -1075,7 +1075,7 @@ function renderHome() {
     return `<div class="fade-up">
         <div style="background:linear-gradient(135deg,#12181e,#0d1a14);border:1px solid rgba(16,185,129,0.15);border-radius:24px;padding:24px;margin-bottom:20px;position:relative;overflow:hidden;">
             <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(16,185,129,0.06);border-radius:50%;filter:blur(20px);"></div>
-            <p class="tag" style="color:var(--muted);">Total Balance ${Object.keys(liveRates).length>0?'· Live rates':''}</p>
+            <p class="tag" style="color:var(--muted);">Total Balance ${Object.keys(liveRates).length>0?'· Live rates':''} ${state.wallets.filter(w=>w.excludeFromTotal).length ? `· <span style="color:#f59e0b;">${state.wallets.filter(w=>w.excludeFromTotal).length} wallet${state.wallets.filter(w=>w.excludeFromTotal).length>1?'s':''} excluded</span>` : ''}</p>
             <h2 class="wcard-balance" style="font-size:36px;font-weight:800;margin-bottom:20px;">${fmt(total)}</h2>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div style="background:rgba(16,185,129,0.08);border-radius:14px;padding:12px;">
@@ -1133,15 +1133,30 @@ function renderHome() {
         <div class="card" style="padding:16px;margin-bottom:24px;"><canvas id="cashFlowChart" height="180"></canvas></div>
 
         <div style="display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:24px;">
-            <div class="card" style="padding:16px;">
+            <div class="card" style="padding:20px 16px 16px;">
                 <p class="section-title">Spending Breakdown</p>
-                <div style="position:relative;height:140px;display:flex;align-items:center;justify-content:center;">
-                    <canvas id="donutChart"></canvas>
-                    <div style="position:absolute;text-align:center;pointer-events:none;">
-                        <p class="syne" style="font-size:15px;font-weight:800;color:var(--text);">${fmt(monthOut)}</p>
-                        <p style="font-size:10px;color:var(--muted);">this month</p>
-                    </div>
+                <div style="position:relative; height:220px; display:flex; align-items:center; justify-content:center;">
+                    <!-- SVG Arc Ring Chart -->
+                    <svg id="arcRingChart" width="220" height="220" viewBox="0 0 220 220" style="position:absolute;top:0;left:50%;transform:translateX(-50%);">
+                        <defs>
+                            <filter id="arcGlow">
+                                <feGaussianBlur stdDeviation="3" result="blur"/>
+                                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                            </filter>
+                        </defs>
+                        <!-- Track circle -->
+                        <circle cx="110" cy="110" r="80" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="22"/>
+                        <!-- Arc segments drawn by JS -->
+                        <g id="arc-segments"></g>
+                        <!-- Center text -->
+                        <text x="110" y="104" text-anchor="middle" font-family="Google Sans Flex, sans-serif" font-size="18" font-weight="800" fill="#f4f4f5" id="arc-center-amt">${fmt(monthOut)}</text>
+                        <text x="110" y="122" text-anchor="middle" font-family="Google Sans Flex, sans-serif" font-size="10" fill="#52525b">this month</text>
+                    </svg>
+                    <!-- Floating category icon bubbles, positioned by JS -->
+                    <div id="arc-icons" style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:220px;height:220px;pointer-events:none;"></div>
                 </div>
+                <!-- Legend -->
+                <div id="arc-legend" style="display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:8px;"></div>
             </div>
         </div>
 
@@ -1285,19 +1300,88 @@ function initCashFlowChart() {
 }
 
 function initDonutChart() {
-    const canvas = document.getElementById('donutChart');
-    if (!canvas) return;
+    const svg = document.getElementById('arcRingChart');
+    if (!svg) return;
     const now = new Date(); const month = now.getMonth(); const year = now.getFullYear();
     const byCat = {};
     state.transactions.filter(t => { const d = new Date(t.date); return t.type === 'expense' && d.getMonth() === month && d.getFullYear() === year; }).forEach(t => { const w = state.wallets.find(x => x.id === t.walletId) || {}; byCat[t.categoryId] = (byCat[t.categoryId] || 0) + convertCurrency(t.amount, w.currency, state.currency.code); });
-    const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 6);
     if (!entries.length) return;
-    destroyChart('donut');
-    charts['donut'] = new Chart(canvas, {
-        type: 'doughnut',
-        data: { labels: entries.map(([id]) => getCat(id).name), datasets: [{ data: entries.map(([, v]) => v), backgroundColor: entries.map(([id]) => getCat(id).color), borderWidth: 0, hoverOffset: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)}` } } } }
+
+    const total = entries.reduce((s, [,v]) => s + v, 0);
+    const cx = 110, cy = 110, r = 80, strokeW = 22;
+    const circumference = 2 * Math.PI * r;
+    const gap = 0.018; // gap between segments as fraction
+    const segG = document.getElementById('arc-segments');
+    const iconsDiv = document.getElementById('arc-icons');
+    const legendDiv = document.getElementById('arc-legend');
+    segG.innerHTML = '';
+    iconsDiv.innerHTML = '';
+    legendDiv.innerHTML = '';
+
+    // Update center amount
+    const centerAmt = document.getElementById('arc-center-amt');
+    if (centerAmt) centerAmt.textContent = fmt(total);
+
+    // --- Draw arc segments ---
+    // We draw as SVG circle stroke-dasharray segments rotated
+    // Starting angle: -90deg (top)
+    let startAngle = -Math.PI / 2;
+
+    entries.forEach(([catId, val], i) => {
+        const cat = getCat(catId);
+        const fraction = val / total;
+        const gapRad = gap * Math.PI * 2;
+        const arcRad = fraction * Math.PI * 2 - gapRad;
+        if (arcRad <= 0) return;
+
+        // SVG path arc
+        const x1 = cx + r * Math.cos(startAngle + gapRad / 2);
+        const y1 = cy + r * Math.sin(startAngle + gapRad / 2);
+        const endAngle = startAngle + gapRad / 2 + arcRad;
+        const x2 = cx + r * Math.cos(endAngle);
+        const y2 = cy + r * Math.sin(endAngle);
+        const largeArc = arcRad > Math.PI ? 1 : 0;
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`);
+        path.setAttribute('stroke', cat.color);
+        path.setAttribute('stroke-width', strokeW);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-linecap', 'round');
+        path.style.filter = `drop-shadow(0 0 6px ${cat.color}88)`;
+        path.style.transition = 'opacity 0.2s';
+        path.style.cursor = 'pointer';
+        path.addEventListener('mouseenter', () => { path.style.opacity = '0.75'; });
+        path.addEventListener('mouseleave', () => { path.style.opacity = '1'; });
+        segG.appendChild(path);
+
+        // --- Floating icon bubble at midpoint of arc ---
+        const midAngle = startAngle + gapRad / 2 + arcRad / 2;
+        const iconR = r + strokeW / 2 + 22; // outside the ring
+        const ix = cx + iconR * Math.cos(midAngle);
+        const iy = cy + iconR * Math.sin(midAngle);
+
+        // Only show icon if segment is big enough
+        if (fraction > 0.07) {
+            const bubble = document.createElement('div');
+            bubble.style.cssText = `position:absolute;width:32px;height:32px;border-radius:50%;background:${cat.color}22;border:1.5px solid ${cat.color}55;display:flex;align-items:center;justify-content:center;left:${ix - 16}px;top:${iy - 16}px;backdrop-filter:blur(8px);box-shadow:0 2px 8px rgba(0,0,0,0.4);`;
+            bubble.innerHTML = `<i data-lucide="${cat.icon}" style="width:14px;height:14px;color:${cat.color};"></i>`;
+            iconsDiv.appendChild(bubble);
+        }
+
+        // --- Legend entry ---
+        const pct = Math.round(fraction * 100);
+        const leg = document.createElement('div');
+        leg.style.cssText = 'display:flex;align-items:center;gap:5px;';
+        leg.innerHTML = `<div style="width:8px;height:8px;border-radius:50%;background:${cat.color};flex-shrink:0;"></div><span style="font-size:10px;color:var(--muted);">${cat.name} <strong style="color:var(--text);">${pct}%</strong></span>`;
+        legendDiv.appendChild(leg);
+
+        startAngle = endAngle;
     });
+
+    // Re-render lucide icons inside the bubbles
+    if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: iconsDiv.querySelectorAll('[data-lucide]') });
 }
 
 // ─── BUDGETS & GOALS ──────────────────────────────────────────────────
@@ -1423,50 +1507,169 @@ function openTransactionForm(prefill = null) {
     ui.selectedType = tx.type;
     ui.selectedWalletId = tx.walletId;
     ui.selectedCategoryId = tx.categoryId;
+
+    const isEdit = !!(prefill && prefill.id);
+    const accentColor = tx.type === 'expense' ? 'var(--rose)' : 'var(--emerald)';
+
     document.getElementById('sheet-content').innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h2 class="syne" style="font-size:22px;font-weight:800;">${prefill && prefill.id ? 'Edit' : 'New'} Entry</h2>
-            <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:3px;gap:3px;">
-                <button onclick="setType('expense')" id="btn-expense" class="tab-pill" style="${tx.type==='expense' ? 'background:var(--rose);color:#fff;' : 'color:var(--muted);'}" >Expense</button>
-                <button onclick="setType('income')" id="btn-income" class="tab-pill" style="${tx.type==='income' ? 'background:var(--emerald);color:#000;' : 'color:var(--muted);'}">Income</button>
+    <!-- TYPE SWITCHER -->
+    <div style="display:flex;background:rgba(255,255,255,0.05);border-radius:16px;padding:4px;gap:4px;margin-bottom:20px;">
+        <button onclick="setType('expense')" id="btn-expense" style="flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;${tx.type==='expense'?'background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(244,63,94,0.35);':'color:var(--muted);'}">
+            Expense
+        </button>
+        <button onclick="setType('income')" id="btn-income" style="flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;${tx.type==='income'?'background:var(--emerald);color:#000;box-shadow:0 4px 12px rgba(16,185,129,0.35);':'color:var(--muted);'}">
+            Income
+        </button>
+    </div>
+
+    <!-- AMOUNT DISPLAY -->
+    <div id="amount-display-area" style="text-align:center;padding:8px 0 20px;position:relative;">
+        <p id="tx-currency-label" style="font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">${(state.wallets.find(w=>w.id===tx.walletId)||{}).currency||state.currency.code}</p>
+        <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+            <span id="sign-label" style="font-size:48px;font-weight:800;color:${tx.type==='expense'?'var(--rose)':'var(--emerald)'};line-height:1;">${tx.type==='expense'?'−':'+'}</span>
+            <input
+                type="text"
+                id="tx-amount"
+                inputmode="decimal"
+                pattern="[0-9+\-*/.]*"
+                autocomplete="off"
+                placeholder="0"
+                value="${tx.amount||''}"
+                oninput="syncAmountDisplay(this)"
+                style="
+                    font-size:48px;font-weight:800;
+                    color:var(--text);
+                    background:transparent;border:none;outline:none;
+                    width:100%;max-width:240px;
+                    text-align:center;
+                    font-family:var(--font-main);
+                    font-variant-numeric:tabular-nums;
+                    letter-spacing:-1px;
+                    caret-color:var(--emerald);
+                "
+            >
+        </div>
+    </div>
+
+    <!-- DESCRIPTION INPUT -->
+    <div style="position:relative;margin-bottom:16px;">
+        <i data-lucide="type" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);pointer-events:none;"></i>
+        <input type="text" id="tx-name" class="input" placeholder="Description (optional)" value="${tx.name||''}" style="padding-left:42px;font-size:14px;">
+    </div>
+
+    <!-- WALLET SELECTOR -->
+    <div style="margin-bottom:16px;">
+        <p class="section-title" style="margin-bottom:8px;">Wallet</p>
+        <div id="wallet-chips" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;" class="scroll-hide"></div>
+    </div>
+
+    <!-- CATEGORY GRID -->
+    <div style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <p class="section-title" style="margin:0;">Category</p>
+            <button onclick="toggleManage()" id="manage-btn" style="font-size:10px;font-weight:700;color:var(--emerald);letter-spacing:0.08em;text-transform:uppercase;padding:4px 8px;border-radius:8px;background:rgba(16,185,129,0.1);">Manage</button>
+        </div>
+        <div id="cat-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
+    </div>
+
+    <!-- DATE & NOTE ROW -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        <div>
+            <p class="section-title" style="margin-bottom:6px;">Date</p>
+            <div style="position:relative;">
+                <i data-lucide="calendar" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none;"></i>
+                <input type="date" id="tx-date" class="input" value="${tx.date||today()}" style="font-size:13px;padding-left:36px;">
             </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-            <div style="text-align:center;padding:10px 0;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
-                    <span id="sign-label" class="syne" style="font-size:36px;font-weight:800;color:${tx.type==='expense'?'var(--rose)':'var(--emerald)'};">${tx.type==='expense'?'-':'+'}</span>
-                    <input type="number" id="tx-amount" class="input" placeholder="0.00" value="${tx.amount||''}" style="font-size:32px;font-weight:800;text-align:center;width:160px;border:none;background:transparent;padding:0;" inputmode="decimal">
-                </div>
-                <p id="tx-currency-label" style="font-size:11px;color:var(--muted);margin-top:4px;">${state.currency.code}</p>
+        <div>
+            <p class="section-title" style="margin-bottom:6px;">Note</p>
+            <div style="position:relative;">
+                <i data-lucide="file-text" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none;"></i>
+                <input type="text" id="tx-note" class="input" placeholder="Optional note" value="${tx.note||''}" style="font-size:13px;padding-left:36px;">
             </div>
-            <input type="text" id="tx-name" class="input" placeholder="Description (optional)" value="${tx.name||''}">
-            <div><p class="section-title">Wallet</p><div id="wallet-chips" style="display:flex;flex-wrap:wrap;gap:8px;"></div></div>
-            <div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                    <p class="section-title" style="margin:0;">Category</p>
-                    <button onclick="toggleManage()" id="manage-btn" style="font-size:9px;font-weight:800;color:var(--emerald);letter-spacing:0.1em;text-transform:uppercase;">Manage</button>
-                </div>
-                <div id="cat-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div><p class="section-title">Date</p><input type="date" id="tx-date" class="input" value="${tx.date||today()}" style="font-size:13px;"></div>
-                <div><p class="section-title">Note</p><input type="text" id="tx-note" class="input" placeholder="Note" value="${tx.note||''}" style="font-size:13px;"></div>
-            </div>
-            ${prefill && prefill.id ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="deleteTransaction(${prefill.id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button><button onclick="saveTransaction()" class="btn-primary">Save</button></div>` : `<button onclick="saveTransaction()" class="btn-primary">Add Transaction</button>`}
-        </div>`;
-    renderWalletChips(); renderCatGrid(); updateTxCurrencyLabel(); openSheet();
+        </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    ${isEdit ? `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button onclick="deleteTransaction(${prefill.id})" style="padding:16px;border-radius:18px;border:1.5px solid var(--rose);color:var(--rose);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.15s;background:rgba(244,63,94,0.06);" ontouchstart="this.style.background='rgba(244,63,94,0.14)'" ontouchend="this.style.background='rgba(244,63,94,0.06)'">
+            <i data-lucide="trash-2" style="width:16px;height:16px;"></i> Delete
+        </button>
+        <button onclick="saveTransaction()" style="padding:16px;border-radius:18px;background:var(--emerald);color:#000;font-weight:800;font-size:15px;box-shadow:0 6px 20px rgba(16,185,129,0.35);transition:all 0.15s;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">
+            Save Changes
+        </button>
+    </div>` : `
+    <button onclick="saveTransaction()" id="save-tx-btn" style="width:100%;padding:18px;border-radius:18px;background:var(--emerald);color:#000;font-weight:800;font-size:16px;box-shadow:0 8px 24px rgba(16,185,129,0.35);transition:all 0.15s;letter-spacing:0.01em;" ontouchstart="this.style.transform='scale(0.97)'" ontouchend="this.style.transform=''">
+        Add Transaction
+    </button>`}
+    `;
+
+    renderWalletChips(); renderCatGrid(); openSheet();
+    lucide.createIcons();
+}
+
+function syncAmountDisplay(input) {
+    // Visual feedback — shrink font if value gets long
+    const len = input.value.length;
+    input.style.fontSize = len > 10 ? '32px' : len > 7 ? '40px' : '48px';
+}
+
+function evaluateAmount(raw) {
+    // Safely evaluate expressions like 100+50, 200*3, 1500/2, 300-75
+    const cleaned = raw.replace(/[^0-9+\-*/.]/g, '');
+    if (!cleaned) return NaN;
+    // Guard against empty or operator-only strings
+    if (!/[0-9]/.test(cleaned)) return NaN;
+    try {
+        // Use Function to evaluate — safe because we stripped all non-numeric/operator chars
+        // eslint-disable-next-line no-new-func
+        const result = Function('"use strict"; return (' + cleaned + ')')();
+        return typeof result === 'number' && isFinite(result) ? result : NaN;
+    } catch (e) { return NaN; }
 }
 
 function updateTxCurrencyLabel() { const w = state.wallets.find(x => x.id === ui.selectedWalletId); const lbl = document.getElementById('tx-currency-label'); if(lbl && w) lbl.textContent = w.currency || state.currency.code; }
 function openEditTransaction(id) { const tx = state.transactions.find(t => t.id === id); if (tx) openTransactionForm(tx); }
 function setType(type) {
     ui.selectedType = type;
-    const sign = document.getElementById('sign-label'); const btnE = document.getElementById('btn-expense'); const btnI = document.getElementById('btn-income');
-    if (type === 'expense') { btnE.style.cssText = 'background:var(--rose);color:#fff;'; btnI.style.cssText = 'color:var(--muted);background:none;'; sign.style.color = 'var(--rose)'; sign.textContent = '-'; }
-    else { btnI.style.cssText = 'background:var(--emerald);color:#000;'; btnE.style.cssText = 'color:var(--muted);background:none;'; sign.style.color = 'var(--emerald)'; sign.textContent = '+'; }
+    const sign = document.getElementById('sign-label');
+    const btnE = document.getElementById('btn-expense');
+    const btnI = document.getElementById('btn-income');
+    if (type === 'expense') {
+        btnE.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(244,63,94,0.35);';
+        btnI.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;color:var(--muted);';
+        if (sign) { sign.style.color = 'var(--rose)'; sign.textContent = '−'; }
+    } else {
+        btnI.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;background:var(--emerald);color:#000;box-shadow:0 4px 12px rgba(16,185,129,0.35);';
+        btnE.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;color:var(--muted);';
+        if (sign) { sign.style.color = 'var(--emerald)'; sign.textContent = '+'; }
+    }
     ui.selectedCategoryId = state.categories[type][0]?.id; renderCatGrid();
 }
-function renderWalletChips() { const container = document.getElementById('wallet-chips'); if (!container) return; container.innerHTML = state.wallets.map(w => `<button onclick="selectWallet(${w.id})" style="${ui.selectedWalletId===w.id ? 'border-color:var(--emerald);background:rgba(16,185,129,0.1);color:var(--emerald);' : ''}" class="wallet-chip">${w.name}</button>`).join(''); }
+function renderWalletChips() {
+    const container = document.getElementById('wallet-chips');
+    if (!container) return;
+    container.innerHTML = state.wallets.map(w => {
+        const isSelected = ui.selectedWalletId === w.id;
+        const wCurr = w.currency || state.currency.code;
+        return `<button onclick="selectWallet(${w.id})" style="
+            flex-shrink:0;
+            display:flex;align-items:center;gap:7px;
+            padding:8px 14px;border-radius:12px;
+            font-size:12px;font-weight:700;
+            transition:all 0.18s;white-space:nowrap;
+            ${isSelected
+                ? 'background:rgba(16,185,129,0.15);border:1.5px solid var(--emerald);color:var(--emerald);'
+                : 'background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.08);color:var(--muted);'}
+        ">
+            <i data-lucide="${w.icon}" style="width:13px;height:13px;flex-shrink:0;"></i>
+            ${w.name}
+            <span style="font-size:10px;opacity:0.7;">${wCurr} ${fmtNum(w.balance)}</span>
+        </button>`;
+    }).join('');
+    lucide.createIcons({ nodes: container.querySelectorAll('[data-lucide]') });
+}
 function selectWallet(id) { ui.selectedWalletId = id; renderWalletChips(); updateTxCurrencyLabel(); }
 function renderCatGrid() {
     const grid = document.getElementById('cat-grid'); if (!grid) return;
@@ -1486,7 +1689,9 @@ function saveNewCategory(type) {
     if (!name) return showToast('Enter a name'); const id = name.toLowerCase().replace(/\s+/g, '-') + '_' + genId(); state.categories[type].push({ id, name, icon, color }); saveState(); openTransactionForm();
 }
 function saveTransaction() {
-    const amount = parseFloat(document.getElementById('tx-amount').value); if (!amount || amount <= 0) return showToast('Enter a valid amount');
+    const raw = (document.getElementById('tx-amount').value || '').trim();
+    const amount = evaluateAmount(raw);
+    if (isNaN(amount) || amount <= 0) return showToast('Enter a valid amount');
     const name = document.getElementById('tx-name').value || getCat(ui.selectedCategoryId).name;
     const date = document.getElementById('tx-date').value || today(); const note = document.getElementById('tx-note').value;
     const wallet = state.wallets.find(w => w.id === ui.selectedWalletId); if (!wallet) return showToast('Select a wallet');
@@ -1859,9 +2064,15 @@ function renderWallets() {
                 <i data-lucide="arrow-up-down" style="width:18px;height:18px;"></i>
             </button>
             <h2 class="syne" style="font-size:20px;font-weight:700;">Cards</h2>
-            <button onclick="openWalletForm()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--text);">
-                <i data-lucide="plus" style="width:20px;height:20px;"></i>
-            </button>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button onclick="openTransferForm()" style="height:42px;padding:0 14px;border-radius:14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);display:flex;align-items:center;gap:6px;color:#3b82f6;font-size:12px;font-weight:700;" title="Transfer between wallets">
+                    <i data-lucide="arrow-right-left" style="width:15px;height:15px;"></i>
+                    <span>Transfer</span>
+                </button>
+                <button onclick="openWalletForm()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--text);">
+                    <i data-lucide="plus" style="width:20px;height:20px;"></i>
+                </button>
+            </div>
         </div>
 
         <div class="wallet-container" id="wallet-stack">`;
@@ -1890,8 +2101,11 @@ function renderWallets() {
                 <!-- TOP ROW: name + icon -->
                 <div style="display:flex;justify-content:space-between;align-items:center; z-index: 2; position:relative;">
                     <p class="wcard-name">${w.name}</p>
-                    <div style="width:34px;height:34px;background:rgba(255,255,255,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);">
-                        <i data-lucide="${w.icon}" style="width:15px;height:15px;color:rgba(255,255,255,0.85);"></i>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        ${w.excludeFromTotal ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);padding:3px 7px;border-radius:6px;">Excluded</span>` : ''}
+                        <div style="width:34px;height:34px;background:rgba(255,255,255,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);">
+                            <i data-lucide="${w.icon}" style="width:15px;height:15px;color:rgba(255,255,255,0.85);"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -1940,7 +2154,6 @@ function renderWalletDetails(walletId) {
     const txs = state.transactions.filter(t => t.walletId === walletId).sort((a,b) => new Date(b.date) - new Date(a.date));
     let html = `<div style="display:flex; gap: 10px; margin-bottom: 24px; padding: 0 4px;">
         <button class="btn-primary" onclick="event.stopPropagation(); openWalletForm(${walletId})" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border);">Edit Card</button>
-        <button class="btn-primary" onclick="event.stopPropagation(); openTransferForm()" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border);">Transfer</button>
         <button class="btn-primary" onclick="event.stopPropagation(); openTransactionForm({type:'expense', walletId:${walletId}})" style="flex:1; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border);">+ Record</button>
     </div>
     <div style="padding: 0 4px;"><p class="section-title">Card Activity</p><div style="display: flex; flex-direction: column; gap: 12px;">`;
@@ -1956,11 +2169,25 @@ function openWalletForm(id = null) {
     const w = id ? state.wallets.find(x => x.id === parseInt(id)) : null;
     const icons = ['wallet','landmark','credit-card','banknote','piggy-bank','briefcase','building-2','coins','shopping-bag','truck'];
     const currentColor = w?.color || GRADIENT_COLORS[0];
+    const isExcluded = w?.excludeFromTotal || false;
     document.getElementById('sheet-content').innerHTML = `
         <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${w ? 'Edit' : 'Add'} Wallet</h2>
         <div style="display:flex;flex-direction:column;gap:12px;">
             <input type="text" id="w-name" class="input" placeholder="Wallet name" value="${w?.name||''}">
             <div style="display:flex;gap:10px;"><input type="number" id="w-balance" class="input" placeholder="Starting balance" value="${w?.balance||0}" inputmode="decimal" style="flex:1;"><select id="w-currency" class="input" style="width:100px;">${SUPPORTED_CURRENCIES.map(c => `<option value="${c.code}" ${w?.currency===c.code||(!w&&state.currency.code===c.code)?'selected':''}>${c.code}</option>`).join('')}</select></div>
+            
+            <!-- Include in Total Balance toggle -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px;">
+                <div>
+                    <p style="font-size:14px;font-weight:600;margin-bottom:2px;">Include in Total Balance</p>
+                    <p style="font-size:11px;color:var(--muted);">Show this wallet's balance on the home screen</p>
+                </div>
+                <div onclick="toggleWalletInclude(this)" id="include-toggle" data-on="${!isExcluded}" style="width:48px;height:28px;border-radius:999px;background:${!isExcluded ? 'var(--emerald)' : 'rgba(255,255,255,0.1)'};position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0;">
+                    <div style="position:absolute;top:3px;left:${!isExcluded ? '23px' : '3px'};width:22px;height:22px;border-radius:50%;background:#fff;transition:left 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.3);"></div>
+                </div>
+                <input type="hidden" id="w-exclude" value="${isExcluded ? '1' : '0'}">
+            </div>
+
             <div><p class="section-title">Icon</p><div style="display:flex;flex-wrap:wrap;gap:8px;">${icons.map(i => `<button onclick="document.querySelectorAll('.w-icon-opt').forEach(b=>b.style.background='var(--bg)');this.style.background='rgba(255,255,255,0.1)';document.getElementById('w-icon').value='${i}'" class="w-icon-opt" style="width:40px;height:40px;border-radius:12px;background:${w?.icon===i?'rgba(255,255,255,0.1)':'var(--bg)'};border:1px solid var(--border);display:flex;align-items:center;justify-content:center;"><i data-lucide="${i}" style="width:16px;height:16px;color:var(--muted);"></i></button>`).join('')}</div><input type="hidden" id="w-icon" value="${w?.icon||'wallet'}"></div>
             <div><p class="section-title">Card Theme <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(${GRADIENT_COLORS.length} styles)</span></p><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-height:160px;overflow-y:auto;padding:2px 2px 10px;" class="scroll-hide">${GRADIENT_COLORS.map((c,i) => `<button onclick="document.querySelectorAll('.w-color-opt').forEach(b=>{b.style.outline='none';b.style.transform='scale(1)'});this.style.outline='2.5px solid rgba(255,255,255,0.7)';this.style.transform='scale(1.12)';document.getElementById('w-color').value='${c}'" class="w-color-opt" style="height:44px;border-radius:12px;background:${c};outline:${currentColor === c ? '2.5px solid rgba(255,255,255,0.7)' : 'none'};transform:${currentColor===c?'scale(1.12)':'scale(1)'};box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08);flex-shrink:0;border:1px solid rgba(255,255,255,0.06);transition:all 0.15s;"></button>`).join('')}</div><input type="hidden" id="w-color" value="${currentColor}"></div>
             <div style="display:${w?'grid':'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">${w ? `<button onclick="deleteWallet(${w.id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button>` : ''}<button onclick="saveWallet(${w ? w.id : 'null'})" class="btn-primary">${w ? 'Save' : 'Add Wallet'}</button></div>
@@ -1968,15 +2195,25 @@ function openWalletForm(id = null) {
     openSheet(); lucide.createIcons();
 }
 
+function toggleWalletInclude(el) {
+    const isOn = el.dataset.on === 'true';
+    const newOn = !isOn;
+    el.dataset.on = String(newOn);
+    el.style.background = newOn ? 'var(--emerald)' : 'rgba(255,255,255,0.1)';
+    el.querySelector('div').style.left = newOn ? '23px' : '3px';
+    document.getElementById('w-exclude').value = newOn ? '0' : '1';
+}
+
 function saveWallet(editId) {
     const id = editId ? parseInt(editId) : null;
     const name = document.getElementById('w-name').value.trim(); const balance = parseFloat(document.getElementById('w-balance').value) || 0;
     const icon = document.getElementById('w-icon').value; const color = document.getElementById('w-color').value; const currency = document.getElementById('w-currency').value;
+    const excludeFromTotal = document.getElementById('w-exclude').value === '1';
     if (!name) return showToast('Enter wallet name');
     if (id) {
         const w = state.wallets.find(x => x.id === id);
-        if (w) { const diff = balance - w.balance; if (diff !== 0) { const type = diff > 0 ? 'income' : 'expense'; state.transactions.unshift({ id: genId(), name: `Wallet Adjustment`, categoryId: 'other', type, amount: Math.abs(diff), walletId: w.id, date: today(), note: 'Manual balance update' }); } w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; }
-    } else { state.wallets.push({ id: genId(), name, balance, icon, color, currency }); }
+        if (w) { const diff = balance - w.balance; if (diff !== 0) { const type = diff > 0 ? 'income' : 'expense'; state.transactions.unshift({ id: genId(), name: `Wallet Adjustment`, categoryId: 'other', type, amount: Math.abs(diff), walletId: w.id, date: today(), note: 'Manual balance update' }); } w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.excludeFromTotal = excludeFromTotal; }
+    } else { state.wallets.push({ id: genId(), name, balance, icon, color, currency, excludeFromTotal }); }
     saveState(); closeSheet(); switchTab('wallets'); showToast(id ? 'Wallet Updated!' : 'Wallet added!');
 }
 
