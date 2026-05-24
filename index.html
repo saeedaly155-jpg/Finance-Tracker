@@ -1557,7 +1557,123 @@ function renderDebts() {
     const totalInstall = state.debts.installments.reduce((s, d) => s + convertCurrency(d.amount, (state.wallets.find(w=>w.id===d.walletId)||{currency:state.currency.code}).currency, state.currency.code), 0);
     const totalOwe = state.debts.oweTo.reduce((s, d) => s + d.amount, 0);
     const totalOwed = state.debts.owedToMe.reduce((s, d) => s + d.amount, 0);
+
+    // ── Calendar Logic ──
+    if (!ui.calendarMonth) { const n = new Date(); ui.calendarMonth = n.getMonth(); ui.calendarYear = n.getFullYear(); }
+    const cm = ui.calendarMonth; const cy = ui.calendarYear;
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    const firstDay = new Date(cy, cm, 1).getDay();
+    const daysInMonth = new Date(cy, cm + 1, 0).getDate();
+    const todayStr = today();
+    const todayD = new Date(todayStr);
+
+    // Collect all debt events for this month
+    const events = {}; // day -> [{label, color, amount}]
+    const addEvent = (day, label, color, amount) => {
+        if (!events[day]) events[day] = [];
+        events[day].push({ label, color, amount });
+    };
+
+    // Installments — due date OR startDate recurring monthly
+    state.debts.installments.forEach(d => {
+        if (d.left <= 0) return;
+        // recurring monthly payment on same day as startDate
+        const start = new Date(d.startDate || d.date || todayStr);
+        const payDay = start.getDate();
+        if (payDay <= daysInMonth) {
+            const eventDate = new Date(cy, cm, payDay);
+            if (eventDate >= new Date(d.startDate || d.date)) {
+                addEvent(payDay, d.name, '#f43f5e', d.amount);
+            }
+        }
+        // also mark the final due date if in this month
+        if (d.dueDate) {
+            const due = new Date(d.dueDate);
+            if (due.getMonth() === cm && due.getFullYear() === cy) {
+                addEvent(due.getDate(), d.name + ' (Final)', '#f97316', d.amount);
+            }
+        }
+    });
+    // oweTo debts — date added
+    state.debts.oweTo.forEach(d => {
+        const dt = new Date(d.date);
+        if (dt.getMonth() === cm && dt.getFullYear() === cy) {
+            addEvent(dt.getDate(), d.name, '#ec4899', d.amount);
+        }
+    });
+    // owedToMe debts
+    state.debts.owedToMe.forEach(d => {
+        const dt = new Date(d.date);
+        if (dt.getMonth() === cm && dt.getFullYear() === cy) {
+            addEvent(dt.getDate(), d.name, '#10b981', d.amount);
+        }
+    });
+
+    // Build calendar cells
+    let cells = '';
+    const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+    for (let i = 0; i < totalCells; i++) {
+        const dayNum = i - firstDay + 1;
+        const isValid = dayNum >= 1 && dayNum <= daysInMonth;
+        const dateStr = isValid ? `${cy}-${String(cm+1).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}` : '';
+        const isToday = dateStr === todayStr;
+        const dayEvents = events[dayNum] || [];
+        const hasInstall = dayEvents.some(e => e.color === '#f43f5e' || e.color === '#f97316');
+        const hasOwe = dayEvents.some(e => e.color === '#ec4899');
+        const hasOwed = dayEvents.some(e => e.color === '#10b981');
+        const isPast = isValid && new Date(cy, cm, dayNum) < new Date(todayD.getFullYear(), todayD.getMonth(), todayD.getDate());
+
+        cells += `<div style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:10px;cursor:${isValid?'pointer':'default'};position:relative;
+            background:${isToday ? 'var(--emerald)' : dayEvents.length && isValid ? 'rgba(255,255,255,0.04)' : 'transparent'};
+            border:${isToday ? 'none' : dayEvents.length && isValid ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent'};
+            " ${isValid && dayEvents.length ? `onclick="showDebtDayDetail(${dayNum},${cm},${cy})"` : ''}>
+            <span style="font-size:12px;font-weight:${isToday||dayEvents.length?'700':'400'};color:${isToday?'#000':isPast&&isValid?'rgba(255,255,255,0.3)':isValid?'var(--text)':'transparent'};">${isValid ? dayNum : ''}</span>
+            ${isValid && dayEvents.length ? `<div style="display:flex;gap:2px;">${hasInstall?`<div style="width:4px;height:4px;border-radius:50%;background:#f43f5e;"></div>`:''}${hasOwe?`<div style="width:4px;height:4px;border-radius:50%;background:#ec4899;"></div>`:''}${hasOwed?`<div style="width:4px;height:4px;border-radius:50%;background:#10b981;"></div>`:''}</div>` : ''}
+        </div>`;
+    }
+
+    // Monthly total for installments in this month
+    const monthInstallTotal = state.debts.installments.filter(d => d.left > 0).reduce((s,d) => {
+        const wCurr = (state.wallets.find(w=>w.id===d.walletId)||{currency:state.currency.code}).currency;
+        return s + convertCurrency(d.amount, wCurr, state.currency.code);
+    }, 0);
+
+    const calendarHTML = `
+    <div class="card" style="padding:16px;margin-bottom:20px;">
+        <!-- header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <button onclick="ui.calendarMonth=${cm===0?11:cm-1};ui.calendarYear=${cm===0?cy-1:cy};switchFinanceTab('debts')"
+                style="width:32px;height:32px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);">
+                <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
+            </button>
+            <div style="text-align:center;">
+                <p style="font-size:15px;font-weight:700;color:var(--text);">${monthNames[cm]} ${cy}</p>
+                <p style="font-size:10px;color:var(--muted);">${fmt(monthInstallTotal)} due this month</p>
+            </div>
+            <button onclick="ui.calendarMonth=${cm===11?0:cm+1};ui.calendarYear=${cm===11?cy+1:cy};switchFinanceTab('debts')"
+                style="width:32px;height:32px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);">
+                <i data-lucide="chevron-right" style="width:16px;height:16px;"></i>
+            </button>
+        </div>
+        <!-- day names -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;">
+            ${dayNames.map(d => `<div style="text-align:center;font-size:10px;font-weight:600;color:var(--muted);padding:4px 0;">${d}</div>`).join('')}
+        </div>
+        <!-- cells -->
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;">
+            ${cells}
+        </div>
+        <!-- legend -->
+        <div style="display:flex;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:7px;height:7px;border-radius:50%;background:#f43f5e;"></div><span style="font-size:10px;color:var(--muted);">Installment</span></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:7px;height:7px;border-radius:50%;background:#ec4899;"></div><span style="font-size:10px;color:var(--muted);">I Owe</span></div>
+            <div style="display:flex;align-items:center;gap:5px;"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;"></div><span style="font-size:10px;color:var(--muted);">Owed to Me</span></div>
+        </div>
+    </div>`;
+
     let html = `<div class="fade-up">
+        ${calendarHTML}
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><p class="section-title" style="margin:0;">Installments <span style="color:var(--rose);">${fmt(totalInstall)}/mo</span></p><button onclick="openDebtForm('installments')" style="color:var(--emerald);"><i data-lucide="plus-circle" style="width:20px;height:20px;"></i></button></div>
         <div style="display:flex;flex-direction:column;gap:10px;">
             ${state.debts.installments.map(item => {
@@ -1581,6 +1697,59 @@ function renderDebts() {
         </div>
     </div>`;
     return html;
+}
+
+function showDebtDayDetail(day, month, year) {
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    let items = [];
+
+    state.debts.installments.forEach(d => {
+        if (d.left <= 0) return;
+        const start = new Date(d.startDate || d.date);
+        const payDay = start.getDate();
+        if (payDay === day) {
+            const wCurr = (state.wallets.find(w=>w.id===d.walletId)||{currency:state.currency.code}).currency;
+            items.push({ label: d.name, sub: 'Installment · ' + wCurr + ' ' + fmtNum(d.amount) + '/mo', color: '#f43f5e', icon: d.icon||'credit-card', action: `payInstallment(${d.id})`, actionLabel: 'Pay Now' });
+        }
+        if (d.dueDate === dateStr) {
+            items.push({ label: d.name + ' — Final Payment', sub: 'Last installment', color: '#f97316', icon: 'flag', action: `payInstallment(${d.id})`, actionLabel: 'Pay Final' });
+        }
+    });
+    state.debts.oweTo.forEach(d => {
+        const dt = d.date;
+        if (dt === dateStr) items.push({ label: d.name, sub: 'I Owe · ' + fmt(d.amount), color: '#ec4899', icon: 'arrow-up-right', action: `settleSimpleDebtPrompt('oweTo',${d.id})`, actionLabel: 'Settle' });
+    });
+    state.debts.owedToMe.forEach(d => {
+        const dt = d.date;
+        if (dt === dateStr) items.push({ label: d.name, sub: 'Owes Me · ' + fmt(d.amount), color: '#10b981', icon: 'arrow-down-left', action: `settleSimpleDebtPrompt('owedToMe',${d.id})`, actionLabel: 'Receive' });
+    });
+
+    document.getElementById('sheet-content').innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+            <div style="width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--border);">
+                <span style="font-size:16px;font-weight:800;color:var(--text);line-height:1;">${day}</span>
+                <span style="font-size:8px;color:var(--muted);font-weight:600;">${monthNames[month].slice(0,3).toUpperCase()}</span>
+            </div>
+            <div><h2 class="syne" style="font-size:18px;font-weight:800;margin:0;">${monthNames[month]} ${day}</h2>
+            <p style="font-size:11px;color:var(--muted);">${items.length} payment${items.length!==1?'s':''} scheduled</p></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            ${items.map(it => `
+                <div class="card" style="padding:16px;border-color:${it.color}22;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                        <div style="width:38px;height:38px;border-radius:12px;background:${it.color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i data-lucide="${it.icon}" style="width:16px;height:16px;color:${it.color};"></i>
+                        </div>
+                        <div style="flex:1;"><p style="font-size:14px;font-weight:700;">${it.label}</p>
+                        <p style="font-size:11px;color:var(--muted);">${it.sub}</p></div>
+                    </div>
+                    <button onclick="closeSheet();${it.action}" style="width:100%;padding:10px;border-radius:12px;background:${it.color}18;border:1px solid ${it.color}33;color:${it.color};font-size:12px;font-weight:700;">${it.actionLabel}</button>
+                </div>
+            `).join('')}
+        </div>`;
+    openSheet();
+    lucide.createIcons();
 }
 
 function openSimpleDebtForm(type, editId = null) {
