@@ -20,7 +20,7 @@
             --rose: #f43f5e;
             --bg: #000000;
             --surface: #0f0f14;
-            --surface2: #16161e;W
+            --surface2: #16161e;
             --border: rgba(255,255,255,0.06);
             --text: #f4f4f5;
             --muted: #52525b;
@@ -43,24 +43,6 @@
         .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scroll-hide::-webkit-scrollbar { display: none; }
         .sheet { transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; z-index: 100; }
-        .sheet.open { transform: translateY(0); }
-    
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: var(--font-main);
-            background: var(--bg);
-            color: var(--text);
-            overflow: hidden;
-            height: 100vh;
-        }
-        h1, h2, h3, .syne { 
-            font-family: var(--font-main);
-            font-weight: 800;
-        }
-        .app { max-width: 430px; margin: 0 auto; height: 100vh; background: var(--surface); position: relative; display: flex; flex-direction: column; overflow: hidden; }
-        .scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        .scroll-hide::-webkit-scrollbar { display: none; }
-        .sheet { transform: translateY(100%); transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1); will-change: transform; }
         .sheet.open { transform: translateY(0); }
       /* ── Apple iOS 26 / VisionOS Glass Effect ── */
        .glass { 
@@ -269,13 +251,17 @@
             letter-spacing: -0.5px;
             line-height: 1.1;
             font-variant-numeric: tabular-nums;
-            /* silver-white gradient like the image */
-            background: linear-gradient(160deg,
-                #9a9a9a 0%,
-                #ffffff 30%,
-                #d0d0d0 55%,
-                #ffffff 75%,
-                #888888 100%
+            /* silver-white high-contrast chrome metallic gradient */
+            background: linear-gradient(135deg,
+                #ffffff 0%,
+                #dcdcdc 20%,
+                #8a8a8a 40%,
+                #ffffff 45%,
+                #aeaeae 50%,
+                #ffffff 55%,
+                #505050 70%,
+                #b4b4b4 85%,
+                #ffffff 100%
             );
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -289,16 +275,6 @@
             margin-top: 3px;
         }
 
-        /* Sort sheet styles */
-        .sort-opt { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 14px; border: 1.5px solid var(--border); transition: all 0.18s; cursor: pointer; }
-        .sort-opt.active { border-color: var(--emerald); background: rgba(16,185,129,0.07); }
-        .sort-opt p { font-size: 14px; font-weight: 600; }
-        .sort-opt span { font-size: 11px; color: var(--muted); }
-
-        /* Drag handle for sorting */
-        .drag-handle { cursor: grab; color: var(--muted); display: flex; align-items: center; padding: 4px; }
-        .drag-handle:active { cursor: grabbing; }
-        .dragging { opacity: 0.5; border: 1.5px dashed var(--emerald) !important; }
     </style>
 </head>
 <body>
@@ -433,8 +409,7 @@ const DEFAULT_STATE = {
     goals: [
         { id: 1, name: 'Emergency Fund', target: 50000, saved: 15000, color: '#3b82f6', icon: 'shield', deadline: '2027-01-01' },
         { id: 2, name: 'New Laptop', target: 45000, saved: 10000, color: '#f59e0b', icon: 'laptop', deadline: '2026-10-01' }
-    ],
-    walletSortOrder: 'custom' // 'custom' | 'balance-desc' | 'balance-asc' | 'name-asc'
+    ]
 };
 
 const SUPPORTED_CURRENCIES = [
@@ -657,7 +632,6 @@ function loadState() {
             if (!state.goals) state.goals = DEFAULT_STATE.goals;
             if (!state.debts.oweTo) state.debts.oweTo = [];
             if (!state.debts.owedToMe) state.debts.owedToMe = [];
-            if (!state.walletSortOrder) state.walletSortOrder = 'custom';
             state.wallets.forEach(w => { if(!w.currency) w.currency = state.currency.code; });
         } else {
             state = JSON.parse(JSON.stringify(DEFAULT_STATE));
@@ -719,102 +693,7 @@ function destroyChart(key) {
     if (charts[key]) { try { charts[key].destroy(); } catch(e) {} charts[key] = null; }
 }
 
-// ─── WALLET SORTING ───────────────────────────────────────────────────
-function getSortedWallets() {
-    const wallets = [...state.wallets];
-    const sort = state.walletSortOrder || 'custom';
-    if (sort === 'balance-desc') {
-        wallets.sort((a, b) => {
-            const bv = convertCurrency(b.balance, b.currency || state.currency.code, state.currency.code);
-            const av = convertCurrency(a.balance, a.currency || state.currency.code, state.currency.code);
-            return bv - av;
-        });
-    } else if (sort === 'balance-asc') {
-        wallets.sort((a, b) => {
-            const av = convertCurrency(a.balance, a.currency || state.currency.code, state.currency.code);
-            const bv = convertCurrency(b.balance, b.currency || state.currency.code, state.currency.code);
-            return av - bv;
-        });
-    } else if (sort === 'name-asc') {
-        wallets.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    return wallets;
-}
 
-function openSortSheet() {
-    const opts = [
-        { key: 'custom',       label: 'Custom Order',     desc: 'Drag to arrange manually',    icon: 'grip-vertical' },
-        { key: 'balance-desc', label: 'Highest Balance',  desc: 'Most money first',            icon: 'arrow-down-wide-narrow' },
-        { key: 'balance-asc',  label: 'Lowest Balance',   desc: 'Least money first',           icon: 'arrow-up-narrow-wide' },
-        { key: 'name-asc',     label: 'Name A → Z',       desc: 'Alphabetical order',          icon: 'a-large-small' },
-    ];
-    document.getElementById('sheet-content').innerHTML = `
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:16px;">
-            <div style="width:40px;height:40px;border-radius:14px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;">
-                <i data-lucide="arrow-up-down" style="color:var(--emerald);width:18px;height:18px;"></i>
-            </div>
-            <div>
-                <h2 class="syne" style="font-size:18px;font-weight:800;margin:0;">Sort Cards</h2>
-                <p style="font-size:11px;color:var(--muted);">Choose how to order your wallets</p>
-            </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-            ${opts.map(o => `
-                <div class="sort-opt ${state.walletSortOrder === o.key ? 'active' : ''}" onclick="applySortOrder('${o.key}')">
-                    <div style="width:38px;height:38px;border-radius:12px;background:${state.walletSortOrder===o.key?'rgba(16,185,129,0.12)':'rgba(255,255,255,0.04)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i data-lucide="${o.icon}" style="width:16px;height:16px;color:${state.walletSortOrder===o.key?'var(--emerald)':'var(--muted)'};"></i>
-                    </div>
-                    <div style="flex:1;">
-                        <p style="font-size:14px;font-weight:600;color:${state.walletSortOrder===o.key?'var(--text)':'var(--text)'};">${o.label}</p>
-                        <span>${o.desc}</span>
-                    </div>
-                    ${state.walletSortOrder === o.key ? `<i data-lucide="check-circle-2" style="width:18px;height:18px;color:var(--emerald);flex-shrink:0;"></i>` : ''}
-                </div>
-            `).join('')}
-        </div>
-        ${state.walletSortOrder === 'custom' ? `
-        <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
-            <p class="section-title">Drag to Reorder</p>
-            <div id="drag-list" style="display:flex;flex-direction:column;gap:8px;">
-                ${state.wallets.map((w, i) => `
-                    <div class="tx-row" draggable="true" data-wallet-id="${w.id}"
-                         ondragstart="dragStart(event,${i})" ondragover="dragOver(event)" ondrop="dragDrop(event,${i})"
-                         style="cursor:default;user-select:none;">
-                        <div class="drag-handle"><i data-lucide="grip-vertical" style="width:16px;height:16px;"></i></div>
-                        <div style="width:32px;height:32px;border-radius:10px;background:${w.color};flex-shrink:0;"></div>
-                        <div style="flex:1;">
-                            <p style="font-size:14px;font-weight:600;">${w.name}</p>
-                            <p style="font-size:10px;color:var(--muted);">${w.currency||state.currency.code} ${fmtNum(w.balance)}</p>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>` : ''}
-    `;
-    openSheet();
-    lucide.createIcons();
-}
-
-let dragSrcIndex = null;
-function dragStart(e, idx) { dragSrcIndex = idx; e.target.classList.add('dragging'); }
-function dragOver(e) { e.preventDefault(); }
-function dragDrop(e, targetIdx) {
-    e.preventDefault();
-    document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
-    if (dragSrcIndex === null || dragSrcIndex === targetIdx) return;
-    const moved = state.wallets.splice(dragSrcIndex, 1)[0];
-    state.wallets.splice(targetIdx, 0, moved);
-    dragSrcIndex = null;
-    saveState();
-    openSortSheet();
-}
-
-function applySortOrder(key) {
-    state.walletSortOrder = key;
-    saveState();
-    closeSheet();
-    switchTab('wallets');
-}
 
 // ─── TAB SWITCHING & NEW FINANCE PAGE ─────────────────────────────────
 function switchTab(tabId) {
@@ -1100,7 +979,7 @@ function renderHome() {
         </div>` : ''}
 
         <div style="display:flex;gap:16px;overflow-x:auto;padding:10px 0 24px;margin-bottom:14px;" class="scroll-hide">
-            ${getSortedWallets().map(w => {
+            ${state.wallets.map(w => {
                 const wCurr = w.currency || state.currency.code;
                 const mainCurr = state.currency.code;
                 let conversionHTML = '';
@@ -2100,16 +1979,13 @@ function payInstallment(id) {
 }
 function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Removed'); }
 
-// ─── WALLETS (with Sort button) ───────────────────────────────────────
+// ─── WALLETS ──────────────────────────────────────────────────────────
 function renderWallets() {
     ui.currentTab = 'wallets';
-    const sorted = getSortedWallets();
+    const sorted = state.wallets;
 
     let html = `<div class="fade-up" style="padding-bottom: 10px; overflow-x: hidden; min-height: 100vh;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; position:relative;">
-            <button onclick="openSortSheet()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);" title="Sort cards">
-                <i data-lucide="arrow-up-down" style="width:18px;height:18px;"></i>
-            </button>
             <h2 class="syne" style="font-size:20px;font-weight:700;">Cards</h2>
             <div style="display:flex;gap:8px;align-items:center;">
                 <button onclick="openTransferForm()" style="height:42px;padding:0 14px;border-radius:14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);display:flex;align-items:center;gap:6px;color:#3b82f6;font-size:12px;font-weight:700;" title="Transfer between wallets">
@@ -2393,22 +2269,6 @@ function generateMilestoneTrack(title, pct, color, subtitle) {
             <span style="color:${pct>=100?color:'var(--muted)'}">Done</span>
         </div>
     </div>`;
-  return `
-        <div style="animation: fade-up 0.3s ease both;">
-            <div style="text-align:center; margin-bottom:30px;">
-                <div style="width:80px; height:80px; background:var(--emerald); border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center;">
-                    <i data-lucide="user" style="width:40px; height:40px; color:#000;"></i>
-                </div>
-                <h2 style="color:var(--text); font-family:'Syne';">User Profile</h2>
-            </div>
-            
-            <div class="card" style="padding:20px; border-radius:20px; background:rgba(255,255,255,0.05);">
-                <label style="color:var(--muted); font-size:12px;">Gemini API Key</label>
-                <input type="password" id="gemini-key" class="input" value="${localStorage.getItem('velto_gemini_key') || ''}" style="margin: 10px 0; width: 100%;">
-                <button onclick="saveApiKey()" class="btn-primary" style="width:100%;">Save Settings</button>
-            </div>
-        </div>
-    `;
 }
 
  function saveApiKey() {
