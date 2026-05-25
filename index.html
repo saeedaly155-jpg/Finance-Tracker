@@ -641,7 +641,7 @@ function loadState() {
     }
     // Added financeTab for the new combined page
     const now = new Date();
-    ui = { currentTab: 'home', financeTab: 'budgets', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false, txMonth: now.getMonth(), txYear: now.getFullYear(), txFilter: 'all' };
+    ui = { currentTab: 'home', financeTab: 'budgets', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false, txMonth: now.getMonth(), txYear: now.getFullYear(), txFilter: 'all', milestonesExpanded: false };
 }
 
 function saveState() {
@@ -654,6 +654,12 @@ let ui = {};
 const fmtNum = (n) => Math.abs(n).toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 const fmt = (n) => `${state.currency.symbol}${fmtNum(n)}`;
 const today = () => new Date().toISOString().split('T')[0];
+const nowWithTime = () => {
+    const now = new Date();
+    const yyyymmdd = now.toISOString().split('T')[0];
+    const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    return `${yyyymmdd}T${timeStr}`;
+};
 
 function convertCurrency(amount, fromCode, toCode) {
     if (fromCode === toCode || !liveRates[fromCode] || !liveRates[toCode]) return amount;
@@ -667,12 +673,21 @@ function getCat(id, type) {
 }
 
 function dateLabel(dateStr) {
-    const d = new Date(dateStr + 'T00:00:00');
+    const parts = dateStr.split('T');
+    const dStr = parts[0];
+    const tStr = parts[1] || '';
+    const d = new Date(dStr + 'T00:00:00');
     const t = new Date(); t.setHours(0,0,0,0);
     const diff = Math.round((t - d) / 86400000);
-    if (diff === 0) return 'Today';
-    if (diff === 1) return 'Yesterday';
-    return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+    let label = '';
+    if (diff === 0) label = 'Today';
+    else if (diff === 1) label = 'Yesterday';
+    else label = d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+    
+    if (tStr) {
+        return `${label} at ${tStr}`;
+    }
+    return label;
 }
 
 function getCurrentMonthSpend(categoryId) {
@@ -680,7 +695,7 @@ function getCurrentMonthSpend(categoryId) {
     const month = now.getMonth(); const year = now.getFullYear();
     return state.transactions.filter(t => {
         const d = new Date(t.date);
-        return t.type === 'expense' && t.categoryId === categoryId && d.getMonth() === month && d.getFullYear() === year;
+        return t.type === 'expense' && !t.isTransfer && t.categoryId === categoryId && d.getMonth() === month && d.getFullYear() === year;
     }).reduce((s, t) => {
         const w = state.wallets.find(x => x.id === t.walletId) || { currency: state.currency.code };
         return s + convertCurrency(t.amount, w.currency, state.currency.code);
@@ -891,7 +906,7 @@ function executeAITransaction(txData) {
     const wallet = state.wallets.find(w => w.id === txData.walletId) || state.wallets[0];
     let catArray = state.categories[txData.type] || state.categories['expense'];
     const cat = catArray.find(c => c.id === txData.categoryId) || catArray[0];
-    const tx = { id: genId(), name: txData.name, categoryId: cat.id, type: txData.type, amount: txData.amount, walletId: wallet.id, date: today(), note: 'Added via Smart Assistant' };
+    const tx = { id: genId(), name: txData.name, categoryId: cat.id, type: txData.type, amount: txData.amount, walletId: wallet.id, date: nowWithTime(), note: 'Added via Smart Assistant' };
     state.transactions.unshift(tx);
     wallet.balance += txData.type === 'expense' ? -txData.amount : txData.amount;
     saveState();
@@ -952,7 +967,7 @@ function renderHome() {
 
     const monthTx = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth() === month && d.getFullYear() === year; });
     let monthIn = 0; let monthOut = 0;
-    monthTx.forEach(t => { const w = state.wallets.find(x => x.id === t.walletId) || {currency: state.currency.code}; const converted = convertCurrency(t.amount, w.currency, state.currency.code); if (t.type === 'income') monthIn += converted; else monthOut += converted; });
+    monthTx.forEach(t => { const w = state.wallets.find(x => x.id === t.walletId) || {currency: state.currency.code}; const converted = convertCurrency(t.amount, w.currency, state.currency.code); if (t.isTransfer) return; if (t.type === 'income') monthIn += converted; else monthOut += converted; });
     const recent = [...monthTx].sort((a, b) => new Date(b.date) - new Date(a.date));
     const alerts = state.budgets.filter(b => getCurrentMonthSpend(b.categoryId) >= b.limit * 0.8);
 
@@ -1130,9 +1145,9 @@ function initCashFlowChart() {
         const ds = d.toISOString().split('T')[0];
         const label = days <= 7 ? d.toLocaleDateString('en', { weekday: 'short' }) : d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
         labels.push(label);
-        const dayTx = state.transactions.filter(t => t.date === ds);
-        incomes.push(dayTx.filter(t => t.type === 'income').reduce((s, t) => s + convertCurrency(t.amount, (state.wallets.find(w=>w.id===t.walletId)||{}).currency, state.currency.code), 0));
-        expenses.push(dayTx.filter(t => t.type === 'expense').reduce((s, t) => s + convertCurrency(t.amount, (state.wallets.find(w=>w.id===t.walletId)||{}).currency, state.currency.code), 0));
+        const dayTx = state.transactions.filter(t => t.date.startsWith(ds));
+        incomes.push(dayTx.filter(t => t.type === 'income' && !t.isTransfer).reduce((s, t) => s + convertCurrency(t.amount, (state.wallets.find(w=>w.id===t.walletId)||{}).currency, state.currency.code), 0));
+        expenses.push(dayTx.filter(t => t.type === 'expense' && !t.isTransfer).reduce((s, t) => s + convertCurrency(t.amount, (state.wallets.find(w=>w.id===t.walletId)||{}).currency, state.currency.code), 0));
     }
     destroyChart('cashFlow');
     const ctx = canvas.getContext('2d');
@@ -1230,7 +1245,7 @@ function initDonutChart() {
     if (!svg) return;
     const month = ui.txMonth; const year = ui.txYear;
     const byCat = {};
-    state.transactions.filter(t => { const d = new Date(t.date); return t.type === 'expense' && d.getMonth() === month && d.getFullYear() === year; }).forEach(t => { const w = state.wallets.find(x => x.id === t.walletId) || {}; byCat[t.categoryId] = (byCat[t.categoryId] || 0) + convertCurrency(t.amount, w.currency, state.currency.code); });
+    state.transactions.filter(t => { const d = new Date(t.date); return t.type === 'expense' && !t.isTransfer && d.getMonth() === month && d.getFullYear() === year; }).forEach(t => { const w = state.wallets.find(x => x.id === t.walletId) || {}; byCat[t.categoryId] = (byCat[t.categoryId] || 0) + convertCurrency(t.amount, w.currency, state.currency.code); });
     const entries = Object.entries(byCat).sort((a, b) => b[1] - a[1]).slice(0, 6);
     if (!entries.length) return;
 
@@ -1422,7 +1437,7 @@ function processGoalFunding(goalId) {
     const addedToBase = convertCurrency(amount, wCurr, state.currency.code);
     g.saved += addedToBase;
     const catId = state.categories.expense.find(c => c.id === 'savings')?.id || 'other';
-    state.transactions.unshift({ id: genId(), name: `Goal: ${g.name}`, categoryId: catId, type: 'expense', amount, walletId: wallet.id, date: today(), note: 'Transferred to Savings Goal' });
+    state.transactions.unshift({ id: genId(), name: `Goal: ${g.name}`, categoryId: catId, type: 'expense', amount, walletId: wallet.id, date: nowWithTime(), note: 'Transferred to Savings Goal' });
     saveState(); closeSheet(); switchFinanceTab('budgets'); showToast(`Added ${fmt(addedToBase)} to goal!`);
 }
 
@@ -1495,7 +1510,7 @@ function openTransactionForm(prefill = null) {
             <p class="section-title" style="margin:0;">Category</p>
             <button onclick="toggleManage()" id="manage-btn" style="font-size:10px;font-weight:700;color:var(--emerald);letter-spacing:0.08em;text-transform:uppercase;padding:4px 8px;border-radius:8px;background:rgba(16,185,129,0.1);">Manage</button>
         </div>
-        <div id="cat-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;"></div>
+        <div id="cat-grid"></div>
     </div>
 
     <!-- DATE & NOTE ROW -->
@@ -1504,7 +1519,7 @@ function openTransactionForm(prefill = null) {
             <p class="section-title" style="margin-bottom:6px;">Date</p>
             <div style="position:relative;">
                 <i data-lucide="calendar" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none;"></i>
-                <input type="date" id="tx-date" class="input" value="${tx.date||today()}" style="font-size:13px;padding-left:36px;">
+                <input type="date" id="tx-date" class="input" value="${(tx.date ? tx.date.split(/[T ]/)[0] : today())}" style="font-size:13px;padding-left:36px;">
             </div>
         </div>
         <div>
@@ -1598,11 +1613,62 @@ function renderWalletChips() {
 }
 function selectWallet(id) { ui.selectedWalletId = id; renderWalletChips(); updateTxCurrencyLabel(); }
 function renderCatGrid() {
-    const grid = document.getElementById('cat-grid'); if (!grid) return;
+    const container = document.getElementById('cat-grid');
+    if (!container) return;
     const cats = state.categories[ui.selectedType];
-    grid.innerHTML = cats.map(c => `<button onclick="${ui.isManagingCategories ? `deleteCat('${c.id}','${ui.selectedType}')` : `selectCat('${c.id}')`}" class="cat-btn ${ui.selectedCategoryId===c.id ? 'selected' : ''} ${ui.isManagingCategories ? 'manage-ring' : ''}"><div style="width:40px;height:40px;border-radius:13px;background:${c.color}18;display:flex;align-items:center;justify-content:center;position:relative;"><i data-lucide="${c.icon}" style="width:18px;height:18px;color:${c.color};"></i>${ui.isManagingCategories ? `<span class="delete-badge">−</span>` : ''}</div><span style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;line-height:1;">${c.name}</span></button>`).join('') + (ui.isManagingCategories ? `<button onclick="addCategoryPrompt()" class="cat-btn" style="border:1.5px dashed rgba(255,255,255,0.1);"><div style="width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;"><i data-lucide="plus" style="width:18px;height:18px;color:var(--emerald);"></i></div><span style="font-size:9px;font-weight:700;color:var(--emerald);">New</span></button>` : '');
-    lucide.createIcons();
+    
+    if (!cats.some(c => c.id === ui.selectedCategoryId)) {
+        ui.selectedCategoryId = cats[0]?.id || 'other';
+    }
+
+    let selectHTML = `
+        <div style="position:relative; width: 100%;">
+            <select id="tx-category" class="input" onchange="handleCategorySelect(this.value)" style="padding-right: 40px;">
+                ${cats.map(c => `<option value="${c.id}" ${ui.selectedCategoryId === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
+                <option value="_add_new_" style="color: var(--emerald); font-weight: bold;">+ Add New Category...</option>
+            </select>
+        </div>
+    `;
+
+    let manageHTML = '';
+    if (ui.isManagingCategories) {
+        manageHTML = `
+            <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding: 4px;" class="scroll-hide">
+                <p class="section-title" style="font-size: 9px; margin-bottom: 6px;">Delete Categories</p>
+                ${cats.map(c => `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 24px; height: 24px; border-radius: 6px; background: ${c.color}18; display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="${c.icon}" style="width: 12px; height: 12px; color: ${c.color};"></i>
+                            </div>
+                            <span style="font-size: 13px; font-weight: 600;">${c.name}</span>
+                        </div>
+                        <button onclick="deleteCat('${c.id}', '${ui.selectedType}')" style="width: 28px; height: 28px; border-radius: 8px; background: rgba(244,63,94,0.1); color: var(--rose); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
+                        </button>
+                    </div>
+                `).join('')}
+                <button onclick="addCategoryPrompt()" style="padding: 10px; border-radius: 12px; border: 1.5px dashed rgba(16,185,129,0.2); background: rgba(16,185,129,0.05); color: var(--emerald); font-size: 12px; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; margin-top: 4px;">
+                    <i data-lucide="plus" style="width: 14px; height: 14px;"></i> Add New Category
+                </button>
+            </div>
+        `;
+    }
+
+    container.innerHTML = selectHTML + manageHTML;
+    lucide.createIcons({ nodes: container.querySelectorAll('[data-lucide]') });
 }
+
+function handleCategorySelect(value) {
+    if (value === '_add_new_') {
+        addCategoryPrompt();
+        const select = document.getElementById('tx-category');
+        if (select) select.value = ui.selectedCategoryId;
+    } else {
+        ui.selectedCategoryId = value;
+    }
+}
+
 function selectCat(id) { ui.selectedCategoryId = id; renderCatGrid(); }
 function toggleManage() { ui.isManagingCategories = !ui.isManagingCategories; const btn = document.getElementById('manage-btn'); if (btn) btn.textContent = ui.isManagingCategories ? 'Done' : 'Manage'; renderCatGrid(); }
 function deleteCat(id, type) { state.categories[type] = state.categories[type].filter(c => c.id !== id); saveState(); if (ui.selectedCategoryId === id) ui.selectedCategoryId = state.categories[type][0]?.id; renderCatGrid(); }
@@ -1619,12 +1685,29 @@ function saveTransaction() {
     const amount = evaluateAmount(raw);
     if (isNaN(amount) || amount <= 0) return showToast('Enter a valid amount');
     const name = document.getElementById('tx-name').value || getCat(ui.selectedCategoryId).name;
-    const date = document.getElementById('tx-date').value || today(); const note = document.getElementById('tx-note').value;
+    const dateInput = document.getElementById('tx-date').value || today();
+    let date = dateInput;
+    const now = new Date();
+    const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+    const note = document.getElementById('tx-note').value;
     const wallet = state.wallets.find(w => w.id === ui.selectedWalletId); if (!wallet) return showToast('Select a wallet');
     if (ui.editingTransaction) {
         const old = state.transactions.find(t => t.id === ui.editingTransaction);
-        if (old) { const oldWallet = state.wallets.find(w => w.id === old.walletId); if (oldWallet) oldWallet.balance -= old.type === 'expense' ? -old.amount : old.amount; old.name = name; old.amount = amount; old.type = ui.selectedType; old.categoryId = ui.selectedCategoryId; old.walletId = ui.selectedWalletId; old.date = date; old.note = note; wallet.balance += ui.selectedType === 'expense' ? -amount : amount; }
-    } else { const tx = { id: genId(), name, categoryId: ui.selectedCategoryId, type: ui.selectedType, amount, walletId: ui.selectedWalletId, date, note }; state.transactions.unshift(tx); wallet.balance += ui.selectedType === 'expense' ? -amount : amount; }
+        if (old) {
+            const oldWallet = state.wallets.find(w => w.id === old.walletId);
+            if (oldWallet) oldWallet.balance -= old.type === 'expense' ? -old.amount : old.amount;
+            if (old.date.startsWith(dateInput)) {
+                date = old.date;
+            } else {
+                date = `${dateInput}T${timeStr}`;
+            }
+            old.name = name; old.amount = amount; old.type = ui.selectedType; old.categoryId = ui.selectedCategoryId; old.walletId = ui.selectedWalletId; old.date = date; old.note = note; wallet.balance += ui.selectedType === 'expense' ? -amount : amount;
+        }
+    } else {
+        date = `${dateInput}T${timeStr}`;
+        const tx = { id: genId(), name, categoryId: ui.selectedCategoryId, type: ui.selectedType, amount, walletId: ui.selectedWalletId, date, note };
+        state.transactions.unshift(tx); wallet.balance += ui.selectedType === 'expense' ? -amount : amount;
+    }
     saveState(); closeSheet(); switchTab('home'); showToast(ui.editingTransaction ? 'Updated!' : 'Added!');
 }
 function deleteTransaction(id) {
@@ -1677,7 +1760,7 @@ function receiveIncome(id) {
     const wallet = state.wallets.find(w => w.id === item.walletId); if (!wallet) return showToast('Wallet not found', 'error');
     wallet.balance += item.amount;
     const catId = state.categories.income.find(c => c.name.toLowerCase().includes('salary'))?.id || state.categories.income[0]?.id || 'other';
-    state.transactions.unshift({ id: genId(), name: `${item.name}`, categoryId: catId, type: 'income', amount: item.amount, walletId: item.walletId, date: today(), note: 'Received from sources' });
+    state.transactions.unshift({ id: genId(), name: `${item.name}`, categoryId: catId, type: 'income', amount: item.amount, walletId: item.walletId, date: nowWithTime(), note: 'Received from sources' });
     saveState(); showToast(`Received ${wallet.currency||state.currency.code} ${fmtNum(item.amount)}! 🎉`); switchFinanceTab('income');
 }
 
@@ -1929,7 +2012,7 @@ function processSettleDebt(type, id) {
             type: 'expense',
             amount: convAmount,
             walletId: wallet.id,
-            date: today(),
+            date: nowWithTime(),
             note: 'Paid a debt'
         });
     } else {
@@ -1943,7 +2026,7 @@ function processSettleDebt(type, id) {
             type: 'income',
             amount: convAmount,
             walletId: wallet.id,
-            date: today(),
+            date: nowWithTime(),
             note: 'Received owed money'
         });
     }
@@ -1973,7 +2056,7 @@ function payInstallment(id) {
     const item = state.debts.installments.find(d => d.id === id); if (!item) return; if (item.left <= 0) return showToast('Already fully paid!', 'warn');
     const wallet = state.wallets.find(w => w.id === item.walletId); if (!wallet) return showToast('Wallet not found', 'error'); if (wallet.balance < item.amount) return showToast('Insufficient balance', 'error');
     wallet.balance -= item.amount; item.paidAmount = parseFloat(((item.paidAmount || 0) + item.amount).toFixed(2)); item.left = Math.max(0, item.left - 1);
-    state.transactions.unshift({ id: genId(), name: `Payment: ${item.name}`, categoryId: 'bills', type: 'expense', amount: item.amount, walletId: item.walletId, date: today(), note: `Installment (${item.total - item.left}/${item.total})` });
+    state.transactions.unshift({ id: genId(), name: `Payment: ${item.name}`, categoryId: 'bills', type: 'expense', amount: item.amount, walletId: item.walletId, date: nowWithTime(), note: `Installment (${item.total - item.left}/${item.total})` });
     if (item.left === 0) { state.debts.installments = state.debts.installments.filter(d => d.id !== id); saveState(); switchFinanceTab('debts'); return showToast(`${item.name} fully paid! 🎉`); }
     saveState(); switchFinanceTab('debts'); showToast(`Paid! ${item.left} months left`);
 }
@@ -2135,11 +2218,10 @@ function saveWallet(editId) {
     if (!name) return showToast('Enter wallet name');
     if (id) {
         const w = state.wallets.find(x => x.id === id);
-        if (w) { const diff = balance - w.balance; if (diff !== 0) { const type = diff > 0 ? 'income' : 'expense'; state.transactions.unshift({ id: genId(), name: `Wallet Adjustment`, categoryId: 'other', type, amount: Math.abs(diff), walletId: w.id, date: today(), note: 'Manual balance update' }); } w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.excludeFromTotal = excludeFromTotal; }
+        if (w) { const diff = balance - w.balance; if (diff !== 0) { const type = diff > 0 ? 'income' : 'expense'; state.transactions.unshift({ id: genId(), name: `Wallet Adjustment`, categoryId: 'other', type, amount: Math.abs(diff), walletId: w.id, date: nowWithTime(), note: 'Manual balance update' }); } w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.excludeFromTotal = excludeFromTotal; }
     } else { state.wallets.push({ id: genId(), name, balance, icon, color, currency, excludeFromTotal }); }
     saveState(); closeSheet(); switchTab('wallets'); showToast(id ? 'Wallet Updated!' : 'Wallet added!');
 }
-
 function deleteWallet(id) { if (state.wallets.length <= 1) return showToast("Can't delete last wallet"); state.wallets = state.wallets.filter(w => w.id !== id); saveState(); closeSheet(); switchTab('wallets'); showToast('Wallet removed'); }
 
 function openTransferForm() {
@@ -2155,9 +2237,9 @@ function processTransfer() {
     if (wFrom.balance < amount) return showToast('Insufficient balance', 'error');
     const fromCurr = wFrom.currency || state.currency.code; const toCurr = wTo.currency || state.currency.code; const convertedAmount = convertCurrency(amount, fromCurr, toCurr);
     wFrom.balance -= amount; wTo.balance += convertedAmount;
-    const dateStr = today();
-    state.transactions.unshift({ id: genId(), name: `Transfer to ${wTo.name}`, categoryId: 'other', type: 'expense', amount, walletId: wFrom.id, date: dateStr, note: 'Internal Transfer Out' });
-    state.transactions.unshift({ id: genId() + 1, name: `Transfer from ${wFrom.name}`, categoryId: 'other', type: 'income', amount: convertedAmount, walletId: wTo.id, date: dateStr, note: 'Internal Transfer In' });
+    const dateStr = nowWithTime();
+    state.transactions.unshift({ id: genId(), name: `Transfer to ${wTo.name}`, categoryId: 'other', type: 'expense', amount, walletId: wFrom.id, date: dateStr, note: 'Internal Transfer Out', isTransfer: true });
+    state.transactions.unshift({ id: genId() + 1, name: `Transfer from ${wFrom.name}`, categoryId: 'other', type: 'income', amount: convertedAmount, walletId: wTo.id, date: dateStr, note: 'Internal Transfer In', isTransfer: true });
     saveState(); closeSheet(); switchTab('wallets'); showToast('Transfer Successful! 💸');
 }
 
@@ -2175,24 +2257,37 @@ function renderSettings() {
     const allDebts = state.debts.installments || [];
 
     if (allGoals.length > 0 || allDebts.length > 0) {
-        milestonesHTML += `<div class="card" style="padding:16px; margin-top:20px; margin-bottom:20px;">
-            <p class="section-title" style="margin-bottom: 20px; display:flex; align-items:center; gap:6px;">
-                <i data-lucide="award" style="width:16px;height:16px;color:var(--emerald);"></i> Milestones
-            </p>`;
-        
+        const milestones = [];
         allGoals.forEach(g => {
             const pct = Math.min(100, Math.round((g.saved / g.target) * 100)) || 0;
-            milestonesHTML += generateMilestoneTrack(g.name, pct, g.color || 'var(--emerald)', 'Savings Goal');
+            milestones.push({ name: g.name, pct, color: g.color || 'var(--emerald)', subtitle: 'Savings Goal' });
         });
-
         allDebts.forEach(d => {
             const paidAmount = d.paidAmount || 0; 
             const totalAmount = d.totalAmount || (d.amount * d.total);
             const pct = Math.min(100, Math.round((paidAmount / totalAmount) * 100)) || 0;
-            milestonesHTML += generateMilestoneTrack(d.name, pct, '#3b82f6', 'Debt Payoff'); 
+            milestones.push({ name: d.name, pct, color: '#3b82f6', subtitle: 'Debt Payoff' });
         });
 
-        milestonesHTML += `</div>`;
+        const isExpanded = ui.milestonesExpanded || false;
+        
+        milestonesHTML += `<div class="card" style="padding:16px; margin-top:20px; margin-bottom:20px;">
+            <p class="section-title" style="margin-bottom: 20px; display:flex; align-items:center; gap:6px;">
+                <i data-lucide="award" style="width:16px;height:16px;color:var(--emerald);"></i> Milestones
+            </p>
+            
+            ${milestones.slice(0, 2).map(m => generateMilestoneTrack(m.name, m.pct, m.color, m.subtitle)).join('')}
+            
+            ${milestones.length > 2 ? `
+            <div id="hidden-milestones" style="display: ${isExpanded ? 'block' : 'none'};">
+                ${milestones.slice(2).map(m => generateMilestoneTrack(m.name, m.pct, m.color, m.subtitle)).join('')}
+            </div>
+            <button onclick="toggleMilestones(this)" style="width:100%; text-align:center; padding:10px; font-size:12px; font-weight:700; color:var(--emerald); background:rgba(16,185,129,0.06); border-radius:12px; border:none; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+                <span>${isExpanded ? 'See Less' : 'See More'}</span>
+                <i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" style="width:14px; height:14px;"></i>
+            </button>
+            ` : ''}
+        </div>`;
     }
 
     return `<div class="fade-up">
@@ -2269,6 +2364,30 @@ function generateMilestoneTrack(title, pct, color, subtitle) {
             <span style="color:${pct>=100?color:'var(--muted)'}">Done</span>
         </div>
     </div>`;
+}
+
+function toggleMilestones(btn) {
+    const container = document.getElementById('hidden-milestones');
+    if (!container) return;
+    const isExpanded = container.style.display === 'block';
+    const span = btn.querySelector('span');
+    const icon = btn.querySelector('i');
+    if (isExpanded) {
+        container.style.display = 'none';
+        ui.milestonesExpanded = false;
+        if (span) span.textContent = 'See More';
+        if (icon) {
+            icon.setAttribute('data-lucide', 'chevron-down');
+        }
+    } else {
+        container.style.display = 'block';
+        ui.milestonesExpanded = true;
+        if (span) span.textContent = 'See Less';
+        if (icon) {
+            icon.setAttribute('data-lucide', 'chevron-up');
+        }
+    }
+    lucide.createIcons({ nodes: btn.querySelectorAll('[data-lucide]') });
 }
 
  function saveApiKey() {
