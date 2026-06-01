@@ -846,7 +846,7 @@ function openAIChat() {
             </div>
         </div>
         <div id="chat-messages" style="display:flex; flex-direction:column; gap:12px; max-height:50vh; overflow-y:auto; padding-bottom:10px; margin-bottom:16px;" class="scroll-hide">
-            ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">أهلاً يا سعيد! كيف أساعدك اليوم في تصميماتك أو حساباتك؟ 😊</div>` : ''}
+            ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">أهلاً! أنا مساعدك المالي الذكي 🤖✨<br>ممكن أضيف معاملات، أحلل مصاريفك، أنشئ أهداف، أنقل فلوس بين المحافظ، أمسح ديون — وكتير أكتر. قولي إيه اللي تحتاجه!</div>` : ''}
         </div>
         <div style="display:flex; gap:8px; align-items:flex-end;">
             <textarea id="chat-input" class="input scroll-hide" placeholder="اسألني أي شيء..." style="flex:1; resize:none; min-height:52px; max-height:100px; padding:16px; border-radius:18px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
@@ -889,11 +889,84 @@ async function sendChatMessage() {
             currentDate: today(), baseCurrency: state.currency.code,
             wallets: state.wallets.map(({id, name, balance, currency}) => ({id, name, balance, currency})),
             categories: { expense: state.categories.expense.map(({id, name}) => ({id, name})), income: state.categories.income.map(({id, name}) => ({id, name})) },
-            transactions: state.transactions.map(({id, name, amount, type, categoryId, walletId, date}) => ({id, name, amount, type, categoryId, walletId, date})),
-            budgets: state.budgets.map(b => { const catName = getCat(b.categoryId).name; return { category: catName, limit: b.limit, currentlySpent: getCurrentMonthSpend(b.categoryId) }; }),
-            goals: state.goals.map(({name, target, saved, deadline}) => ({name, target, saved, deadline})),
+            recentTransactions: state.transactions.slice(0, 30).map(({id, name, amount, type, categoryId, walletId, date, note}) => ({id, name, amount, type, categoryId, walletId, date, note})),
+            budgets: state.budgets.map(b => { const catName = getCat(b.categoryId).name; return { id: b.id, categoryId: b.categoryId, category: catName, limit: b.limit, currentlySpent: getCurrentMonthSpend(b.categoryId) }; }),
+            goals: state.goals.map(({id, name, target, saved, deadline}) => ({id, name, target, saved, deadline})),
+            debts: {
+                oweTo: state.debts.oweTo.map(({id, name, amount, date}) => ({id, name, amount, date})),
+                owedToMe: state.debts.owedToMe.map(({id, name, amount, date}) => ({id, name, amount, date})),
+                installments: state.debts.installments.map(({id, name, amount, total, left, paidAmount}) => ({id, name, amount, total, left, paidAmount}))
+            }
         };
-        const sysPrompt = `You are a highly intelligent financial assistant embedded in a user's local finance app. Speak in friendly Egyptian Arabic. Be concise and helpful.\n\nUser finances:\n${JSON.stringify(aiState)}\n\nIf adding a transaction, output JSON:\n\`\`\`json\n{"execute":true,"transaction":{"name":"...","amount":100,"type":"expense","categoryId":"food","walletId":1},"message":"تم ✅"}\n\`\`\``;
+
+        const sysPrompt = `You are a powerful AI assistant built into Velto Finance — the user's personal finance app. You can do anything they ask: answer questions, analyze their finances, AND execute real actions in the app.
+
+Language: Reply in the same language the user writes in. If they write Arabic, reply in friendly Egyptian Arabic. If English, reply in English.
+
+CURRENT APP DATA:
+${JSON.stringify(aiState)}
+
+═══════════════════════════════════════
+ACTIONS YOU CAN EXECUTE
+═══════════════════════════════════════
+When you need to perform an action, output a JSON block at the END of your message like this:
+\`\`\`json
+{ "actions": [ ... ] }
+\`\`\`
+
+You can include MULTIPLE actions in one response. Supported actions:
+
+1. ADD TRANSACTION (expense or income):
+{ "type": "add_transaction", "data": { "name": "...", "amount": 150, "type": "expense", "categoryId": "food", "walletId": 1, "note": "optional" } }
+
+2. DELETE TRANSACTION (by id):
+{ "type": "delete_transaction", "data": { "id": 123456 } }
+
+3. TRANSFER BETWEEN WALLETS:
+{ "type": "transfer", "data": { "fromWalletId": 1, "toWalletId": 2, "amount": 500, "note": "optional" } }
+
+4. ADD WALLET:
+{ "type": "add_wallet", "data": { "name": "...", "balance": 0, "currency": "EGP", "icon": "wallet", "color": "#8b5cf6" } }
+
+5. DELETE WALLET (by id):
+{ "type": "delete_wallet", "data": { "id": 1 } }
+
+6. ADD BUDGET:
+{ "type": "add_budget", "data": { "categoryId": "food", "limit": 2000 } }
+
+7. DELETE BUDGET (by id):
+{ "type": "delete_budget", "data": { "id": 123456 } }
+
+8. ADD GOAL:
+{ "type": "add_goal", "data": { "name": "...", "target": 10000, "saved": 0, "deadline": "2025-12-31" } }
+
+9. ADD TO GOAL (deposit into a saving goal):
+{ "type": "add_to_goal", "data": { "goalId": 123, "amount": 500 } }
+
+10. DELETE GOAL (by id):
+{ "type": "delete_goal", "data": { "id": 123456 } }
+
+11. ADD DEBT (money you owe):
+{ "type": "add_debt_owe", "data": { "name": "Ahmad", "amount": 300, "date": "2025-01-15" } }
+
+12. ADD DEBT (money owed to you):
+{ "type": "add_debt_owed", "data": { "name": "Sara", "amount": 200, "date": "2025-01-15" } }
+
+13. NAVIGATE TO TAB:
+{ "type": "navigate", "data": { "tab": "home|wallets|finance|settings" } }
+
+14. SHOW SUMMARY (just answer, no action needed — omit the JSON block)
+
+IMPORTANT RULES:
+- Use EXACT ids from the data above when referencing existing items
+- For categoryId, use the exact ids from the categories list
+- For walletId, use the exact ids from the wallets list  
+- If the user asks to delete something, confirm the right item from the data and delete it
+- You can chain multiple actions (e.g., add a transaction AND navigate to home)
+- If you're not sure about an amount or name, ask for clarification
+- If no action is needed, just answer normally without any JSON block
+- The message field in your response is your reply text (shown to user) — keep it friendly and concise`;
+
         const reqBody = {
             systemInstruction: { parts: [{ text: sysPrompt }] },
             contents: [ ...chatHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })), { role: 'user', parts: [{ text }] } ]
@@ -903,14 +976,24 @@ async function sendChatMessage() {
         const data = await response.json();
         let botText = data.candidates[0].content.parts[0].text;
         document.getElementById(loadingId).remove();
-        const jsonMatch = botText.match(/`{3}json\s*([\s\S]*?)\s*`{3}/);
+
+        // Extract and execute action block
+        const jsonMatch = botText.match(/```json\s*([\s\S]*?)\s*```/);
         if (jsonMatch) {
             try {
-                const action = JSON.parse(jsonMatch[1]);
-                if (action.execute && action.transaction) { executeAITransaction(action.transaction); botText = action.message || 'تمت الإضافة ✅'; }
-            } catch(e) { botText = 'فهمت إنك عايز تسجل معاملة، بس في حاجة غلط. ممكن توضح تاني؟'; }
+                const parsed = JSON.parse(jsonMatch[1]);
+                const actions = parsed.actions || (parsed.type ? [parsed] : []);
+                // legacy support: single transaction action
+                if (!parsed.actions && parsed.execute && parsed.transaction) {
+                    executeAITransaction(parsed.transaction);
+                } else {
+                    for (const action of actions) {
+                        executeAIAction(action);
+                    }
+                }
+            } catch(e) { console.warn('AI action parse error', e); }
         }
-        botText = botText.replace(/`{3}json\s*([\s\S]*?)\s*`{3}/, '').trim();
+        botText = botText.replace(/```json[\s\S]*?```/, '').trim();
         chatContainer.innerHTML += `<div class="chat-bubble chat-bot">${botText.replace(/\n/g, '<br>')}</div>`;
         chatHistory.push({role: 'bot', text: botText});
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -926,12 +1009,118 @@ function executeAITransaction(txData) {
     const wallet = state.wallets.find(w => w.id === txData.walletId) || state.wallets[0];
     let catArray = state.categories[txData.type] || state.categories['expense'];
     const cat = catArray.find(c => c.id === txData.categoryId) || catArray[0];
-    const tx = { id: genId(), name: txData.name, categoryId: cat.id, type: txData.type, amount: txData.amount, walletId: wallet.id, date: nowWithTime(), note: 'Added via Smart Assistant' };
+    const tx = { id: genId(), name: txData.name, categoryId: cat.id, type: txData.type, amount: txData.amount, walletId: wallet.id, date: nowWithTime(), note: txData.note || 'Added via Smart Assistant' };
     state.transactions.unshift(tx);
     wallet.balance += txData.type === 'expense' ? -txData.amount : txData.amount;
     saveState();
-    if (ui.currentTab === 'home') { document.getElementById('main-content').innerHTML = renderHome(); initCharts(); }
-    else if (ui.currentTab === 'wallets') { document.getElementById('main-content').innerHTML = renderWallets(); }
+    aiRefreshUI();
+}
+
+function aiRefreshUI() {
+    const t = ui.currentTab;
+    if (t === 'home') { document.getElementById('main-content').innerHTML = renderHome(); initCharts(); }
+    else if (t === 'wallets') { document.getElementById('main-content').innerHTML = renderWallets(); }
+    else if (t === 'finance') { switchTab('finance'); }
+    else if (t === 'settings') { switchTab('settings'); }
+}
+
+function executeAIAction(action) {
+    const d = action.data || {};
+    try {
+        switch(action.type) {
+
+            case 'add_transaction': {
+                const wallet = state.wallets.find(w => w.id === d.walletId) || state.wallets[0];
+                let catArray = state.categories[d.type] || state.categories['expense'];
+                const cat = catArray.find(c => c.id === d.categoryId) || catArray[0];
+                const tx = { id: genId(), name: d.name, categoryId: cat.id, type: d.type || 'expense', amount: parseFloat(d.amount), walletId: wallet.id, date: nowWithTime(), note: d.note || 'Added via Smart Assistant' };
+                state.transactions.unshift(tx);
+                wallet.balance += tx.type === 'expense' ? -tx.amount : tx.amount;
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'delete_transaction': {
+                const tx = state.transactions.find(t => t.id === d.id);
+                if (tx) {
+                    const wallet = state.wallets.find(w => w.id === tx.walletId);
+                    if (wallet) wallet.balance -= tx.type === 'expense' ? -tx.amount : tx.amount;
+                    state.transactions = state.transactions.filter(t => t.id !== d.id);
+                    saveState(); aiRefreshUI();
+                }
+                break;
+            }
+
+            case 'transfer': {
+                const from = state.wallets.find(w => w.id === d.fromWalletId);
+                const to = state.wallets.find(w => w.id === d.toWalletId);
+                if (!from || !to) break;
+                const amt = parseFloat(d.amount);
+                const txOut = { id: genId(), name: `Transfer to ${to.name}`, categoryId: state.categories.expense[0]?.id || 'other', type: 'expense', amount: amt, walletId: from.id, date: nowWithTime(), note: d.note || 'AI Transfer', isTransfer: true, excludeFromTotals: true };
+                const txIn  = { id: genId(), name: `Transfer from ${from.name}`, categoryId: state.categories.income[0]?.id || 'other', type: 'income', amount: amt, walletId: to.id, date: nowWithTime(), note: d.note || 'AI Transfer', isTransfer: true, excludeFromTotals: true };
+                from.balance -= amt; to.balance += amt;
+                state.transactions.unshift(txOut, txIn);
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'add_wallet': {
+                const w = { id: genId(), name: d.name || 'New Wallet', balance: parseFloat(d.balance) || 0, currency: d.currency || state.currency.code, icon: d.icon || 'wallet', color: d.color || '#8b5cf6', excludeFromTotal: false };
+                state.wallets.push(w);
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'delete_wallet': {
+                if (state.wallets.length <= 1) { showToast("Can't delete last wallet", 'warn'); break; }
+                state.wallets = state.wallets.filter(w => w.id !== d.id);
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'add_budget': {
+                const existing = state.budgets.find(b => b.categoryId === d.categoryId);
+                if (existing) { existing.limit = parseFloat(d.limit); }
+                else { state.budgets.push({ id: genId(), categoryId: d.categoryId, limit: parseFloat(d.limit) }); }
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'delete_budget': {
+                state.budgets = state.budgets.filter(b => b.id !== d.id);
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'add_goal': {
+                state.goals.push({ id: genId(), name: d.name, target: parseFloat(d.target), saved: parseFloat(d.saved) || 0, deadline: d.deadline || '' });
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'add_to_goal': {
+                const goal = state.goals.find(g => g.id === d.goalId);
+                if (goal) { goal.saved = Math.min(goal.target, goal.saved + parseFloat(d.amount)); saveState(); aiRefreshUI(); }
+                break;
+            }
+
+            case 'delete_goal': {
+                state.goals = state.goals.filter(g => g.id !== d.id);
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'add_debt_owe': {
+                state.debts.oweTo.push({ id: genId(), name: d.name, amount: parseFloat(d.amount), date: d.date || today() });
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'add_debt_owed': {
+                state.debts.owedToMe.push({ id: genId(), name: d.name, amount: parseFloat(d.amount), date: d.date || today() });
+                saveState(); aiRefreshUI(); break;
+            }
+
+            case 'navigate': {
+                if (d.tab) switchTab(d.tab);
+                break;
+            }
+
+            default:
+                console.warn('Unknown AI action:', action.type);
+        }
+    } catch(e) { console.error('executeAIAction error', action.type, e); }
 }
 
 // ─── SEARCH ───────────────────────────────────────────────────────────
@@ -2527,22 +2716,8 @@ let tokenClient; let accessToken = null;
 function initGoogleDrive() {
     if (typeof google === 'undefined') return;
     tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GDRIVE_CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/drive.file profile email openid',
-        callback: async (tokenResponse) => {
-            if (tokenResponse && tokenResponse.access_token) {
-                accessToken = tokenResponse.access_token;
-                gdrive.connected = true;
-                // Fetch Google account info and sync to profile
-                await fetchGoogleUserInfo();
-                if (!gdrive.autoSyncEnabled) performFirstSync();
-                else {
-                    updateSyncButtonUI();
-                    if (typeof showToast === 'function') showToast('Auto-sync connected ✓');
-                    if (ui.currentTab === 'settings') switchTab('settings');
-                }
-            }
-        },
+        client_id: GDRIVE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file',
+        callback: (tokenResponse) => { if (tokenResponse && tokenResponse.access_token) { accessToken = tokenResponse.access_token; gdrive.connected = true; if (!gdrive.autoSyncEnabled) performFirstSync(); else { updateSyncButtonUI(); if(typeof showToast === 'function') showToast('Auto-sync connected ✓'); if(ui.currentTab === 'settings') switchTab('settings'); } } },
     });
     updateSyncButtonUI();
 }
@@ -2565,28 +2740,6 @@ async function saveToDrive() {
 }
 function setSyncingUI(isSyncing) { gdrive.syncing = isSyncing; const icon = document.getElementById('sync-icon'); if (icon) { if (isSyncing) { icon.classList.add('spin'); icon.style.color = 'var(--emerald)'; } else { icon.classList.remove('spin'); updateSyncButtonUI(); } } }
 function updateSyncButtonUI() { const icon = document.getElementById('sync-icon'); const btn = document.getElementById('top-sync-btn'); if (icon && btn) { if (gdrive.autoSyncEnabled && accessToken) { icon.style.color = 'var(--emerald)'; btn.style.borderColor = 'rgba(16,185,129,0.3)'; } else if (gdrive.autoSyncEnabled && !accessToken) { icon.style.color = '#f59e0b'; btn.style.borderColor = 'rgba(245,158,11,0.3)'; } else { icon.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--border)'; } } }
-
-async function fetchGoogleUserInfo() {
-    if (!accessToken) return;
-    try {
-        const resp = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        if (!resp.ok) return;
-        const info = await resp.json();
-        // Only overwrite fields that came back from Google
-        if (info.name)    state.user.name  = info.name;
-        if (info.email)   state.user.email = info.email;
-        if (info.picture) state.user.photo = info.picture;
-        originalSaveState();
-        // Refresh the header avatar and settings page if open
-        updateHeaderAvatar();
-        if (ui.currentTab === 'settings') switchTab('settings');
-        showToast(`Signed in as ${info.name || info.email} ✓`);
-    } catch(e) {
-        console.warn('Could not fetch Google user info:', e);
-    }
-}
 
 // ─── INIT ─────────────────────────────────────────────────────────────
 loadState();
