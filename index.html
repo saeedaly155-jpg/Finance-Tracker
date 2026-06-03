@@ -43,25 +43,40 @@
             --text: #1c1c1e;
             --muted: #8e8e93;
         }
+
+        /* App shell */
         body.light-mode .app { background: var(--surface); }
+        body.light-mode header { background: #ffffff; }
+
+        /* Nav bar */
         body.light-mode nav.glass { background: rgba(255,255,255,0.92) !important; border-color: rgba(0,0,0,0.1) !important; }
         body.light-mode .nav-icon-btn { color: #8e8e93; }
         body.light-mode .nav-icon-btn.nav-active { color: #10b981 !important; background: rgba(16,185,129,0.1); }
 
-        /* Bottom sheet popup */
+        /* ── Bottom Sheet Popup ── */
         body.light-mode #bottom-sheet {
             background: #ffffff !important;
             border-top-color: rgba(0,0,0,0.08) !important;
         }
-        body.light-mode #bottom-sheet .section-title { color: #8e8e93; }
-        body.light-mode #bottom-sheet h2,
-        body.light-mode #bottom-sheet h3,
-        body.light-mode #bottom-sheet p,
-        body.light-mode #bottom-sheet span,
-        body.light-mode #bottom-sheet label { color: var(--text); }
-        /* sheet drag handle */
-        body.light-mode #bottom-sheet > div:first-child { background: rgba(0,0,0,0.15) !important; }
+        /* drag handle */
+        body.light-mode #bottom-sheet > div:first-child > div { background: rgba(0,0,0,0.15) !important; }
+        /* All text inside the sheet */
+        body.light-mode #sheet-content,
+        body.light-mode #sheet-content * {
+            color: #1c1c1e;
+        }
+        /* Restore accent colors inside the sheet — these must come AFTER the wildcard above */
+        body.light-mode #sheet-content [style*="color:var(--emerald)"],
+        body.light-mode #sheet-content [style*="color: var(--emerald)"] { color: #10b981 !important; }
+        body.light-mode #sheet-content [style*="color:var(--rose)"],
+        body.light-mode #sheet-content [style*="color: var(--rose)"]    { color: #f43f5e !important; }
+        body.light-mode #sheet-content [style*="color:var(--amber)"],
+        body.light-mode #sheet-content [style*="color: var(--amber)"]   { color: #f59e0b !important; }
+        body.light-mode #sheet-content [style*="color:var(--muted)"],
+        body.light-mode #sheet-content [style*="color: var(--muted)"]   { color: #8e8e93 !important; }
+        body.light-mode #sheet-content .section-title { color: #8e8e93; }
 
+        /* Inputs */
         body.light-mode .input {
             background: #f2f2f7;
             color: #1c1c1e;
@@ -70,57 +85,29 @@
         body.light-mode .input::placeholder { color: #aaaaaa; }
         body.light-mode select.input option { background: #ffffff; color: #1c1c1e; }
 
-        body.light-mode .card {
-            background: #ffffff;
-            border-color: rgba(0,0,0,0.07);
-        }
-        body.light-mode .tx-row {
-            background: #ffffff;
-            border-color: rgba(0,0,0,0.07);
-        }
+        /* Cards & rows */
+        body.light-mode .card { background: #ffffff; border-color: rgba(0,0,0,0.07); }
+        body.light-mode .tx-row { background: #ffffff; border-color: rgba(0,0,0,0.07); }
         body.light-mode .tx-row:active { background: rgba(0,0,0,0.03); }
-
-        /* Icon boxes inside cards/sheets */
         body.light-mode .icon-box { background: rgba(0,0,0,0.05) !important; }
 
         /* Wallet card text */
-        body.light-mode .wcard-balance {
-            background: linear-gradient(135deg, #111 0%, #444 30%, #111 60%, #333 80%, #111 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        /* wcard-balance is always white — handled in base CSS with !important */
+        /* Wallet card classes always use white text — no light mode override needed */
+
+        /* Numbers — only reset the transparent gradient text fill from dark mode.
+           Do NOT override inline color styles (colored amounts stay emerald/rose). */
+        body.light-mode .syne {
+            /* reset the silver metallic gradient used in dark mode */
+            -webkit-text-fill-color: currentColor;
         }
-        body.light-mode .wcard-label { color: rgba(0,0,0,0.45); }
-        body.light-mode .wcard-name  { color: rgba(0,0,0,0.85); }
-        body.light-mode .wcard-sub   { color: rgba(0,0,0,0.4); }
 
-        /* Numbers – force readable color; override any inline color:var(--text) that falls through as transparent */
-        body.light-mode .syne { color: #1c1c1e !important; -webkit-text-fill-color: #1c1c1e !important; }
-        /* But let emerald/rose colored syne numbers stay their color */
-        body.light-mode .syne[style*="color:var(--emerald)"],
-        body.light-mode .syne[style*="color: var(--emerald)"] { color: #10b981 !important; -webkit-text-fill-color: #10b981 !important; }
-        body.light-mode .syne[style*="color:var(--rose)"],
-        body.light-mode .syne[style*="color: var(--rose)"]    { color: #f43f5e !important; -webkit-text-fill-color: #f43f5e !important; }
-
-        /* Section title text */
+        /* Section / misc */
         body.light-mode .section-title { color: #8e8e93; }
-
-        /* Progress bar track */
         body.light-mode .progress-bar { background: rgba(0,0,0,0.07); }
-
-        /* Tab pills inactive */
         body.light-mode .tab-pill { color: #8e8e93; }
-
-        /* Cat buttons */
         body.light-mode .cat-btn.selected { border-color: rgba(0,0,0,0.15); background: rgba(0,0,0,0.04); }
-
-        /* AI FAB */
         body.light-mode .ai-fab { background: #e8e8f0; }
-
-        /* Header */
-        body.light-mode header { background: #ffffff; }
-
-        /* Overlay stays dark */
         body.light-mode #overlay { background: rgba(0,0,0,0.5) !important; }
 
         * {
@@ -699,52 +686,50 @@
         }
 
         /* ── Wallet Card: clean minimal text ── */
+        /* Wallet card text — cards always have dark gradient backgrounds,
+           so text must always be white regardless of app theme */
         .wcard-label {
             font-family: var(--font-main);
             font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 0.08em;
+            font-weight: 600;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.55);
+            color: rgba(255, 255, 255, 0.65) !important;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.65) !important;
             margin-bottom: 3px;
         }
 
         .wcard-name {
             font-family: var(--font-main);
             font-size: 15px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95) !important;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.95) !important;
             letter-spacing: 0.01em;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
 
         .wcard-balance {
             font-family: 'Inter', 'Google Sans Flex', sans-serif;
             font-size: 30px;
-            font-weight: 700;
+            font-weight: 800;
             letter-spacing: -0.5px;
             line-height: 1.1;
             font-variant-numeric: tabular-nums;
-            /* silver-white high-contrast chrome metallic gradient */
-            background: linear-gradient(135deg,
-                    #ffffff 0%,
-                    #dcdcdc 20%,
-                    #8a8a8a 40%,
-                    #ffffff 45%,
-                    #aeaeae 50%,
-                    #ffffff 55%,
-                    #505050 70%,
-                    #b4b4b4 85%,
-                    #ffffff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            background: none !important;
+            -webkit-background-clip: unset !important;
+            background-clip: unset !important;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.5);
         }
 
         .wcard-sub {
             font-family: var(--font-main);
             font-size: 12px;
             font-weight: 400;
-            color: rgba(255, 255, 255, 0.55);
+            color: rgba(255, 255, 255, 0.55) !important;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.55) !important;
             margin-top: 3px;
         }
     </style>
@@ -787,7 +772,7 @@
         <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
 
         <button id="ai-fab" class="ai-fab" onclick="openAIChat()">
-            <i data-lucide="sparkles" style="width:16px;height:16px;color:#c4b5fd;flex-shrink:0;"></i>
+            <i data-lucide="sparkles" id="ai-fab-icon" style="width:16px;height:16px;color:#ffffff;flex-shrink:0;"></i>
         </button>
 
         <nav class="glass"
@@ -1207,6 +1192,69 @@
             return `${yyyymmdd}T${timeStr}`;
         };
 
+        // ─── SECURITY HELPERS ────────────────────────────────────────────────
+        // Escape HTML to prevent XSS when rendering user-supplied strings into innerHTML
+        function esc(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Sanitize a plain text string: strip all HTML tags, limit length
+        function sanitizeText(str, maxLen = 120) {
+            if (!str) return '';
+            return String(str).replace(/<[^>]*>/g, '').replace(/[<>"'`]/g, '').trim().slice(0, maxLen);
+        }
+
+        // Validate a number — returns a finite safe number or 0
+        function safeNum(val, min = 0, max = 999_999_999) {
+            const n = parseFloat(val);
+            if (!isFinite(n)) return 0;
+            return Math.max(min, Math.min(max, n));
+        }
+
+        // Validate a date string (YYYY-MM-DD or YYYY-MM-DDTHH:MM)
+        function safeDate(str) {
+            if (!str || typeof str !== 'string') return today();
+            const clean = str.replace(/[^0-9T:\-]/g, '').slice(0, 16);
+            const d = new Date(clean.length === 10 ? clean + 'T00:00:00' : clean);
+            if (isNaN(d.getTime())) return today();
+            // Reject dates more than 20 years away in either direction
+            const now = new Date();
+            if (Math.abs(d.getFullYear() - now.getFullYear()) > 20) return today();
+            return clean;
+        }
+
+        // Rate-limit wrapper for expensive operations
+        let _saveDebounce = null;
+        function saveState() {
+            clearTimeout(_saveDebounce);
+            _saveDebounce = setTimeout(() => {
+                try {
+                    const serialized = JSON.stringify(state);
+                    // Guard against saving corrupt/oversized state (>5MB)
+                    if (serialized.length > 5_000_000) {
+                        console.warn('State too large, trimming old transactions');
+                        state.transactions = state.transactions.slice(0, 500);
+                    }
+                    localStorage.setItem('velto_state_v4', JSON.stringify(state));
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        // Trim transactions and retry once
+                        try {
+                            state.transactions = state.transactions.slice(0, 200);
+                            localStorage.setItem('velto_state_v4', JSON.stringify(state));
+                            showToast('Storage full — older transactions trimmed', 'warn');
+                        } catch (_) { /* silently fail */ }
+                    }
+                }
+            }, 300);
+        }
+
         function convertCurrency(amount, fromCode, toCode) {
             if (fromCode === toCode || !liveRates[fromCode] || !liveRates[toCode]) return amount;
             const inUSD = amount / liveRates[fromCode];
@@ -1229,10 +1277,7 @@
             if (diff === 0) label = 'Today';
             else if (diff === 1) label = 'Yesterday';
             else label = d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-
-            if (tStr) {
-                return `${label} at ${tStr}`;
-            }
+            if (tStr) return `${label} at ${tStr}`;
             return label;
         }
 
@@ -1248,7 +1293,10 @@
             }, 0);
         }
 
-        function genId() { return Date.now() + Math.floor(Math.random() * 1000); }
+        // Collision-resistant ID: timestamp + 4-digit random
+        function genId() {
+            return Date.now() * 10000 + Math.floor(Math.random() * 10000);
+        }
 
         function destroyChart(key) {
             if (charts[key]) { try { charts[key].destroy(); } catch (e) { } charts[key] = null; }
@@ -1290,27 +1338,32 @@
             Object.keys(charts).forEach(k => destroyChart(k));
 
             setTimeout(() => {
-                const titles = {
-                    home: 'Dashboard',
-                    finance: 'Finance',
-                    wallets: 'Wallets',
-                    settings: 'Settings'
-                };
-                title.textContent = titles[tabId] || 'Dashboard';
+                try {
+                    const titles = {
+                        home: 'Dashboard',
+                        finance: 'Finance',
+                        wallets: 'Wallets',
+                        settings: 'Settings'
+                    };
+                    title.textContent = titles[tabId] || 'Dashboard';
 
-                const renders = {
-                    home: renderHome,
-                    finance: renderFinance,
-                    wallets: renderWallets,
-                    settings: renderSettings
-                };
+                    const renders = {
+                        home: renderHome,
+                        finance: renderFinance,
+                        wallets: renderWallets,
+                        settings: renderSettings
+                    };
 
-                // استخدام الـ render المناسب أو العودة للـ Home
-                main.innerHTML = (renders[tabId] || renderHome)();
+                    // استخدام الـ render المناسب أو العودة للـ Home
+                    main.innerHTML = (renders[tabId] || renderHome)();
 
-                lucide.createIcons();
-                if (tabId === 'home') initCharts();
-                updateHeaderAvatar();
+                    lucide.createIcons();
+                    if (tabId === 'home') initCharts();
+                    updateHeaderAvatar();
+                } catch (err) {
+                    console.error('Tab render error:', err);
+                    main.innerHTML = `<div style="padding:40px 20px;text-align:center;color:var(--muted);"><p style="font-size:14px;">Something went wrong. Tap to retry.</p><button onclick="switchTab('home')" style="margin-top:16px;padding:12px 24px;background:var(--emerald);color:#000;border-radius:14px;font-weight:700;font-size:14px;">Go to Dashboard</button></div>`;
+                }
                 main.style.opacity = '1';
             }, 160);
         }
@@ -2038,7 +2091,7 @@ IMPORTANT RULES:
             return `<div class="fade-up">
         <div style="margin-top:25px; margin-bottom:20px;position:relative;overflow:hidden;">
             <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;filter:blur(20px);"></div>
-            <h2 class="wcard-balance" style="font-size:60px;font-weight:800;">${fmt(total)}</h2>
+            <h2 class="syne" style="font-size:60px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1;">${fmt(total)}</h2>
             <p class="tag" style="margin-top:5px;margin-bottom:20px;color:var(--muted);">Total Balance ${Object.keys(liveRates).length > 0 ? '· Live rates' : ''} ${state.wallets.filter(w => w.excludeFromTotal).length ? `· <span style="color:#f59e0b;">${state.wallets.filter(w => w.excludeFromTotal).length} wallet${state.wallets.filter(w => w.excludeFromTotal).length > 1 ? 's' : ''} excluded</span>` : ''}</p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div style="background:rgba(16,185,129,0.08);border-radius:14px;padding:12px; margin-top:10px;">
@@ -2722,35 +2775,58 @@ IMPORTANT RULES:
             if (!name) return showToast('Enter a name'); const id = name.toLowerCase().replace(/\s+/g, '-') + '_' + genId(); state.categories[type].push({ id, name, icon, color }); saveState(); openTransactionForm();
         }
         function saveTransaction() {
-            const raw = (document.getElementById('tx-amount').value || '').trim();
-            const amount = evaluateAmount(raw);
-            if (isNaN(amount) || amount <= 0) return showToast('Enter a valid amount');
-            const name = document.getElementById('tx-name').value || getCat(ui.selectedCategoryId).name;
-            const dateInput = document.getElementById('tx-date').value || today();
-            let date = dateInput;
+            const raw = (document.getElementById('tx-amount')?.value || '').trim();
+            const amount = safeNum(evaluateAmount(raw), 0.01, 999_999_999);
+            if (!amount || amount <= 0) return showToast('Enter a valid amount', 'error');
+
+            const rawName = document.getElementById('tx-name')?.value || '';
+            const name = sanitizeText(rawName, 100) || sanitizeText(getCat(ui.selectedCategoryId).name, 60);
+
+            const dateInput = safeDate(document.getElementById('tx-date')?.value || today());
             const now = new Date();
             const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-            const note = document.getElementById('tx-note').value;
-            const excludeFromTotals = document.getElementById('tx-exclude').value === '1';
-            const wallet = state.wallets.find(w => w.id === ui.selectedWalletId); if (!wallet) return showToast('Select a wallet');
+
+            const rawNote = document.getElementById('tx-note')?.value || '';
+            const note = sanitizeText(rawNote, 300);
+
+            const excludeFromTotals = document.getElementById('tx-exclude')?.value === '1';
+
+            // Validate type
+            const txType = (ui.selectedType === 'income' || ui.selectedType === 'expense') ? ui.selectedType : 'expense';
+
+            // Validate category
+            const allCats = [...(state.categories.expense || []), ...(state.categories.income || [])];
+            const catExists = allCats.some(c => c.id === ui.selectedCategoryId);
+            if (!catExists) ui.selectedCategoryId = txType === 'income' ? (state.categories.income[0]?.id || 'other') : (state.categories.expense[0]?.id || 'other');
+
+            const wallet = state.wallets.find(w => w.id === ui.selectedWalletId);
+            if (!wallet) return showToast('Select a wallet', 'error');
+
+            let date = dateInput;
+
             if (ui.editingTransaction) {
                 const old = state.transactions.find(t => t.id === ui.editingTransaction);
                 if (old) {
                     const oldWallet = state.wallets.find(w => w.id === old.walletId);
                     if (oldWallet) oldWallet.balance -= old.type === 'expense' ? -old.amount : old.amount;
-                    if (old.date.startsWith(dateInput)) {
-                        date = old.date;
-                    } else {
-                        date = `${dateInput}T${timeStr}`;
-                    }
-                    old.name = name; old.amount = amount; old.type = ui.selectedType; old.categoryId = ui.selectedCategoryId; old.walletId = ui.selectedWalletId; old.date = date; old.note = note; old.excludeFromTotals = excludeFromTotals; wallet.balance += ui.selectedType === 'expense' ? -amount : amount;
+                    date = old.date.startsWith(dateInput) ? old.date : `${dateInput}T${timeStr}`;
+                    old.name = name; old.amount = amount; old.type = txType;
+                    old.categoryId = ui.selectedCategoryId; old.walletId = ui.selectedWalletId;
+                    old.date = date; old.note = note; old.excludeFromTotals = excludeFromTotals;
+                    wallet.balance += txType === 'expense' ? -amount : amount;
                 }
             } else {
                 date = `${dateInput}T${timeStr}`;
-                const tx = { id: genId(), name, categoryId: ui.selectedCategoryId, type: ui.selectedType, amount, walletId: ui.selectedWalletId, date, note, excludeFromTotals };
-                state.transactions.unshift(tx); wallet.balance += ui.selectedType === 'expense' ? -amount : amount;
+                const tx = {
+                    id: genId(), name, categoryId: ui.selectedCategoryId,
+                    type: txType, amount, walletId: ui.selectedWalletId,
+                    date, note, excludeFromTotals
+                };
+                state.transactions.unshift(tx);
+                wallet.balance += txType === 'expense' ? -amount : amount;
             }
-            saveState(); closeSheet(); switchTab('home'); showToast(ui.editingTransaction ? 'Updated!' : 'Added!');
+            saveState(); closeSheet(); switchTab('home');
+            showToast(ui.editingTransaction ? 'Updated!' : 'Added!');
         }
         function deleteTransaction(id) {
             const tx = state.transactions.find(t => t.id === id);
@@ -3331,14 +3407,29 @@ IMPORTANT RULES:
 
         function saveWallet(editId) {
             const id = editId ? parseInt(editId) : null;
-            const name = document.getElementById('w-name').value.trim(); const balance = parseFloat(document.getElementById('w-balance').value) || 0;
-            const icon = document.getElementById('w-icon').value; const color = document.getElementById('w-color').value; const currency = document.getElementById('w-currency').value;
-            const excludeFromTotal = document.getElementById('w-exclude').value === '1';
-            if (!name) return showToast('Enter wallet name');
+            const name = sanitizeText(document.getElementById('w-name')?.value || '', 60);
+            const balance = safeNum(document.getElementById('w-balance')?.value, -999_999_999, 999_999_999);
+            const rawIcon = document.getElementById('w-icon')?.value || 'wallet';
+            const icon = /^[a-z0-9\-]+$/.test(rawIcon) ? rawIcon : 'wallet'; // only allow lucide icon names
+            const rawColor = document.getElementById('w-color')?.value || '';
+            const color = /^(#[0-9a-fA-F]{3,8}|linear-gradient[^<>"']{0,300})$/.test(rawColor) ? rawColor : '#10b981';
+            const rawCurrency = (document.getElementById('w-currency')?.value || state.currency.code).toUpperCase();
+            const currency = /^[A-Z]{2,6}$/.test(rawCurrency) ? rawCurrency : state.currency.code;
+            const excludeFromTotal = document.getElementById('w-exclude')?.value === '1';
+            if (!name) return showToast('Enter wallet name', 'error');
             if (id) {
                 const w = state.wallets.find(x => x.id === id);
-                if (w) { const diff = balance - w.balance; if (diff !== 0) { const type = diff > 0 ? 'income' : 'expense'; state.transactions.unshift({ id: genId(), name: `Wallet Adjustment`, categoryId: 'other', type, amount: Math.abs(diff), walletId: w.id, date: nowWithTime(), note: 'Manual balance update' }); } w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.excludeFromTotal = excludeFromTotal; }
-            } else { state.wallets.push({ id: genId(), name, balance, icon, color, currency, excludeFromTotal }); }
+                if (w) {
+                    const diff = balance - w.balance;
+                    if (diff !== 0) {
+                        const type = diff > 0 ? 'income' : 'expense';
+                        state.transactions.unshift({ id: genId(), name: 'Wallet Adjustment', categoryId: 'other', type, amount: safeNum(Math.abs(diff)), walletId: w.id, date: nowWithTime(), note: 'Manual balance update' });
+                    }
+                    w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.excludeFromTotal = excludeFromTotal;
+                }
+            } else {
+                state.wallets.push({ id: genId(), name, balance, icon, color, currency, excludeFromTotal });
+            }
             saveState(); closeSheet(); switchTab('wallets'); showToast(id ? 'Wallet Updated!' : 'Wallet added!');
         }
         function deleteWallet(id) { if (state.wallets.length <= 1) return showToast("Can't delete last wallet"); state.wallets = state.wallets.filter(w => w.id !== id); saveState(); closeSheet(); switchTab('wallets'); showToast('Wallet removed'); }
@@ -3504,6 +3595,7 @@ IMPORTANT RULES:
         <div style="display:flex;flex-direction:column;gap:8px;">
             <div class="card" style="overflow:hidden;">
                 <button onclick="openProfileEdit()" style="width:100%;padding:16px;display:flex;align-items:center;gap:12px;text-align:left;border-bottom:1px solid var(--border);"><div style="width:36px;height:36px;border-radius:11px;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="user" style="width:16px;height:16px;color:var(--emerald);"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">Edit Profile</p><p style="font-size:11px;color:var(--muted);">Name, email</p></div><i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--muted);"></i></button>
+                <button onclick="openCategorySettings()" style="width:100%;padding:16px;display:flex;align-items:center;gap:12px;text-align:left;border-bottom:1px solid var(--border);"><div style="width:36px;height:36px;border-radius:11px;background:rgba(139,92,246,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="tag" style="width:16px;height:16px;color:#8b5cf6;"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">Categories</p><p style="font-size:11px;color:var(--muted);">Edit icons, colors & names</p></div><i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--muted);"></i></button>
                 <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;"><div style="display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:11px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;"><i data-lucide="dollar-sign" style="width:16px;height:16px;color:#3b82f6;"></i></div><div><p style="font-size:14px;font-weight:600;">Main Currency</p><p style="font-size:11px;color:var(--muted);">${state.currency.name || state.currency.code}</p></div></div><select onchange="setCurrency(this.value)" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:6px 10px;color:var(--text);font-size:12px;font-weight:700;outline:none;">${SUPPORTED_CURRENCIES.map(c => `<option value="${c.code}" ${state.currency.code === c.code ? 'selected' : ''}>${c.code} ${c.symbol}</option>`).join('')}</select></div>
             </div>
             <div class="card" style="overflow:hidden;">
@@ -3586,6 +3678,254 @@ IMPORTANT RULES:
         function importDataPrompt() { const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = e => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = evt => { try { const parsed = JSON.parse(evt.target.result); if (parsed.wallets && parsed.transactions) { state = parsed; saveState(); switchTab('home'); showToast('Data imported!'); } else showToast('Invalid file'); } catch { showToast('Failed to parse'); } }; reader.readAsText(file); }; input.click(); }
         function confirmReset() { document.getElementById('sheet-content').innerHTML = `<div style="text-align:center;padding:10px 0;"><div style="width:60px;height:60px;border-radius:20px;background:rgba(244,63,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i data-lucide="alert-triangle" style="width:28px;height:28px;color:var(--rose);"></i></div><h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:8px;">Reset Everything?</h2><p style="font-size:13px;color:var(--muted);margin-bottom:24px;">This will permanently delete all your data.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="closeSheet()" style="padding:14px;border-radius:16px;background:var(--surface2);color:var(--text);font-weight:700;">Cancel</button><button onclick="resetData()" style="padding:14px;border-radius:16px;background:var(--rose);color:#fff;font-weight:700;">Reset</button></div></div>`; openSheet(); lucide.createIcons(); }
         function resetData() { state = JSON.parse(JSON.stringify(DEFAULT_STATE)); saveState(); closeSheet(); switchTab('home'); showToast('Data reset'); }
+
+        // ─── CATEGORY SETTINGS ────────────────────────────────────────────────
+        const CAT_ICONS = [
+            'shopping-cart','coffee','heart','zap','music','book','globe','home','star',
+            'truck','scissors','camera','film','gift','pizza','dumbbell','briefcase','phone',
+            'sun','moon','piggy-bank','utensils','bus','train','car','plane','bike','baby',
+            'cross','pill','stethoscope','graduation-cap','building','tv','monitor','wifi',
+            'bolt','flame','droplets','leaf','tree-pine','dog','cat','shirt','watch',
+            'gem','crown','package','box','wrench','hammer','paint-bucket','pencil','receipt',
+            'banknote','coins','credit-card','wallet','trending-up','bar-chart-2','percent',
+            'tag','layers','grid-2x2','circle','triangle','square','diamond'
+        ];
+
+        function openCategorySettings() {
+            ui.catSettingsType = ui.catSettingsType || 'expense';
+            renderCategorySettingsSheet();
+            openSheet();
+        }
+
+        function renderCategorySettingsSheet() {
+            const type = ui.catSettingsType || 'expense';
+            const cats = state.categories[type] || [];
+            const sheet = document.getElementById('sheet-content');
+            sheet.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                    <h2 class="syne" style="font-size:20px;font-weight:800;">Categories</h2>
+                    <button onclick="openAddCategoryFromSettings()" style="width:36px;height:36px;border-radius:11px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);display:flex;align-items:center;justify-content:center;">
+                        <i data-lucide="plus" style="width:16px;height:16px;color:#8b5cf6;"></i>
+                    </button>
+                </div>
+                <!-- Type toggle -->
+                <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;gap:4px;margin-bottom:20px;">
+                    <button onclick="ui.catSettingsType='expense';renderCategorySettingsSheet();lucide.createIcons();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='expense'?'background:var(--rose);color:#fff;':'color:var(--muted);'}">Expense</button>
+                    <button onclick="ui.catSettingsType='income';renderCategorySettingsSheet();lucide.createIcons();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='income'?'background:var(--emerald);color:#000;':'color:var(--muted);'}">Income</button>
+                </div>
+                <!-- Category list -->
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    ${cats.map((cat, idx) => `
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:16px;">
+                        <div style="width:42px;height:42px;border-radius:13px;background:${cat.color}22;border:1.5px solid ${cat.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <p style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(cat.name)}</p>
+                            <p style="font-size:10px;color:var(--muted);margin-top:1px;">${cat.id}</p>
+                        </div>
+                        <button onclick="openEditCategory('${type}','${cat.id}')" style="width:34px;height:34px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i data-lucide="pencil" style="width:14px;height:14px;color:#8b5cf6;"></i>
+                        </button>
+                    </div>`).join('')}
+                    ${cats.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px 0;font-size:13px;">No categories yet</p>' : ''}
+                </div>`;
+            lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
+        }
+
+        function openEditCategory(type, catId) {
+            const cat = (state.categories[type] || []).find(c => c.id === catId);
+            if (!cat) return;
+            ui.editingCatType = type;
+            ui.editingCatId = catId;
+            const isDefault = DEFAULT_STATE.categories[type]?.some(c => c.id === catId);
+            const sheet = document.getElementById('sheet-content');
+            sheet.innerHTML = `
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+                    <button onclick="renderCategorySettingsSheet();lucide.createIcons();" style="width:36px;height:36px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
+                        <i data-lucide="arrow-left" style="width:16px;height:16px;color:var(--text);"></i>
+                    </button>
+                    <h2 class="syne" style="font-size:20px;font-weight:800;">Edit Category</h2>
+                </div>
+
+                <!-- Live preview -->
+                <div style="display:flex;justify-content:center;margin-bottom:24px;">
+                    <div id="cat-preview" style="width:64px;height:64px;border-radius:20px;background:${cat.color}22;border:2px solid ${cat.color}55;display:flex;align-items:center;justify-content:center;">
+                        <i data-lucide="${cat.icon}" id="cat-preview-icon" style="width:28px;height:28px;color:${cat.color};"></i>
+                    </div>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <!-- Name -->
+                    <div>
+                        <p class="section-title" style="margin-bottom:8px;">Name</p>
+                        <input type="text" id="cat-name" class="input" value="${esc(cat.name)}" maxlength="40" placeholder="Category name">
+                    </div>
+
+                    <!-- Color -->
+                    <div>
+                        <p class="section-title" style="margin-bottom:8px;">Color</p>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <input type="color" id="cat-color" value="${cat.color}" oninput="updateCatPreview()" style="width:52px;height:52px;border-radius:14px;border:1px solid var(--border);background:var(--bg);cursor:pointer;padding:4px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                                ${['#10b981','#f43f5e','#3b82f6','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#ef4444'].map(c =>
+                                    `<button onclick="document.getElementById('cat-color').value='${c}';updateCatPreview()" style="width:28px;height:28px;border-radius:8px;background:${c};border:2px solid ${c === cat.color ? '#fff' : 'transparent'};transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Icon picker -->
+                    <div>
+                        <p class="section-title" style="margin-bottom:8px;">Icon</p>
+                        <div style="display:flex;flex-wrap:wrap;gap:7px;max-height:200px;overflow-y:auto;padding:2px;" class="scroll-hide">
+                            ${CAT_ICONS.map(i => `
+                            <button id="icon-opt-${i}" onclick="selectCatIcon('${i}')" style="width:40px;height:40px;border-radius:12px;background:${cat.icon===i?'rgba(139,92,246,0.15)':'var(--bg)'};border:1.5px solid ${cat.icon===i?'#8b5cf6':'var(--border)'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                                <i data-lucide="${i}" style="width:16px;height:16px;color:${cat.icon===i?'#8b5cf6':'var(--muted)'};pointer-events:none;"></i>
+                            </button>`).join('')}
+                        </div>
+                        <input type="hidden" id="cat-icon" value="${cat.icon}">
+                    </div>
+
+                    <div style="display:${isDefault?'grid':'grid'};grid-template-columns:${isDefault?'1fr':'1fr 1fr'};gap:10px;margin-top:6px;">
+                        ${!isDefault ? `<button onclick="confirmDeleteCategory('${type}','${catId}')" style="padding:14px;border-radius:16px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);color:var(--rose);font-weight:700;font-size:14px;">Delete</button>` : ''}
+                        <button onclick="saveEditCategory()" style="padding:14px;border-radius:16px;background:#8b5cf6;color:#fff;font-weight:700;font-size:14px;${isDefault?'':''}">Save</button>
+                    </div>
+                    ${isDefault ? `<p style="text-align:center;font-size:11px;color:var(--muted);">Default categories can be edited but not deleted</p>` : ''}
+                </div>`;
+            lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
+        }
+
+        function selectCatIcon(icon) {
+            document.getElementById('cat-icon').value = icon;
+            document.querySelectorAll('[id^="icon-opt-"]').forEach(btn => {
+                const isSelected = btn.id === `icon-opt-${icon}`;
+                btn.style.background = isSelected ? 'rgba(139,92,246,0.15)' : 'var(--bg)';
+                btn.style.borderColor = isSelected ? '#8b5cf6' : 'var(--border)';
+                const ico = btn.querySelector('i');
+                if (ico) ico.style.color = isSelected ? '#8b5cf6' : 'var(--muted)';
+            });
+            updateCatPreview();
+        }
+
+        function updateCatPreview() {
+            const color = document.getElementById('cat-color')?.value || '#10b981';
+            const icon = document.getElementById('cat-icon')?.value || 'tag';
+            const preview = document.getElementById('cat-preview');
+            const previewIcon = document.getElementById('cat-preview-icon');
+            if (preview) { preview.style.background = color + '22'; preview.style.borderColor = color + '55'; }
+            if (previewIcon) { previewIcon.style.color = color; previewIcon.setAttribute('data-lucide', icon); lucide.createIcons({ nodes: [previewIcon] }); }
+        }
+
+        function saveEditCategory() {
+            const type = ui.editingCatType;
+            const catId = ui.editingCatId;
+            const name = sanitizeText(document.getElementById('cat-name')?.value || '', 40);
+            const rawColor = document.getElementById('cat-color')?.value || '#10b981';
+            const color = /^#[0-9a-fA-F]{3,8}$/.test(rawColor) ? rawColor : '#10b981';
+            const rawIcon = document.getElementById('cat-icon')?.value || 'tag';
+            const icon = /^[a-z0-9\-]+$/.test(rawIcon) ? rawIcon : 'tag';
+            if (!name) return showToast('Enter a category name', 'error');
+            const cat = (state.categories[type] || []).find(c => c.id === catId);
+            if (!cat) return;
+            cat.name = name; cat.color = color; cat.icon = icon;
+            saveState();
+            showToast('Category updated!');
+            renderCategorySettingsSheet();
+            lucide.createIcons();
+        }
+
+        function confirmDeleteCategory(type, catId) {
+            const cat = (state.categories[type] || []).find(c => c.id === catId);
+            if (!cat) return;
+            const sheet = document.getElementById('sheet-content');
+            sheet.innerHTML = `
+                <div style="text-align:center;padding:10px 0;">
+                    <div style="width:60px;height:60px;border-radius:20px;background:rgba(244,63,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                        <i data-lucide="trash-2" style="width:28px;height:28px;color:var(--rose);"></i>
+                    </div>
+                    <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:8px;">Delete "${esc(cat.name)}"?</h2>
+                    <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">Transactions using this category will show as "Other".</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <button onclick="openEditCategory('${type}','${catId}')" style="padding:14px;border-radius:16px;background:var(--surface2);color:var(--text);font-weight:700;">Cancel</button>
+                        <button onclick="deleteCategoryConfirmed('${type}','${catId}')" style="padding:14px;border-radius:16px;background:var(--rose);color:#fff;font-weight:700;">Delete</button>
+                    </div>
+                </div>`;
+            lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
+        }
+
+        function deleteCategoryConfirmed(type, catId) {
+            state.categories[type] = (state.categories[type] || []).filter(c => c.id !== catId);
+            saveState();
+            showToast('Category deleted');
+            renderCategorySettingsSheet();
+            lucide.createIcons();
+        }
+
+        function openAddCategoryFromSettings() {
+            const type = ui.catSettingsType || 'expense';
+            const sheet = document.getElementById('sheet-content');
+            sheet.innerHTML = `
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+                    <button onclick="renderCategorySettingsSheet();lucide.createIcons();" style="width:36px;height:36px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
+                        <i data-lucide="arrow-left" style="width:16px;height:16px;color:var(--text);"></i>
+                    </button>
+                    <h2 class="syne" style="font-size:20px;font-weight:800;">New Category</h2>
+                </div>
+                <!-- Live preview -->
+                <div style="display:flex;justify-content:center;margin-bottom:24px;">
+                    <div id="cat-preview" style="width:64px;height:64px;border-radius:20px;background:#8b5cf622;border:2px solid #8b5cf655;display:flex;align-items:center;justify-content:center;">
+                        <i data-lucide="tag" id="cat-preview-icon" style="width:28px;height:28px;color:#8b5cf6;"></i>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                    <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;gap:4px;">
+                        <button onclick="ui.catSettingsType='expense';openAddCategoryFromSettings();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;${type==='expense'?'background:var(--rose);color:#fff;':'color:var(--muted);'}">Expense</button>
+                        <button onclick="ui.catSettingsType='income';openAddCategoryFromSettings();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;${type==='income'?'background:var(--emerald);color:#000;':'color:var(--muted);'}">Income</button>
+                    </div>
+                    <div><p class="section-title" style="margin-bottom:8px;">Name</p><input type="text" id="cat-name" class="input" placeholder="Category name" maxlength="40"></div>
+                    <div>
+                        <p class="section-title" style="margin-bottom:8px;">Color</p>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <input type="color" id="cat-color" value="#8b5cf6" oninput="updateCatPreview()" style="width:52px;height:52px;border-radius:14px;border:1px solid var(--border);background:var(--bg);cursor:pointer;padding:4px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                                ${['#10b981','#f43f5e','#3b82f6','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#ef4444'].map(c =>
+                                    `<button onclick="document.getElementById('cat-color').value='${c}';updateCatPreview()" style="width:28px;height:28px;border-radius:8px;background:${c};border:2px solid transparent;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="section-title" style="margin-bottom:8px;">Icon</p>
+                        <div style="display:flex;flex-wrap:wrap;gap:7px;max-height:200px;overflow-y:auto;padding:2px;" class="scroll-hide">
+                            ${CAT_ICONS.map((i, idx) => `
+                            <button id="icon-opt-${i}" onclick="selectCatIcon('${i}')" style="width:40px;height:40px;border-radius:12px;background:${idx===0?'rgba(139,92,246,0.15)':'var(--bg)'};border:1.5px solid ${idx===0?'#8b5cf6':'var(--border)'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
+                                <i data-lucide="${i}" style="width:16px;height:16px;color:${idx===0?'#8b5cf6':'var(--muted)'};pointer-events:none;"></i>
+                            </button>`).join('')}
+                        </div>
+                        <input type="hidden" id="cat-icon" value="${CAT_ICONS[0]}">
+                    </div>
+                    <button onclick="saveNewCategoryFromSettings()" style="padding:14px;border-radius:16px;background:#8b5cf6;color:#fff;font-weight:700;font-size:14px;margin-top:6px;">Add Category</button>
+                </div>`;
+            lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
+        }
+
+        function saveNewCategoryFromSettings() {
+            const type = ui.catSettingsType || 'expense';
+            const name = sanitizeText(document.getElementById('cat-name')?.value || '', 40);
+            const rawColor = document.getElementById('cat-color')?.value || '#8b5cf6';
+            const color = /^#[0-9a-fA-F]{3,8}$/.test(rawColor) ? rawColor : '#8b5cf6';
+            const rawIcon = document.getElementById('cat-icon')?.value || 'tag';
+            const icon = /^[a-z0-9\-]+$/.test(rawIcon) ? rawIcon : 'tag';
+            if (!name) return showToast('Enter a category name', 'error');
+            const id = 'cat_' + Date.now();
+            state.categories[type] = state.categories[type] || [];
+            state.categories[type].push({ id, name, icon, color });
+            saveState();
+            showToast('Category added!');
+            renderCategorySettingsSheet();
+            lucide.createIcons();
+        }
 
         // ─── SHEET & TOAST ────────────────────────────────────────────────────
         function openSheet() { document.getElementById('bottom-sheet').classList.add('open'); document.getElementById('overlay').style.opacity = '1'; document.getElementById('overlay').style.pointerEvents = 'auto'; lucide.createIcons(); }
@@ -3880,6 +4220,9 @@ IMPORTANT RULES:
             const icon = document.getElementById('theme-icon');
             if (icon) icon.setAttribute('data-lucide', isLight ? 'moon' : 'sun');
             lucide.createIcons({ nodes: document.querySelectorAll('#theme-icon') });
+            // AI fab icon: dark blue in dark mode, muted purple in light mode
+            const fabIcon = document.getElementById('ai-fab-icon');
+            if (fabIcon) fabIcon.style.color = isLight ? '#1e3a5f' : '#ffffff';
             showToast(isLight ? '☀️ Light Mode' : '🌙 Dark Mode');
         }
 
@@ -3890,6 +4233,8 @@ IMPORTANT RULES:
                 setTimeout(() => {
                     const icon = document.getElementById('theme-icon');
                     if (icon) { icon.setAttribute('data-lucide', 'moon'); lucide.createIcons({ nodes: [icon] }); }
+                    const fabIcon = document.getElementById('ai-fab-icon');
+                    if (fabIcon) fabIcon.style.color = '#1e3a5f';
                 }, 200);
             }
         }
@@ -4005,6 +4350,17 @@ IMPORTANT RULES:
             currentDragY = 0;
         });
 
+    </script>
+    <script>
+        // ─── GLOBAL ERROR BOUNDARY ────────────────────────────────────────────
+        window.addEventListener('error', function(e) {
+            console.error('Uncaught error:', e.message, e.filename, e.lineno);
+            // Don't show UI toast for script load errors (CDN failures etc.)
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            console.warn('Unhandled promise rejection:', e.reason);
+            e.preventDefault(); // suppress console noise for network failures
+        });
     </script>
 </body>
 
