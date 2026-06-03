@@ -3681,56 +3681,128 @@ IMPORTANT RULES:
 
         // ─── CATEGORY SETTINGS ────────────────────────────────────────────────
         const CAT_ICONS = [
-            'shopping-cart','coffee','heart','zap','music','book','globe','home','star',
-            'truck','scissors','camera','film','gift','pizza','dumbbell','briefcase','phone',
-            'sun','moon','piggy-bank','utensils','bus','train','car','plane','bike','baby',
-            'cross','pill','stethoscope','graduation-cap','building','tv','monitor','wifi',
-            'bolt','flame','droplets','leaf','tree-pine','dog','cat','shirt','watch',
-            'gem','crown','package','box','wrench','hammer','paint-bucket','pencil','receipt',
-            'banknote','coins','credit-card','wallet','trending-up','bar-chart-2','percent',
-            'tag','layers','grid-2x2','circle','triangle','square','diamond'
+            // Food & Drink
+            'utensils','coffee','pizza','beef','cake','wine','beer','milk','sandwich','salad',
+            // Transport
+            'car','bus','train','plane','bike','truck','ship','fuel','map-pin','navigation',
+            // Shopping
+            'shopping-cart','shopping-bag','gift','package','tag','gem','crown','shirt','watch','scissors',
+            // Home & Bills
+            'home','building','wifi','zap','flame','droplets','tv','monitor','phone','wrench',
+            // Health
+            'heart','pill','stethoscope','cross','activity','thermometer','dumbbell','apple',
+            // Entertainment
+            'music','film','camera','headphones','gamepad-2','book','graduation-cap','star','sun','moon',
+            // Finance
+            'banknote','coins','credit-card','wallet','trending-up','bar-chart-2','percent','piggy-bank','receipt','briefcase',
+            // Nature & Travel
+            'globe','tree-pine','leaf','dog','cat','baby','plane','map','compass','mountain',
+            // Misc
+            'bolt','hammer','paint-bucket','pencil','layers','grid-2x2','circle','triangle','square','box'
+        ];
+
+        const CAT_ICON_GROUPS = [
+            { label: 'Food & Drink', icons: ['utensils','coffee','pizza','beef','cake','wine','beer','milk','sandwich','salad'] },
+            { label: 'Transport', icons: ['car','bus','train','plane','bike','truck','ship','fuel','map-pin','navigation'] },
+            { label: 'Shopping', icons: ['shopping-cart','shopping-bag','gift','package','tag','gem','crown','shirt','watch','scissors'] },
+            { label: 'Home & Bills', icons: ['home','building','wifi','zap','flame','droplets','tv','monitor','phone','wrench'] },
+            { label: 'Health', icons: ['heart','pill','stethoscope','cross','activity','thermometer','dumbbell','apple'] },
+            { label: 'Entertainment', icons: ['music','film','camera','headphones','book','graduation-cap','star','sun','moon','gamepad-2'] },
+            { label: 'Finance', icons: ['banknote','coins','credit-card','wallet','trending-up','bar-chart-2','percent','piggy-bank','receipt','briefcase'] },
+            { label: 'Misc', icons: ['bolt','hammer','paint-bucket','pencil','layers','circle','globe','tree-pine','dog','box'] },
+        ];
+
+        const PRESET_COLORS = [
+            '#10b981','#f43f5e','#3b82f6','#f59e0b','#8b5cf6',
+            '#ec4899','#06b6d4','#84cc16','#f97316','#6366f1',
+            '#14b8a6','#ef4444','#a855f7','#0ea5e9','#22c55e',
+            '#fb923c','#e879f9','#38bdf8','#4ade80','#facc15'
         ];
 
         function openCategorySettings() {
             ui.catSettingsType = ui.catSettingsType || 'expense';
+            ui.catSearchQuery = '';
             renderCategorySettingsSheet();
             openSheet();
         }
 
         function renderCategorySettingsSheet() {
             const type = ui.catSettingsType || 'expense';
-            const cats = state.categories[type] || [];
+            const query = (ui.catSearchQuery || '').toLowerCase();
+            const cats = (state.categories[type] || []).filter(c =>
+                !query || c.name.toLowerCase().includes(query)
+            );
             const sheet = document.getElementById('sheet-content');
             sheet.innerHTML = `
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+                <!-- Header -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
                     <h2 class="syne" style="font-size:20px;font-weight:800;">Categories</h2>
-                    <button onclick="openAddCategoryFromSettings()" style="width:36px;height:36px;border-radius:11px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);display:flex;align-items:center;justify-content:center;">
-                        <i data-lucide="plus" style="width:16px;height:16px;color:#8b5cf6;"></i>
+                    <button onclick="openAddCategoryFromSettings()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:12px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);color:#8b5cf6;font-size:12px;font-weight:700;">
+                        <i data-lucide="plus" style="width:14px;height:14px;"></i> Add
                     </button>
                 </div>
+
                 <!-- Type toggle -->
-                <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;gap:4px;margin-bottom:20px;">
-                    <button onclick="ui.catSettingsType='expense';renderCategorySettingsSheet();lucide.createIcons();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='expense'?'background:var(--rose);color:#fff;':'color:var(--muted);'}">Expense</button>
-                    <button onclick="ui.catSettingsType='income';renderCategorySettingsSheet();lucide.createIcons();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='income'?'background:var(--emerald);color:#000;':'color:var(--muted);'}">Income</button>
+                <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;gap:4px;margin-bottom:14px;">
+                    <button onclick="ui.catSettingsType='expense';ui.catSearchQuery='';renderCategorySettingsSheet();lucide.createIcons();"
+                        style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='expense'?'background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(244,63,94,0.3);':'color:var(--muted);'}">
+                        💸 Expense (${(state.categories.expense||[]).length})
+                    </button>
+                    <button onclick="ui.catSettingsType='income';ui.catSearchQuery='';renderCategorySettingsSheet();lucide.createIcons();"
+                        style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='income'?'background:var(--emerald);color:#000;box-shadow:0 4px 12px rgba(16,185,129,0.3);':'color:var(--muted);'}">
+                        💰 Income (${(state.categories.income||[]).length})
+                    </button>
                 </div>
-                <!-- Category list -->
+
+                <!-- Search -->
+                <div style="position:relative;margin-bottom:16px;">
+                    <i data-lucide="search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none;"></i>
+                    <input type="text" id="cat-search" class="input" placeholder="Search categories…"
+                        value="${esc(ui.catSearchQuery || '')}"
+                        oninput="ui.catSearchQuery=this.value;renderCategorySettingsSheet();lucide.createIcons();"
+                        style="padding-left:36px;font-size:13px;">
+                </div>
+
+                <!-- Category grid -->
                 <div style="display:flex;flex-direction:column;gap:8px;">
-                    ${cats.map((cat, idx) => `
-                    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:16px;">
-                        <div style="width:42px;height:42px;border-radius:13px;background:${cat.color}22;border:1.5px solid ${cat.color}44;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i>
-                        </div>
-                        <div style="flex:1;min-width:0;">
-                            <p style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(cat.name)}</p>
-                            <p style="font-size:10px;color:var(--muted);margin-top:1px;">${cat.id}</p>
-                        </div>
-                        <button onclick="openEditCategory('${type}','${cat.id}')" style="width:34px;height:34px;border-radius:10px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i data-lucide="pencil" style="width:14px;height:14px;color:#8b5cf6;"></i>
-                        </button>
-                    </div>`).join('')}
-                    ${cats.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px 0;font-size:13px;">No categories yet</p>' : ''}
+                    ${cats.length === 0 ? `
+                        <div style="text-align:center;padding:40px 20px;">
+                            <div style="width:52px;height:52px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+                                <i data-lucide="search-x" style="width:22px;height:22px;color:var(--muted);"></i>
+                            </div>
+                            <p style="font-size:13px;color:var(--muted);">No categories found</p>
+                        </div>` :
+                    cats.map(cat => {
+                        const usageCount = state.transactions.filter(t => t.categoryId === cat.id).length;
+                        const isDefault = DEFAULT_STATE.categories[type]?.some(c => c.id === cat.id);
+                        return `
+                        <div style="display:flex;align-items:center;gap:12px;padding:13px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:16px;transition:opacity 0.15s;">
+                            <!-- Icon -->
+                            <div style="width:46px;height:46px;border-radius:14px;background:${cat.color}20;border:1.5px solid ${cat.color}40;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i data-lucide="${cat.icon}" style="width:20px;height:20px;color:${cat.color};"></i>
+                            </div>
+                            <!-- Info -->
+                            <div style="flex:1;min-width:0;">
+                                <p style="font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(cat.name)}</p>
+                                <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:${cat.color};flex-shrink:0;"></div>
+                                    <p style="font-size:10px;color:var(--muted);">${usageCount} transaction${usageCount !== 1 ? 's' : ''}${isDefault ? ' · default' : ''}</p>
+                                </div>
+                            </div>
+                            <!-- Edit btn -->
+                            <button onclick="openEditCategory('${type}','${cat.id}')"
+                                style="width:36px;height:36px;border-radius:11px;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i data-lucide="pencil" style="width:14px;height:14px;color:#8b5cf6;"></i>
+                            </button>
+                        </div>`;
+                    }).join('')}
                 </div>`;
             lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
+            // Restore focus in search
+            if (ui.catSearchQuery) {
+                const searchEl = sheet.querySelector('#cat-search');
+                if (searchEl) { searchEl.focus(); searchEl.setSelectionRange(9999, 9999); }
+            }
         }
 
         function openEditCategory(type, catId) {
@@ -3738,99 +3810,189 @@ IMPORTANT RULES:
             if (!cat) return;
             ui.editingCatType = type;
             ui.editingCatId = catId;
+            ui._editCatIcon = cat.icon;
+            ui._editCatColor = cat.color;
             const isDefault = DEFAULT_STATE.categories[type]?.some(c => c.id === catId);
+            _renderCatEditForm({ cat, type, catId, isDefault, isNew: false });
+        }
+
+        function openAddCategoryFromSettings() {
+            const type = ui.catSettingsType || 'expense';
+            ui.editingCatType = type;
+            ui.editingCatId = null;
+            ui._editCatIcon = CAT_ICONS[0];
+            ui._editCatColor = '#8b5cf6';
+            _renderCatEditForm({ cat: { name: '', icon: CAT_ICONS[0], color: '#8b5cf6' }, type, catId: null, isDefault: false, isNew: true });
+        }
+
+        function _renderCatEditForm({ cat, type, catId, isDefault, isNew }) {
             const sheet = document.getElementById('sheet-content');
+            const color = ui._editCatColor;
+            const icon = ui._editCatIcon;
             sheet.innerHTML = `
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-                    <button onclick="renderCategorySettingsSheet();lucide.createIcons();" style="width:36px;height:36px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
+                <!-- Back + title -->
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+                    <button onclick="renderCategorySettingsSheet();lucide.createIcons();"
+                        style="width:36px;height:36px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                         <i data-lucide="arrow-left" style="width:16px;height:16px;color:var(--text);"></i>
                     </button>
-                    <h2 class="syne" style="font-size:20px;font-weight:800;">Edit Category</h2>
+                    <h2 class="syne" style="font-size:20px;font-weight:800;">${isNew ? 'New Category' : 'Edit Category'}</h2>
                 </div>
 
-                <!-- Live preview -->
+                <!-- Live preview card -->
                 <div style="display:flex;justify-content:center;margin-bottom:24px;">
-                    <div id="cat-preview" style="width:64px;height:64px;border-radius:20px;background:${cat.color}22;border:2px solid ${cat.color}55;display:flex;align-items:center;justify-content:center;">
-                        <i data-lucide="${cat.icon}" id="cat-preview-icon" style="width:28px;height:28px;color:${cat.color};"></i>
+                    <div id="cat-preview" style="width:80px;height:80px;border-radius:24px;background:${color}20;border:2px solid ${color}50;display:flex;align-items:center;justify-content:center;transition:all 0.2s;box-shadow:0 8px 24px ${color}30;">
+                        <i data-lucide="${icon}" id="cat-preview-icon" style="width:34px;height:34px;color:${color};"></i>
                     </div>
                 </div>
 
-                <div style="display:flex;flex-direction:column;gap:16px;">
+                <div style="display:flex;flex-direction:column;gap:18px;">
                     <!-- Name -->
                     <div>
-                        <p class="section-title" style="margin-bottom:8px;">Name</p>
-                        <input type="text" id="cat-name" class="input" value="${esc(cat.name)}" maxlength="40" placeholder="Category name">
+                        <p class="section-title" style="margin-bottom:8px;">Category Name</p>
+                        <input type="text" id="cat-name" class="input" value="${esc(cat.name)}" maxlength="40" placeholder="e.g. Groceries">
                     </div>
+
+                    ${isNew ? `
+                    <!-- Type (only for new) -->
+                    <div>
+                        <p class="section-title" style="margin-bottom:8px;">Type</p>
+                        <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:3px;gap:3px;">
+                            <button onclick="ui.catSettingsType='expense';ui.editingCatType='expense';openAddCategoryFromSettings();" style="flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='expense'?'background:var(--rose);color:#fff;':'color:var(--muted);'}">Expense</button>
+                            <button onclick="ui.catSettingsType='income';ui.editingCatType='income';openAddCategoryFromSettings();" style="flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='income'?'background:var(--emerald);color:#000;':'color:var(--muted);'}">Income</button>
+                        </div>
+                    </div>` : ''}
 
                     <!-- Color -->
                     <div>
-                        <p class="section-title" style="margin-bottom:8px;">Color</p>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <input type="color" id="cat-color" value="${cat.color}" oninput="updateCatPreview()" style="width:52px;height:52px;border-radius:14px;border:1px solid var(--border);background:var(--bg);cursor:pointer;padding:4px;">
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                                ${['#10b981','#f43f5e','#3b82f6','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#ef4444'].map(c =>
-                                    `<button onclick="document.getElementById('cat-color').value='${c}';updateCatPreview()" style="width:28px;height:28px;border-radius:8px;background:${c};border:2px solid ${c === cat.color ? '#fff' : 'transparent'};transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>`
-                                ).join('')}
+                        <p class="section-title" style="margin-bottom:10px;">Color</p>
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                            <!-- Color swatch grid -->
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;flex:1;">
+                                ${PRESET_COLORS.map(c => `
+                                <button onclick="ui._editCatColor='${c}';document.getElementById('cat-color').value='${c}';updateCatPreview();"
+                                    style="width:30px;height:30px;border-radius:9px;background:${c};border:2.5px solid ${c === color ? '#fff' : 'transparent'};box-shadow:${c === color ? '0 0 0 2px ' + c : 'none'};transition:all 0.15s;flex-shrink:0;"
+                                    title="${c}">
+                                </button>`).join('')}
+                            </div>
+                            <!-- Custom color picker -->
+                            <div style="position:relative;">
+                                <input type="color" id="cat-color" value="${color}"
+                                    oninput="ui._editCatColor=this.value;updateCatPreview();"
+                                    style="width:44px;height:44px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;padding:3px;">
+                                <i data-lucide="pipette" style="position:absolute;bottom:-4px;right:-4px;width:12px;height:12px;color:var(--muted);pointer-events:none;background:var(--surface);border-radius:50%;padding:1px;"></i>
                             </div>
                         </div>
                     </div>
 
                     <!-- Icon picker -->
                     <div>
-                        <p class="section-title" style="margin-bottom:8px;">Icon</p>
-                        <div style="display:flex;flex-wrap:wrap;gap:7px;max-height:200px;overflow-y:auto;padding:2px;" class="scroll-hide">
-                            ${CAT_ICONS.map(i => `
-                            <button id="icon-opt-${i}" onclick="selectCatIcon('${i}')" style="width:40px;height:40px;border-radius:12px;background:${cat.icon===i?'rgba(139,92,246,0.15)':'var(--bg)'};border:1.5px solid ${cat.icon===i?'#8b5cf6':'var(--border)'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
-                                <i data-lucide="${i}" style="width:16px;height:16px;color:${cat.icon===i?'#8b5cf6':'var(--muted)'};pointer-events:none;"></i>
-                            </button>`).join('')}
+                        <p class="section-title" style="margin-bottom:10px;">Icon</p>
+                        <input type="hidden" id="cat-icon" value="${icon}">
+                        <div style="max-height:240px;overflow-y:auto;padding-right:2px;" class="scroll-hide">
+                            ${CAT_ICON_GROUPS.map(group => `
+                            <div style="margin-bottom:12px;">
+                                <p style="font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;padding-left:2px;">${group.label}</p>
+                                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                                    ${group.icons.map(i => `
+                                    <button id="icon-opt-${i}" onclick="selectCatIcon('${i}')"
+                                        style="width:40px;height:40px;border-radius:12px;background:${i === icon ? color + '20' : 'var(--bg)'};border:1.5px solid ${i === icon ? color : 'var(--border)'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;">
+                                        <i data-lucide="${i}" style="width:16px;height:16px;color:${i === icon ? color : 'var(--muted)'};pointer-events:none;"></i>
+                                    </button>`).join('')}
+                                </div>
+                            </div>`).join('')}
                         </div>
-                        <input type="hidden" id="cat-icon" value="${cat.icon}">
                     </div>
 
-                    <div style="display:${isDefault?'grid':'grid'};grid-template-columns:${isDefault?'1fr':'1fr 1fr'};gap:10px;margin-top:6px;">
-                        ${!isDefault ? `<button onclick="confirmDeleteCategory('${type}','${catId}')" style="padding:14px;border-radius:16px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);color:var(--rose);font-weight:700;font-size:14px;">Delete</button>` : ''}
-                        <button onclick="saveEditCategory()" style="padding:14px;border-radius:16px;background:#8b5cf6;color:#fff;font-weight:700;font-size:14px;${isDefault?'':''}">Save</button>
+                    <!-- Action buttons -->
+                    <div style="display:grid;grid-template-columns:${!isNew && !isDefault ? '1fr 1fr' : '1fr'};gap:10px;padding-top:4px;">
+                        ${!isNew && !isDefault ? `
+                        <button onclick="confirmDeleteCategory('${type}','${catId}')"
+                            style="padding:14px;border-radius:16px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);color:var(--rose);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px;">
+                            <i data-lucide="trash-2" style="width:15px;height:15px;"></i> Delete
+                        </button>` : ''}
+                        <button onclick="${isNew ? 'saveNewCategoryFromSettings()' : 'saveEditCategory()'}"
+                            style="padding:14px;border-radius:16px;background:#8b5cf6;color:#fff;font-weight:700;font-size:14px;box-shadow:0 4px 14px rgba(139,92,246,0.35);">
+                            ${isNew ? 'Add Category' : 'Save Changes'}
+                        </button>
                     </div>
-                    ${isDefault ? `<p style="text-align:center;font-size:11px;color:var(--muted);">Default categories can be edited but not deleted</p>` : ''}
+                    ${isDefault && !isNew ? `<p style="text-align:center;font-size:11px;color:var(--muted);margin-top:4px;">Default categories can be edited but not deleted</p>` : ''}
                 </div>`;
             lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
         }
 
         function selectCatIcon(icon) {
+            ui._editCatIcon = icon;
+            const color = ui._editCatColor || document.getElementById('cat-color')?.value || '#8b5cf6';
             document.getElementById('cat-icon').value = icon;
             document.querySelectorAll('[id^="icon-opt-"]').forEach(btn => {
                 const isSelected = btn.id === `icon-opt-${icon}`;
-                btn.style.background = isSelected ? 'rgba(139,92,246,0.15)' : 'var(--bg)';
-                btn.style.borderColor = isSelected ? '#8b5cf6' : 'var(--border)';
+                btn.style.background = isSelected ? color + '20' : 'var(--bg)';
+                btn.style.borderColor = isSelected ? color : 'var(--border)';
                 const ico = btn.querySelector('i');
-                if (ico) ico.style.color = isSelected ? '#8b5cf6' : 'var(--muted)';
+                if (ico) ico.style.color = isSelected ? color : 'var(--muted)';
             });
             updateCatPreview();
         }
 
         function updateCatPreview() {
-            const color = document.getElementById('cat-color')?.value || '#10b981';
-            const icon = document.getElementById('cat-icon')?.value || 'tag';
+            const color = ui._editCatColor || document.getElementById('cat-color')?.value || '#10b981';
+            const icon = ui._editCatIcon || document.getElementById('cat-icon')?.value || 'tag';
             const preview = document.getElementById('cat-preview');
             const previewIcon = document.getElementById('cat-preview-icon');
-            if (preview) { preview.style.background = color + '22'; preview.style.borderColor = color + '55'; }
-            if (previewIcon) { previewIcon.style.color = color; previewIcon.setAttribute('data-lucide', icon); lucide.createIcons({ nodes: [previewIcon] }); }
+            // Update swatch borders
+            document.querySelectorAll('[id^="icon-opt-"]').forEach(btn => {
+                const isSelected = btn.id === `icon-opt-${icon}`;
+                btn.style.background = isSelected ? color + '20' : 'var(--bg)';
+                btn.style.borderColor = isSelected ? color : 'var(--border)';
+                const ico = btn.querySelector('i');
+                if (ico) ico.style.color = isSelected ? color : 'var(--muted)';
+            });
+            if (preview) {
+                preview.style.background = color + '20';
+                preview.style.borderColor = color + '50';
+                preview.style.boxShadow = `0 8px 24px ${color}30`;
+            }
+            if (previewIcon) {
+                previewIcon.style.color = color;
+                previewIcon.setAttribute('data-lucide', icon);
+                lucide.createIcons({ nodes: [previewIcon] });
+            }
         }
 
         function saveEditCategory() {
             const type = ui.editingCatType;
             const catId = ui.editingCatId;
             const name = sanitizeText(document.getElementById('cat-name')?.value || '', 40);
-            const rawColor = document.getElementById('cat-color')?.value || '#10b981';
+            const rawColor = ui._editCatColor || document.getElementById('cat-color')?.value || '#10b981';
             const color = /^#[0-9a-fA-F]{3,8}$/.test(rawColor) ? rawColor : '#10b981';
-            const rawIcon = document.getElementById('cat-icon')?.value || 'tag';
+            const rawIcon = ui._editCatIcon || document.getElementById('cat-icon')?.value || 'tag';
             const icon = /^[a-z0-9\-]+$/.test(rawIcon) ? rawIcon : 'tag';
             if (!name) return showToast('Enter a category name', 'error');
             const cat = (state.categories[type] || []).find(c => c.id === catId);
             if (!cat) return;
             cat.name = name; cat.color = color; cat.icon = icon;
             saveState();
-            showToast('Category updated!');
+            showToast('Category updated! ✓');
+            ui.catSearchQuery = '';
+            renderCategorySettingsSheet();
+            lucide.createIcons();
+        }
+
+        function saveNewCategoryFromSettings() {
+            const type = ui.catSettingsType || 'expense';
+            const name = sanitizeText(document.getElementById('cat-name')?.value || '', 40);
+            const rawColor = ui._editCatColor || document.getElementById('cat-color')?.value || '#8b5cf6';
+            const color = /^#[0-9a-fA-F]{3,8}$/.test(rawColor) ? rawColor : '#8b5cf6';
+            const rawIcon = ui._editCatIcon || document.getElementById('cat-icon')?.value || 'tag';
+            const icon = /^[a-z0-9\-]+$/.test(rawIcon) ? rawIcon : 'tag';
+            if (!name) return showToast('Enter a category name', 'error');
+            const id = 'cat_' + Date.now();
+            state.categories[type] = state.categories[type] || [];
+            state.categories[type].push({ id, name, icon, color });
+            saveState();
+            showToast('Category added! ✓');
+            ui.catSearchQuery = '';
             renderCategorySettingsSheet();
             lucide.createIcons();
         }
@@ -3838,17 +4000,21 @@ IMPORTANT RULES:
         function confirmDeleteCategory(type, catId) {
             const cat = (state.categories[type] || []).find(c => c.id === catId);
             if (!cat) return;
+            const usageCount = state.transactions.filter(t => t.categoryId === catId).length;
             const sheet = document.getElementById('sheet-content');
             sheet.innerHTML = `
-                <div style="text-align:center;padding:10px 0;">
-                    <div style="width:60px;height:60px;border-radius:20px;background:rgba(244,63,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-                        <i data-lucide="trash-2" style="width:28px;height:28px;color:var(--rose);"></i>
+                <div style="text-align:center;padding:16px 0;">
+                    <div style="width:64px;height:64px;border-radius:20px;background:rgba(244,63,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                        <i data-lucide="${cat.icon}" style="width:28px;height:28px;color:${cat.color};"></i>
                     </div>
                     <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:8px;">Delete "${esc(cat.name)}"?</h2>
-                    <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">Transactions using this category will show as "Other".</p>
+                    ${usageCount > 0 ? `<p style="font-size:13px;color:var(--muted);margin-bottom:8px;">${usageCount} transaction${usageCount!==1?'s':''} will be moved to "Other".</p>` : ''}
+                    <p style="font-size:13px;color:var(--muted);margin-bottom:28px;">This action cannot be undone.</p>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                        <button onclick="openEditCategory('${type}','${catId}')" style="padding:14px;border-radius:16px;background:var(--surface2);color:var(--text);font-weight:700;">Cancel</button>
-                        <button onclick="deleteCategoryConfirmed('${type}','${catId}')" style="padding:14px;border-radius:16px;background:var(--rose);color:#fff;font-weight:700;">Delete</button>
+                        <button onclick="openEditCategory('${type}','${catId}')"
+                            style="padding:14px;border-radius:16px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-weight:700;">Cancel</button>
+                        <button onclick="deleteCategoryConfirmed('${type}','${catId}')"
+                            style="padding:14px;border-radius:16px;background:var(--rose);color:#fff;font-weight:700;">Delete</button>
                     </div>
                 </div>`;
             lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
@@ -3856,73 +4022,11 @@ IMPORTANT RULES:
 
         function deleteCategoryConfirmed(type, catId) {
             state.categories[type] = (state.categories[type] || []).filter(c => c.id !== catId);
+            // Remap transactions using deleted cat to 'other'
+            state.transactions.forEach(t => { if (t.categoryId === catId) t.categoryId = 'other'; });
             saveState();
             showToast('Category deleted');
-            renderCategorySettingsSheet();
-            lucide.createIcons();
-        }
-
-        function openAddCategoryFromSettings() {
-            const type = ui.catSettingsType || 'expense';
-            const sheet = document.getElementById('sheet-content');
-            sheet.innerHTML = `
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
-                    <button onclick="renderCategorySettingsSheet();lucide.createIcons();" style="width:36px;height:36px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;">
-                        <i data-lucide="arrow-left" style="width:16px;height:16px;color:var(--text);"></i>
-                    </button>
-                    <h2 class="syne" style="font-size:20px;font-weight:800;">New Category</h2>
-                </div>
-                <!-- Live preview -->
-                <div style="display:flex;justify-content:center;margin-bottom:24px;">
-                    <div id="cat-preview" style="width:64px;height:64px;border-radius:20px;background:#8b5cf622;border:2px solid #8b5cf655;display:flex;align-items:center;justify-content:center;">
-                        <i data-lucide="tag" id="cat-preview-icon" style="width:28px;height:28px;color:#8b5cf6;"></i>
-                    </div>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:16px;">
-                    <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;gap:4px;">
-                        <button onclick="ui.catSettingsType='expense';openAddCategoryFromSettings();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;${type==='expense'?'background:var(--rose);color:#fff;':'color:var(--muted);'}">Expense</button>
-                        <button onclick="ui.catSettingsType='income';openAddCategoryFromSettings();" style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;${type==='income'?'background:var(--emerald);color:#000;':'color:var(--muted);'}">Income</button>
-                    </div>
-                    <div><p class="section-title" style="margin-bottom:8px;">Name</p><input type="text" id="cat-name" class="input" placeholder="Category name" maxlength="40"></div>
-                    <div>
-                        <p class="section-title" style="margin-bottom:8px;">Color</p>
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <input type="color" id="cat-color" value="#8b5cf6" oninput="updateCatPreview()" style="width:52px;height:52px;border-radius:14px;border:1px solid var(--border);background:var(--bg);cursor:pointer;padding:4px;">
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                                ${['#10b981','#f43f5e','#3b82f6','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#ef4444'].map(c =>
-                                    `<button onclick="document.getElementById('cat-color').value='${c}';updateCatPreview()" style="width:28px;height:28px;border-radius:8px;background:${c};border:2px solid transparent;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'"></button>`
-                                ).join('')}
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <p class="section-title" style="margin-bottom:8px;">Icon</p>
-                        <div style="display:flex;flex-wrap:wrap;gap:7px;max-height:200px;overflow-y:auto;padding:2px;" class="scroll-hide">
-                            ${CAT_ICONS.map((i, idx) => `
-                            <button id="icon-opt-${i}" onclick="selectCatIcon('${i}')" style="width:40px;height:40px;border-radius:12px;background:${idx===0?'rgba(139,92,246,0.15)':'var(--bg)'};border:1.5px solid ${idx===0?'#8b5cf6':'var(--border)'};display:flex;align-items:center;justify-content:center;transition:all 0.15s;">
-                                <i data-lucide="${i}" style="width:16px;height:16px;color:${idx===0?'#8b5cf6':'var(--muted)'};pointer-events:none;"></i>
-                            </button>`).join('')}
-                        </div>
-                        <input type="hidden" id="cat-icon" value="${CAT_ICONS[0]}">
-                    </div>
-                    <button onclick="saveNewCategoryFromSettings()" style="padding:14px;border-radius:16px;background:#8b5cf6;color:#fff;font-weight:700;font-size:14px;margin-top:6px;">Add Category</button>
-                </div>`;
-            lucide.createIcons({ nodes: sheet.querySelectorAll('[data-lucide]') });
-        }
-
-        function saveNewCategoryFromSettings() {
-            const type = ui.catSettingsType || 'expense';
-            const name = sanitizeText(document.getElementById('cat-name')?.value || '', 40);
-            const rawColor = document.getElementById('cat-color')?.value || '#8b5cf6';
-            const color = /^#[0-9a-fA-F]{3,8}$/.test(rawColor) ? rawColor : '#8b5cf6';
-            const rawIcon = document.getElementById('cat-icon')?.value || 'tag';
-            const icon = /^[a-z0-9\-]+$/.test(rawIcon) ? rawIcon : 'tag';
-            if (!name) return showToast('Enter a category name', 'error');
-            const id = 'cat_' + Date.now();
-            state.categories[type] = state.categories[type] || [];
-            state.categories[type].push({ id, name, icon, color });
-            saveState();
-            showToast('Category added!');
+            ui.catSearchQuery = '';
             renderCategorySettingsSheet();
             lucide.createIcons();
         }
