@@ -3,8 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finance Pro">
     <meta name="theme-color" content="#07070a">
@@ -935,20 +934,20 @@
         }
 
         .app-bottom-nav {
-            position: fixed;
-            left: 50%;
-            bottom: 18px;
-            width: min(calc(100% - 24px), 430px);
-            max-width: 430px;
-            transform: translateX(-50%);
-            z-index: 20;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0 16px;
-            pointer-events: none;
-            position: relative;
-        }
+          position: fixed;
+          left: 50%;
+          /* FIX: Dynamically calculate the bottom position to float above the home indicator */
+           bottom: calc(18px + env(safe-area-inset-bottom));
+          width: 100%;
+          max-width: 430px;
+          transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* This gap keeps the search button detached and beside the main nav */
+    pointer-events: none;
+    padding:6px;
+}
 
         .nav-search-glass {
             position: relative;
@@ -1067,14 +1066,20 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            transition: width 0.35s cubic-bezier(0.32, 0.72, 0, 1), background 0.35s ease;
+            transition: width 0.35s cubic-bezier(0.32, 0.72, 0, 1), background 0.35s ease, border-color 0.3s ease;
         }
 
         .nav-search-glass.search-expanded {
             flex: 1 1 100%;
             width: 100% !important;
             justify-content: flex-start;
-            padding: 0 14px 0 8px;
+            padding: 0 16px 0 12px;
+            gap: 8px;
+        }
+
+        .nav-search-glass.search-expanded:focus-within {
+            border-color: rgba(255, 255, 255, 0.28);
+            background: rgba(0, 0, 0, 0.68);
         }
 
         .nav-back-btn {
@@ -1129,18 +1134,22 @@
             background: transparent;
             color: #fff;
             font-family: var(--font-main);
-            font-size: 14px;
-            font-weight: 700;
-            transition: width 0.24s ease, opacity 0.18s ease;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            transition: width 0.24s ease, opacity 0.18s ease, font-size 0.2s ease;
         }
 
         .nav-search-input::placeholder {
-            color: rgba(255, 255, 255, 0.58);
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 400;
         }
 
         .nav-search-glass.search-expanded .nav-search-input {
             width: 100%;
             opacity: 1;
+            font-size: 16px;
+            font-weight: 500;
         }
 
         body.light-mode .nav-search-input {
@@ -1148,7 +1157,53 @@
         }
 
         body.light-mode .nav-search-input::placeholder {
-            color: var(--muted);
+            color: #999;
+            font-weight: 400;
+        }
+
+        body.light-mode .nav-search-glass.search-expanded:focus-within {
+            border-color: rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Mobile Search Responsiveness */
+        @media (max-width: 600px) {
+            .nav-search-input {
+                font-size: 14px;
+            }
+            .nav-search-glass.search-expanded .nav-search-input {
+                font-size: 14px;
+            }
+            .nav-search-btn {
+                width: 48px;
+                height: 48px;
+            }
+            .nav-search-btn i {
+                width: 22px;
+                height: 22px;
+            }
+        }
+
+        @media (max-width: 393px) {
+            .nav-search-input {
+                font-size: 13px;
+            }
+            .nav-search-glass {
+                width: 60px;
+               
+            }
+            .nav-search-glass.search-expanded {
+                padding: 0 12px 0 10px;
+                gap: 6px;
+            }
+            .nav-search-btn {
+                width: 33px;
+                height: 33px;
+            }
+            .nav-search-btn i {
+                width: 15px;
+                height: 15px;
+            }
         }
 
         .nav-icon-btn {
@@ -1254,7 +1309,7 @@
             border-radius: 20px;
         }
 
-        @media (min-width: 431px) {
+        @media (min-width: 393px) {
             .app {
                 border-left: 1px solid var(--border);
                 border-right: 1px solid var(--border);
@@ -1262,6 +1317,7 @@
         }
 
         @media (max-width: 380px) {
+            
             header {
                 padding-left: 16px !important;
                 padding-right: 16px !important;
@@ -1276,8 +1332,10 @@
             }
 
             .app-bottom-nav {
-                width: calc(100% - 24px);
-                gap: 6px;
+            
+                width: calc(100% - 16px);
+                gap: 4px;
+                padding: 0 8px;
             }
 
             .nav-tabs-glass,
@@ -1297,7 +1355,8 @@
             }
 
             .nav-search-glass {
-                width: 64px;
+                width: 50px;
+                hight: 50px;
             }
 
             .nav-search-glass.search-expanded {
@@ -1331,7 +1390,7 @@
 
             .nav-tabs-glass {
                 width: 100%;
-                grid-template-columns: repeat(4, minmax(0, 1fr));
+                grid-template-columns: repeat(4, minmax(0, 2fr));
                 gap: 4px;
                 padding: 0 4px;
             }
