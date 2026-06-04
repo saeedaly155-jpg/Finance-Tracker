@@ -660,6 +660,103 @@
             transform: scale(0.9);
         }
 
+        .search-page {
+            position: relative;
+            z-index: 20;
+        }
+
+        .ai-mode-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            background: #000;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            overflow: hidden;
+            transition: background 0.2s ease;
+            box-shadow: 0 0 28px rgba(16, 185, 129, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .ai-mode-btn:hover {
+            transform: none;
+            background: #000;
+        }
+
+        .ai-mode-btn::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #10b981, #3b82f6, #ec4899, #f97316, #8b5cf6, #10b981);
+            filter: blur(14px);
+            opacity: 0.9;
+            z-index: -2;
+            animation: glow-scroll 3.5s linear infinite;
+        }
+
+        .ai-mode-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            padding: 1px;
+            background: linear-gradient(90deg, #10b981, #3b82f6, #ec4899, #f97316, #8b5cf6, #10b981);
+            -webkit-mask: linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            z-index: -1;
+        }
+
+        @keyframes glow-scroll {
+            from { transform: translateX(-30%); }
+            to { transform: translateX(30%); }
+        }
+
+        .ai-chat-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 15px;
+            min-height: 46px;
+            outline: none;
+            font-family: var(--font-main);
+        }
+
+        .ai-chat-bar input::placeholder {
+            color: var(--muted);
+        }
+
+        .ai-chat-bar button {
+            width: 46px;
+            height: 46px;
+            border-radius: 999px;
+            border: none;
+            background: var(--emerald);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.18s ease;
+        }
+
+        .ai-chat-bar button:active {
+            transform: scale(0.94);
+        }
+
+        .ai-chat-row {
+            margin-bottom: 18px;
+        }
+
         .chat-bubble {
             padding: 12px 16px;
             border-radius: 18px;
@@ -732,6 +829,543 @@
             -webkit-text-fill-color: rgba(255, 255, 255, 0.55) !important;
             margin-top: 3px;
         }
+
+        /* WWDC25-inspired system pass: Liquid Glass, concentric shapes, clearer hierarchy. */
+        :root {
+            --bg: #050507;
+            --surface: #111116;
+            --surface2: rgba(255, 255, 255, 0.075);
+            --surface-glass: rgba(30, 30, 34, 0.58);
+            --surface-glass-strong: rgba(24, 24, 28, 0.82);
+            --border: rgba(255, 255, 255, 0.14);
+            --text: #f6f6f7;
+            --muted: #a2a2aa;
+            --shadow-glass: 0 18px 50px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            --focus-ring: 0 0 0 4px rgba(16, 185, 129, 0.18);
+        }
+
+        body.light-mode {
+            --bg: #f5f5f7;
+            --surface: #fbfbfd;
+            --surface2: rgba(0, 0, 0, 0.045);
+            --surface-glass: rgba(255, 255, 255, 0.68);
+            --surface-glass-strong: rgba(255, 255, 255, 0.9);
+            --border: rgba(0, 0, 0, 0.11);
+            --text: #1d1d1f;
+            --muted: #6e6e73;
+            --shadow-glass: 0 18px 50px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 50% -18%, rgba(16, 185, 129, 0.16), transparent 32%),
+                var(--bg);
+            letter-spacing: 0;
+        }
+
+        body.light-mode {
+            background:
+                radial-gradient(circle at 50% -18%, rgba(16, 185, 129, 0.12), transparent 34%),
+                var(--bg);
+        }
+
+        .app {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 28%),
+                var(--surface) !important;
+        }
+
+        header {
+            padding: 18px 20px 10px !important;
+            background: linear-gradient(180deg, var(--surface) 66%, rgba(17, 17, 22, 0)) !important;
+        }
+
+        body.light-mode header {
+            background: linear-gradient(180deg, var(--surface) 66%, rgba(251, 251, 253, 0)) !important;
+        }
+
+        #header-title {
+            font-size: 28px !important;
+            line-height: 1.05 !important;
+            font-weight: 850 !important;
+            letter-spacing: 0 !important;
+        }
+
+        .tag,
+        .section-title {
+            letter-spacing: 0.08em !important;
+            color: var(--muted) !important;
+        }
+
+        header button,
+        .icon-box,
+        .input,
+        .card,
+        .tx-row,
+        .cat-btn {
+            border-radius: 16px;
+        }
+
+        header button {
+            background: var(--surface-glass) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+        }
+
+        .glass {
+            background: var(--surface-glass) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(26px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
+        }
+
+        nav.glass {
+            bottom: 18px !important;
+            left: 50% !important;
+            right: auto !important;
+            width: calc(100% - 32px) !important;
+            max-width: 398px !important;
+            height: 72px !important;
+            border-radius: 36px !important;
+            padding: 0 10px;
+            transform: translateX(-50%);
+        }
+
+        .app-bottom-nav {
+            position: fixed;
+            left: 50%;
+            bottom: 18px;
+            width: min(calc(100% - 24px), 430px);
+            max-width: 430px;
+            transform: translateX(-50%);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .nav-search-glass {
+            position: relative;
+            flex-shrink: 0;
+            min-width: 72px;
+        }
+
+        .nav-plus-btn {
+            position: absolute;
+            top: -70px;
+            right: 1px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 999px;
+            background: var(--emerald);
+            color: #000;
+            box-shadow: 0 20px 42px rgba(16, 185, 129, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            transform: none;
+            cursor: pointer;
+            pointer-events: auto;
+            z-index: 22;
+        }
+
+        .nav-plus-btn i {
+            width: 26px;
+            height: 26px;
+        }
+
+        .app-bottom-nav.search-mode {
+            gap: 0;
+        }
+
+        .nav-tabs-glass,
+        .nav-search-glass {
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.58);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(26px) saturate(180%);
+            -webkit-backdrop-filter: blur(26px) saturate(180%);
+        }
+
+        body.light-mode .nav-tabs-glass,
+        body.light-mode .nav-search-glass {
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .nav-tabs-glass {
+            flex: 1;
+            height: 68px;
+            border-radius: 34px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            align-items: center;
+            transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), flex-basis 0.28s cubic-bezier(0.32, 0.72, 0, 1), padding 0.22s ease;
+        }
+
+        .app-bottom-nav.search-mode .nav-tabs-glass {
+            flex: 0 0 0 !important;
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            opacity: 0 !important;
+            padding: 0;
+            border: 0;
+            transform: scale(0.96);
+            visibility: hidden;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .nav-tab-btn {
+            height: 100px;
+            border: 0;
+            border-radius: 28px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.68);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            font-family: var(--font-main);
+            font-size: 10px;
+            font-weight: 750;
+            transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
+        }
+
+        body.light-mode .nav-tab-btn {
+            color: var(--muted);
+        }
+
+        .nav-tab-btn i {
+            width: 100px;
+            height: 100px;
+            stroke-width: 2.6;
+        }
+
+        .nav-tab-btn.nav-active {
+            background: linear-gradient(135deg, #ff5a24, #f43f3f);
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(63, 244, 144, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+        }
+
+        .nav-search-glass {
+            width: 68px;
+            height: 68px;
+            border-radius: 34px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: width 0.35s cubic-bezier(0.32, 0.72, 0, 1), background 0.35s ease;
+        }
+
+        .nav-search-glass.search-expanded {
+            flex: 1 1 100%;
+            width: 100% !important;
+            justify-content: flex-start;
+            padding: 0 14px 0 8px;
+        }
+
+        .nav-back-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 999px;
+            border: 0;
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-right: 4px;
+        }
+
+        .nav-back-btn i {
+            width: 22px;
+            height: 22px;
+            stroke-width: 2.7;
+        }
+
+        .nav-search-glass.search-expanded .nav-back-btn {
+            display: flex;
+        }
+
+        .nav-search-btn {
+            width: 58px;
+            height: 58px;
+            border-radius: 999px;
+            border: 0;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.68);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .nav-search-btn i {
+            width: 28px;
+            height: 28px;
+            stroke-width: 2.4;
+        }
+
+        .nav-search-input {
+            width: 0;
+            min-width: 0;
+            opacity: 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #fff;
+            font-family: var(--font-main);
+            font-size: 14px;
+            font-weight: 700;
+            transition: width 0.24s ease, opacity 0.18s ease;
+        }
+
+        .nav-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .nav-search-glass.search-expanded .nav-search-input {
+            width: 100%;
+            opacity: 1;
+        }
+
+        body.light-mode .nav-search-input {
+            color: var(--text);
+        }
+
+        body.light-mode .nav-search-input::placeholder {
+            color: var(--muted);
+        }
+
+        .nav-icon-btn {
+            width: 75px;
+            height: 60px;
+            border-radius: 999px;
+            color: var(--muted);
+            
+    
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-icon-btn.nav-active {
+            background: rgba(16, 185, 129, 0.15) !important;
+            color: var(--emerald) !important;
+            transform: none;
+        }
+
+        /* nav-plus-btn sizing handled by base rule */
+
+        .main-scroll {
+            padding: 4px 18px 112px;
+            scroll-padding-bottom: 112px;
+        }
+
+        .card,
+        .tx-row {
+            background: var(--surface2);
+            border-color: var(--border);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+        }
+
+        body.light-mode .card,
+        body.light-mode .tx-row {
+            background: rgba(255, 255, 255, 0.72);
+            border-color: var(--border);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .wallet-chip {
+            border-radius: 28px;
+            box-shadow: 0 16px 44px rgba(0, 0, 0, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        .input {
+            min-height: 48px;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border);
+        }
+
+        body.light-mode .input {
+            background: rgba(0, 0, 0, 0.045);
+            border-color: var(--border);
+        }
+
+        .input:focus {
+            border-color: rgba(16, 185, 129, 0.7);
+            box-shadow: var(--focus-ring);
+        }
+
+        .btn-primary {
+            min-height: 50px;
+            border-radius: 999px;
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.38);
+        }
+
+        #overlay {
+            background: rgba(0, 0, 0, 0.42) !important;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+        #bottom-sheet {
+            background: var(--surface-glass-strong) !important;
+            border: 1px solid var(--border) !important;
+            border-bottom: none !important;
+            border-radius: 32px 32px 0 0 !important;
+            box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(30px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+        }
+
+        #sheet-content {
+            padding: 22px 24px 46px !important;
+        }
+
+        .ai-fab {
+            background: var(--surface-glass) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+        }
+
+        .ai-fab::after {
+            opacity: 0.42;
+        }
+
+        .chat-user,
+        .chat-bot {
+            border-radius: 20px;
+        }
+
+        @media (min-width: 431px) {
+            .app {
+                border-left: 1px solid var(--border);
+                border-right: 1px solid var(--border);
+            }
+        }
+
+        @media (max-width: 380px) {
+            header {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+
+            #header-title {
+                font-size: 25px !important;
+            }
+
+            nav.glass {
+                width: calc(100% - 24px) !important;
+            }
+
+            .app-bottom-nav {
+                width: calc(100% - 24px);
+                gap: 6px;
+            }
+
+            .nav-tabs-glass,
+            .nav-search-glass {
+                height: 64px;
+                border-radius: 32px;
+            }
+
+            .nav-tab-btn {
+                height: 52px;
+                font-size: 9px;
+            }
+
+            .nav-tab-btn i {
+                width: 19px;
+                height: 19px;
+            }
+
+            .nav-search-glass {
+                width: 64px;
+            }
+
+            .nav-search-glass.search-expanded {
+                width: 100%;
+            }
+
+            .nav-plus-btn {
+                right: 12px;
+                width: 54px;
+                height: 54px;
+            }
+
+            .app-bottom-nav {
+                width: calc(100% - 20px);
+                bottom: 12px;
+                padding: 0 10px;
+            }
+
+            .main-scroll {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+
+        @media (max-width: 340px) {
+            .app-bottom-nav {
+                width: calc(100% - 16px);
+                gap: 4px;
+                padding: 0 8px;
+            }
+
+            .nav-tabs-glass {
+                width: 100%;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 4px;
+                padding: 0 4px;
+            }
+
+            .nav-tab-btn {
+                min-width: 0;
+                padding: 0 6px;
+                height: 48px;
+                font-size: 0;
+            }
+
+            .nav-tab-btn span {
+                display: none;
+            }
+
+            .nav-tab-btn i {
+                width: 22px;
+                height: 22px;
+            }
+
+            .nav-search-glass {
+                width: 56px;
+            }
+
+            .nav-search-glass.search-expanded {
+                width: 100%;
+            }
+
+            .nav-plus-btn {
+                right: 8px;
+                width: 52px;
+                height: 52px;
+            }
+        }
     </style>
 </head>
 
@@ -751,10 +1385,7 @@
                     style="width:34px;height:34px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
                     <i data-lucide="sun" id="theme-icon" style="width:15px;height:15px;color:var(--text);"></i>
                 </button>
-                <button onclick="openSearch()"
-                    style="width:34px;height:34px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
-                    <i data-lucide="search" style="width:15px;height:15px;color:var(--text);"></i>
-                </button>
+                
                 <button id="top-sync-btn" onclick="handleTopSyncClick()"
                     style="width:34px;height:34px;border-radius:11px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
                     <i data-lucide="refresh-cw" id="sync-icon" style="width:15px;height:15px;color:var(--muted);"></i>
@@ -770,38 +1401,44 @@
         </header>
 
         <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
+        <nav class="app-bottom-nav" aria-label="Main navigation">
+            <div class="nav-tabs-glass">
+                <button onclick="switchTab('home')" class="nav-tab-btn nav-icon-btn nav-active" data-tab="home">
+                    <i data-lucide="layout-grid"></i>
+                    <span>Home</span>
+                </button>
 
-        <button id="ai-fab" class="ai-fab" onclick="openAIChat()">
-            <i data-lucide="sparkles" id="ai-fab-icon" style="width:16px;height:16px;color:#ffffff;flex-shrink:0;"></i>
-        </button>
+                <button onclick="switchTab('finance')" class="nav-tab-btn nav-icon-btn" data-tab="finance">
+                    <i data-lucide="pie-chart"></i>
+                    <span>Finance</span>
+                </button>
 
-        <nav class="glass"
-            style="position: fixed; bottom: 24px; left: 20px; right: 20px; height: 76px; border-radius: 38px; display: grid; grid-template-columns: 1fr 1fr 1.2fr 1fr 1fr; align-items: center; z-index: 20;">
+                <button onclick="switchTab('wallets')" class="nav-tab-btn nav-icon-btn" data-tab="wallets">
+                    <i data-lucide="wallet"></i>
+                    <span>Wallets</span>
+                </button>
 
-            <button onclick="switchTab('home')" class="nav-icon-btn nav-active">
-                <i data-lucide="layout-grid"></i>
-            </button>
-
-            <button onclick="switchTab('finance')" class="nav-icon-btn">
-                <i data-lucide="pie-chart"></i>
-            </button>
-
-            <div style="display: flex; justify-content: center; align-items: center;">
-                <button onclick="openTransactionForm()" class="nav-plus-btn"
-                    style="width: 62px; height: 62px; background: #10b981; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); transition: 0.3s;">
-                    <i data-lucide="plus" style="width: 30px; height: 30px; color: #000; stroke-width: 3;"></i>
+                <button onclick="switchTab('settings')" class="nav-tab-btn nav-icon-btn" data-tab="settings">
+                    <i data-lucide="user"></i>
+                    <span>Settings</span>
                 </button>
             </div>
-
-            <button onclick="switchTab('wallets')" class="nav-icon-btn">
-                <i data-lucide="wallet"></i>
+           
+            <div id="nav-search-shell" class="nav-search-glass">
+                <button onclick="closeSearchMode()" class="nav-back-btn" aria-label="Back">
+                    <i data-lucide="arrow-left"></i>
+                </button>
+                <button onclick="openSearch()" class="nav-search-btn" aria-label="Search">
+                    <i data-lucide="search"></i>
+                </button>
+                <input id="nav-search-input" class="nav-search-input" type="search" placeholder="Search"
+                    oninput="handleSearch(this.value)" onfocus="openSearch(false)">
+            </div>
+            <button class="nav-plus-btn" id="floating-plus-btn" aria-label="Add" onclick="openTransactionForm()">
+                <i data-lucide="plus"></i>
             </button>
-
-            <button onclick="switchTab('settings')" class="nav-icon-btn">
-                <i data-lucide="user"></i>
-            </button>
-
         </nav>
+
 
 
         <div id="overlay" onclick="closeSheet()"
@@ -1317,7 +1954,7 @@
                 btn.style.strokeWidth = "2";
             });
 
-            const activeBtn = document.querySelector(`[onclick*="switchTab('${target}')"]`);
+            const activeBtn = document.querySelector(`[data-tab="${target}"]`) || document.querySelector(`[onclick*="switchTab('${target}')"]`);
             if (activeBtn) {
                 activeBtn.classList.add('nav-active');
                 activeBtn.style.strokeWidth = "3";
@@ -1343,7 +1980,9 @@
                         home: 'Dashboard',
                         finance: 'Finance',
                         wallets: 'Wallets',
-                        settings: 'Settings'
+                        settings: 'Settings',
+                        search: 'Search',
+                        chat: 'AI Chat'
                     };
                     title.textContent = titles[tabId] || 'Dashboard';
 
@@ -1351,15 +1990,22 @@
                         home: renderHome,
                         finance: renderFinance,
                         wallets: renderWallets,
-                        settings: renderSettings
+                        settings: renderSettings,
+                        search: renderSearch,
+                        chat: renderChatPage
                     };
 
                     // استخدام الـ render المناسب أو العودة للـ Home
                     main.innerHTML = (renders[tabId] || renderHome)();
+                    if (tabId === 'chat') {
+                        renderChatMessages();
+                        setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
+                    }
 
                     lucide.createIcons();
                     if (tabId === 'home') initCharts();
                     updateHeaderAvatar();
+                    syncSearchUI();
                 } catch (err) {
                     console.error('Tab render error:', err);
                     main.innerHTML = `<div style="padding:40px 20px;text-align:center;color:var(--muted);"><p style="font-size:14px;">Something went wrong. Tap to retry.</p><button onclick="switchTab('home')" style="margin-top:16px;padding:12px 24px;background:var(--emerald);color:#000;border-radius:14px;font-weight:700;font-size:14px;">Go to Dashboard</button></div>`;
@@ -1734,43 +2380,56 @@
         }
         // ─── AI CHAT ──────────────────────────────────────────────────────────
         function openAIChat() {
-            // التحقق من وجود المفتاح في localStorage وليس كمتغير ثابت
             const apiKey = localStorage.getItem('velto_gemini_key');
-
             if (!apiKey) {
                 showToast('برجاء إدخال الـ API Key أولاً في الإعدادات', 'warn');
-                // يمكننا هنا توجيهه للإعدادات مباشرة
                 return;
             }
 
-            document.getElementById('sheet-content').innerHTML = `
-                < div style = "display:flex; align-items:center; gap:10px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:16px;" >
-            <div style="width:40px; height:40px; border-radius:14px; background:linear-gradient(135deg, #8b5cf6, #d946ef); display:flex; align-items:center; justify-content:center;">
-                <i data-lucide="sparkles" style="color:#ffffff;"></i>
-            </div>
-            <div>
-                <h2 class="syne" style="font-size:18px; font-weight:800; margin:0;">Smart Assistant</h2>
-                <p style="font-size:11px; color:var(--emerald);">Online & Ready</p>
-            </div>
-        </div >
-        <div id="chat-messages" style="display:flex; flex-direction:column; gap:12px; max-height:50vh; overflow-y:auto; padding-bottom:10px; margin-bottom:16px;" class="scroll-hide">
-            ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">أهلاً! أنا مساعدك المالي الذكي 🤖✨<br>ممكن أضيف معاملات، أحلل مصاريفك، أنشئ أهداف، أنقل فلوس بين المحافظ، أمسح ديون — وكتير أكتر. قولي إيه اللي تحتاجه!</div>` : ''}
-        </div>
-        <div style="display:flex; gap:8px; align-items:flex-end;">
-            <textarea id="chat-input" class="input scroll-hide" placeholder="اسألني أي شيء..." style="flex:1; resize:none; min-height:52px; max-height:100px; padding:16px; border-radius:18px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
-            <button onclick="sendChatMessage()" style="width:52px; height:52px; border-radius:18px; background:linear-gradient(135deg,#f97316,#ef4444 50%,#8b5cf6); color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow: 0 0 14px 3px rgba(239,68,68,0.4);">
-                <i data-lucide="send" style="width:20px; height:20px;"></i>
-            </button>
-        </div>
+            if (document.getElementById('bottom-sheet').classList.contains('open')) closeSheet();
+            ui.chatReturnTab = ui.currentTab === 'chat' ? (ui.chatReturnTab || 'home') : (ui.currentTab || 'home');
+            switchTab('chat');
+        }
+
+        function renderChatPage() {
+            return `
+                <div class="fade-up" style="padding:20px 0;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+                        <button onclick="closeChatPage()" style="width:44px;height:44px;border-radius:16px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;">
+                            <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
+                        </button>
+                        <div>
+                            <p class="tag" style="margin:0;color:var(--muted);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;">AI Chat</p>
+                            <h2 class="syne" style="margin:6px 0 0;font-size:24px;line-height:1.1;">Smart Assistant</h2>
+                        </div>
+                    </div>
+                    <div id="chat-messages" style="display:flex;flex-direction:column;gap:12px;max-height:62vh;overflow-y:auto;padding:8px 0;" class="scroll-hide">
+                        ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">أهلاً! أنا مساعدك المالي الذكي 🤖✨<br>ممكن أضيف معاملات، أحلل مصاريفك، أنشئ أهداف، أنقل فلوس بين المحافظ، أمسح ديون — وكتير أكتر. قولي إيه اللي تحتاجه!</div>` : ''}
+                    </div>
+                    <div style="display:flex;gap:10px;align-items:flex-end;margin-top:16px;">
+                        <textarea id="chat-input" class="input scroll-hide" placeholder="اسألني أي شيء..." style="flex:1;resize:none;min-height:56px;max-height:110px;padding:16px;border-radius:22px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
+                        <button onclick="sendChatMessage()" style="width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#f97316,#ef4444 50%,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(239,68,68,0.3);">
+                            <i data-lucide="send" style="width:20px;height:20px;"></i>
+                        </button>
+                    </div>
+                </div>
             `;
-            openSheet();
-            lucide.createIcons();
-            setTimeout(() => document.getElementById('chat-input').focus(), 100);
+        }
+
+        function renderChatMessages() {
             const chatContainer = document.getElementById('chat-messages');
-            chatHistory.forEach(msg => {
-                chatContainer.innerHTML += `< div class="chat-bubble ${msg.role === 'user' ? 'chat-user' : 'chat-bot'}" > ${msg.text}</div > `;
-            });
-            if (chatHistory.length > 0) chatContainer.scrollTop = chatContainer.scrollHeight;
+            if (!chatContainer) return;
+            if (chatHistory.length > 0) {
+                chatContainer.innerHTML = '';
+                chatHistory.forEach(msg => {
+                    chatContainer.innerHTML += `<div class="chat-bubble ${msg.role === 'user' ? 'chat-user' : 'chat-bot'}">${msg.text}</div>`;
+                });
+            }
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function closeChatPage() {
+            switchTab(ui.chatReturnTab || 'home');
         }
 
         async function sendChatMessage() {
@@ -1779,16 +2438,16 @@
             const text = inputEl ? inputEl.value.trim() : '';
             if (!text) return;
             const chatContainer = document.getElementById('chat-messages');
-            chatContainer.innerHTML += `< div class="chat-bubble chat-user" > ${text}</div > `;
+            chatContainer.innerHTML += `<div class="chat-bubble chat-user">${text}</div>`;
             chatHistory.push({ role: 'user', text });
             inputEl.value = '';
             chatContainer.scrollTop = chatContainer.scrollHeight;
             const loadingId = 'loading-' + Date.now();
-            chatContainer.innerHTML += `< div id = "${loadingId}" class="chat-bubble chat-bot" style = "display:flex; gap:6px; align-items:center;" > <div class="sync-status-dot syncing" style="background:#8b5cf6;"></div> Thinking...</div > `;
+            chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex;gap:6px;align-items:center;"><div class="sync-status-dot syncing" style="background:#8b5cf6;"></div> Thinking...</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
             if (!apiKey) {
                 document.getElementById(loadingId)?.remove();
-                chatContainer.innerHTML += `< div class="chat-bubble chat-bot" style = "color:var(--amber);" > برجاء إدخال الـ Gemini API Key في الإعدادات أولاً 🔑</div > `;
+                chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--amber);">برجاء إدخال الـ Gemini API Key في الإعدادات أولاً 🔑</div>`;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 return;
             }
@@ -2074,6 +2733,104 @@ IMPORTANT RULES:
         }
 
         // ─── HOME ─────────────────────────────────────────────────────────────
+        function openSearch(shouldFocus = true) {
+            ui.searchQuery = ui.searchQuery || '';
+            if (ui.currentTab !== 'search') ui.searchReturnTab = ui.currentTab || 'home';
+            if (ui.currentTab !== 'search') switchTab('search');
+            syncSearchUI();
+            if (shouldFocus) {
+                setTimeout(() => {
+                    const navInput = document.getElementById('nav-search-input');
+                    const pageInput = document.getElementById('search-input');
+                    (navInput || pageInput)?.focus();
+                }, 220);
+            }
+        }
+
+        function closeSearchMode() {
+            const target = ui.searchReturnTab && ui.searchReturnTab !== 'search' ? ui.searchReturnTab : 'home';
+            switchTab(target);
+        }
+
+        function syncSearchUI() {
+            const isSearch = ui.currentTab === 'search';
+            const nav = document.querySelector('.app-bottom-nav');
+            const shell = document.getElementById('nav-search-shell');
+            const navInput = document.getElementById('nav-search-input');
+            if (nav) nav.classList.toggle('search-mode', isSearch);
+            if (shell) shell.classList.toggle('search-expanded', isSearch);
+            if (navInput) navInput.value = ui.searchQuery || '';
+            const pageInput = document.getElementById('search-input');
+            if (pageInput) pageInput.value = ui.searchQuery || '';
+            if (isSearch) renderSearchResults();
+        }
+
+        function renderSearch() {
+            return `<div class="fade-up search-page" style="position:relative;z-index:20;padding-top:14px;">
+                <div style="position:relative;margin-bottom:18px;">
+                    <i data-lucide="search" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none;"></i>
+                    <input type="search" id="search-input" class="input" placeholder="Find transactions, wallets, goals..."
+                        value="${esc(ui.searchQuery || '')}" oninput="handleSearch(this.value)"
+                        style="height:54px;border-radius:999px;padding-left:46px;background:var(--surface2);">
+                </div>
+                <div id="search-results" style="display:flex;flex-direction:column;gap:10px;" class="scroll-hide">
+                    ${getSearchResultsHTML(ui.searchQuery || '')}
+                </div>
+            </div>`;
+        }
+
+        function handleSearch(value) {
+            ui.searchQuery = (value ?? document.getElementById('search-input')?.value ?? '').toLowerCase();
+            const navInput = document.getElementById('nav-search-input');
+            const pageInput = document.getElementById('search-input');
+            if (navInput && navInput.value.toLowerCase() !== ui.searchQuery) navInput.value = ui.searchQuery;
+            if (pageInput && pageInput.value.toLowerCase() !== ui.searchQuery) pageInput.value = ui.searchQuery;
+            renderSearchResults();
+        }
+
+        function renderSearchResults() {
+            const resDiv = document.getElementById('search-results');
+            if (!resDiv) return;
+            resDiv.innerHTML = getSearchResultsHTML(ui.searchQuery || '');
+            lucide.createIcons();
+        }
+
+        function getSearchResultsHTML(queryValue) {
+            const query = (queryValue || '').toLowerCase().trim();
+            if (!query) {
+                return `<div style="text-align:center;padding:46px 20px;color:var(--muted);">
+                    <i data-lucide="search" style="width:34px;height:34px;margin:0 auto 12px;opacity:0.5;"></i>
+                    <p style="font-size:13px;font-weight:650;">Find transactions, wallets, goals & more</p>
+                </div>`;
+            }
+            let html = '';
+            const wallets = state.wallets.filter(w => w.name.toLowerCase().includes(query) || (w.currency && w.currency.toLowerCase().includes(query)));
+            if (wallets.length) {
+                html += '<p class="section-title" style="margin-top:10px;">Wallets</p>';
+                html += wallets.map(w => `<div class="tx-row" onclick="switchTab('wallets');"><div class="icon-box" style="background:rgba(255,255,255,0.05);"><i data-lucide="${w.icon}" style="color:var(--muted);"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${w.name}</p><p style="font-size:10px;color:var(--muted);">${w.currency || state.currency.code} ${fmtNum(w.balance)}</p></div></div>`).join('');
+            }
+            const goals = state.goals.filter(g => g.name.toLowerCase().includes(query));
+            if (goals.length) {
+                html += '<p class="section-title" style="margin-top:10px;">Goals</p>';
+                html += goals.map(g => `<div class="tx-row" onclick="openGoalForm(${g.id})"><div class="icon-box" style="background:${g.color}18;"><i data-lucide="${g.icon}" style="color:${g.color};"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${g.name}</p><p style="font-size:10px;color:var(--muted);">${fmt(g.saved)} / ${fmt(g.target)}</p></div></div>`).join('');
+            }
+            const txs = state.transactions.filter(t => {
+                const cat = getCat(t.categoryId);
+                return t.name.toLowerCase().includes(query) || (t.note && t.note.toLowerCase().includes(query)) || cat.name.toLowerCase().includes(query);
+            });
+            if (txs.length) {
+                html += '<p class="section-title" style="margin-top:10px;">Transactions</p>';
+                html += txs.map(t => {
+                    const cat = getCat(t.categoryId);
+                    const wallet = state.wallets.find(w => w.id === t.walletId) || {};
+                    const wCurr = wallet.currency || state.currency.code;
+                    return `<div class="tx-row" onclick="openEditTransaction(${t.id})"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div><div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</p><p style="font-size:10px;color:var(--muted);">${cat.name} - ${dateLabel(t.date)}</p></div><div style="text-align:right;"><p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p></div></div>`;
+                }).join('');
+            }
+            if (!html) return '<p style="text-align:center;color:var(--muted);padding:34px 20px;font-size:13px;">No results found</p>';
+            return html;
+        }
+
         function renderHome() {
             let total = 0;
             state.wallets.forEach(w => { if (!w.excludeFromTotal) total += convertCurrency(w.balance, w.currency, state.currency.code); });
@@ -2105,10 +2862,19 @@ IMPORTANT RULES:
             </div>
         </div>
 
-        <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="width:100%;margin:20px 0 10px 0;position:relative;z-index:2;">
+            <button class="ai-mode-btn" onclick="openAIChat()" aria-label="AI Mode" style="width:100%;max-width:100%;">
+                <i data-lucide="search" style="width:18px;height:18px;"></i>
+                <span>AI Mode</span>
+            </button>
+        </div>
+
+        <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;z-index:1;">
             <p class="section-title" style="margin:0;">Cash Flow</p>
-            <div style="display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px;border:1px solid var(--border);">
-                ${['7d', '30d', '3m'].map(p => `<button onclick="setChartPeriod('${p}')" id="period-${p}" class="tab-pill" style="${ui.chartPeriod === p ? 'background:var(--surface2);color:var(--text);' : 'color:var(--muted);'}">${p}</button>`).join('')}
+            <div style="display:flex;gap:8px;align-items:center;">
+                <div style="display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:3px;border:1px solid var(--border);">
+                    ${['7d', '30d', '3m'].map(p => `<button onclick="setChartPeriod('${p}')" id="period-${p}" class="tab-pill" style="${ui.chartPeriod === p ? 'background:var(--surface2);color:var(--text);' : 'color:var(--muted);'}">${p}</button>`).join('')}
+                </div>
             </div>
         </div>
         <div class="card" style="padding:16px;margin-bottom:24px;"><canvas id="cashFlowChart" height="180"></canvas></div>
