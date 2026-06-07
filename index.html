@@ -48,9 +48,8 @@
         body.light-mode header { background: #ffffff; }
 
         /* Nav bar */
-        body.light-mode nav.glass { background: rgba(255,255,255,0.92) !important; border-color: rgba(0,0,0,0.1) !important; }
-        body.light-mode .nav-icon-btn { color: #8e8e93; }
-        body.light-mode .nav-icon-btn.nav-active { color: #10b981 !important; background: rgba(16,185,129,0.1); }
+        body.light-mode .nav-icon-btn { color: rgba(0,0,0,0.4); }
+        body.light-mode .nav-icon-btn.nav-active { color: var(--emerald) !important; }
 
         /* ── Bottom Sheet Popup ── */
         body.light-mode #bottom-sheet {
@@ -425,7 +424,7 @@
         .main-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 0 20px 120px;
+            padding: 0 20px calc(96px + env(safe-area-inset-bottom));
         }
 
         @keyframes pulse-ring {
@@ -499,7 +498,7 @@
         /* تأثير الـ Active عند اللمس */
         .nav-icon-btn:active {
             transform: scale(0.92);
-            filter: brightness(1.2);
+            filter: brightness(0.2);
             background: rgba(16, 185, 129, 0.15);
             color: var(--emerald) !important;
         }
@@ -517,37 +516,9 @@
             /* جعل الخطوط أوضح */
         }
 
-        /* زر الإضافة الوسطي */
-        .nav-plus-btn {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
 
-        .nav-plus-btn:hover {
-            transform: scale(1.1) rotate(90deg);
-            background: #34d399 !important;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.6) !important;
-        }
 
-        .nav-plus-btn:active {
-            transform: scale(0.92) rotate(90deg);
-        }
 
-        .nav-bar {
-            position: fixed;
-            bottom: 24px;
-            left: 20px;
-            right: 20px;
-            height: 76px;
-            border-radius: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
-            z-index: 20;
-            background: rgba(15, 15, 20, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
 
         /* Apple Wallet Card Stack */
         .wallet-container {
@@ -921,212 +892,350 @@
             -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
         }
 
-        nav.glass {
-            bottom: 18px !important;
-            left: 50% !important;
-            right: auto !important;
-            width: calc(100% - 32px) !important;
-            max-width: 398px !important;
-            height: 72px !important;
-            border-radius: 36px !important;
-            padding: 0 10px;
-            transform: translateX(-50%);
-        }
-
+        /* ── iOS 26 Liquid Glass Nav ── */
         .app-bottom-nav {
-          position: fixed;
-          left: 50%;
-          /* FIX: Dynamically calculate the bottom position to float above the home indicator */
-           bottom: calc(18px + env(safe-area-inset-bottom));
-          width: 100%;
-          max-width: 430px;
-          transform: translateX(-50%);
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: 8px; /* This gap keeps the search button detached and beside the main nav */
-    pointer-events: none;
-    padding:6px;
-}
-
-        .nav-search-glass {
-            position: relative;
-            flex-shrink: 0;
-            min-width: 72px;
+            position: fixed;
+            bottom: calc(14px + env(safe-area-inset-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 20;
+            pointer-events: none;
         }
 
-        .nav-plus-btn {
-            position: absolute;
-            top: -70px;
-            right: 1px;
-            display: inline-flex;
+        /* The glass pill */
+        .nav-pill {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            height: 64px;
+            border-radius: 32px;
+            padding: 6px;
+            pointer-events: auto;
+            cursor: pointer;
+
+            /* Liquid glass layers */
+            background:
+                linear-gradient(
+                    160deg,
+                    rgba(255,255,255,0.13) 0%,
+                    rgba(255,255,255,0.04) 40%,
+                    rgba(255,255,255,0.07) 100%
+                );
+            backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+            -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+
+            /* Specular top highlight + outer glow */
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.22),
+                inset 0 -1px 0 rgba(0,0,0,0.18),
+                0 8px 32px rgba(0,0,0,0.38),
+                0 2px 8px rgba(0,0,0,0.22);
+        }
+
+        body.light-mode .nav-pill {
+            background:
+                linear-gradient(
+                    160deg,
+                    rgba(255,255,255,0.72) 0%,
+                    rgba(255,255,255,0.48) 40%,
+                    rgba(255,255,255,0.60) 100%
+                );
+            border-color: rgba(255,255,255,0.9);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.95),
+                inset 0 -1px 0 rgba(0,0,0,0.06),
+                0 8px 32px rgba(0,0,0,0.12),
+                0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* Slide nav-pill out when search opens */
+        .nav-pill {
+            transition: opacity 0.25s ease, transform 0.28s cubic-bezier(0.32,0.72,0,1), flex 0.28s ease;
+        }
+
+        .app-bottom-nav.search-expanded .nav-pill {
+            opacity: 0;
+            transform: scale(0.92) translateX(-8px);
+            flex: 0 0 0 !important;
+            min-width: 0 !important;
+            padding: 0 !important;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* Each tab button */
+        .nav-tab-btn {
+            flex: 1;
+            height: 100%;
+            border: 0;
+            background: transparent;
+            color: rgba(255,255,255,0.45);
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 60px;
-            height: 60px;
-            border-radius: 999px;
-            background: var(--emerald);
-            color: #000;
-            box-shadow: 0 20px 42px rgba(16, 185, 129, 0.22);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            transform: none;
+            border-radius: 26px;
             cursor: pointer;
-            pointer-events: auto;
-            z-index: 22;
-        }
-
-        .nav-plus-btn i {
-            width: 26px;
-            height: 26px;
-        }
-
-        .app-bottom-nav.search-mode {
-            gap: 0;
-        }
-
-        .nav-tabs-glass,
-        .nav-search-glass {
-            pointer-events: auto;
-            background: rgba(0, 0, 0, 0.58);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: var(--shadow-glass);
-            backdrop-filter: blur(26px) saturate(180%);
-            -webkit-backdrop-filter: blur(26px) saturate(180%);
-        }
-
-        body.light-mode .nav-tabs-glass,
-        body.light-mode .nav-search-glass {
-            background: rgba(255, 255, 255, 0.72);
-        }
-
-        .nav-tabs-glass {
-            flex: 1;
-            height: 68px;
-            border-radius: 34px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            align-items: center;
-            transition: opacity 0.22s ease, transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), flex-basis 0.28s cubic-bezier(0.32, 0.72, 0, 1), padding 0.22s ease;
-        }
-
-        .app-bottom-nav.search-mode .nav-tabs-glass {
-            flex: 0 0 0 !important;
-            width: 0 !important;
-            min-width: 0 !important;
-            max-width: 0 !important;
-            opacity: 0 !important;
             padding: 0;
-            border: 0;
-            transform: scale(0.96);
-            visibility: hidden;
-            pointer-events: none;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transition: flex 0.32s cubic-bezier(0.32,0.72,0,1),
+                        opacity 0.22s ease,
+                        transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
         }
 
-        .nav-tab-btn {
-            height: 100px;
-            border: 0;
-            border-radius: 28px;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.68);
+        body.light-mode .nav-tab-btn {
+            color: rgba(0,0,0,0.38);
+        }
+
+        .nav-tab-btn:hover .nav-tab-inner {
+            background: rgba(255,255,255,0.09);
+            border-radius: 90px;
+        }
+
+        body.light-mode .nav-tab-btn:hover .nav-tab-inner {
+            background: rgba(0,0,0,0.06);
+        }
+
+        .nav-tab-btn:active {
+            transform: scale(0.88);
+        }
+
+        /* Inner wrapper — the frosted capsule on active */
+        .nav-tab-inner {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 3px;
-            font-family: var(--font-main);
-            font-size: 10px;
-            font-weight: 750;
-            transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
-        }
-
-        body.light-mode .nav-tab-btn {
-            color: var(--muted);
+            gap: 2px;
+            width: 100%;
+            height: 100%;
+            border-radius: 90px;
+            transition: background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, border-radius 0.22s ease;
         }
 
         .nav-tab-btn i {
-            width: 100px;
-            height: 100px;
-            stroke-width: 2.6;
-        }
-
-        .nav-tab-btn.nav-active {
-            background: linear-gradient(135deg, #ff5a24, #f43f3f);
-            color: #fff !important;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 22px rgba(63, 244, 144, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.28);
-        }
-
-        .nav-search-glass {
-            width: 68px;
-            height: 68px;
-            border-radius: 34px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: width 0.35s cubic-bezier(0.32, 0.72, 0, 1), background 0.35s ease, border-color 0.3s ease;
-        }
-
-        .nav-search-glass.search-expanded {
-            flex: 1 1 100%;
-            width: 100% !important;
-            justify-content: flex-start;
-            padding: 0 16px 0 12px;
-            gap: 8px;
-        }
-
-        .nav-search-glass.search-expanded:focus-within {
-            border-color: rgba(255, 255, 255, 0.28);
-            background: rgba(0, 0, 0, 0.68);
-        }
-
-        .nav-back-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 999px;
-            border: 0;
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            margin-right: 4px;
-        }
-
-        .nav-back-btn i {
             width: 22px;
             height: 22px;
-            stroke-width: 2.7;
+            stroke-width: 2.1;
+            transition: stroke-width 0.18s ease;
         }
 
-        .nav-search-glass.search-expanded .nav-back-btn {
+        .nav-label {
+            font-size: 9.5px;
+            font-weight: 650;
+            letter-spacing: 0.01em;
+            line-height: 1;
+        }
+
+        /* Active tab — frosted glass capsule */
+        .nav-tab-btn.nav-active {
+            color: rgba(16, 214, 105, 0.95) !important;
+        }
+
+        .nav-tab-btn.nav-active .nav-tab-inner {
+            background:
+                linear-gradient(
+                    150deg,
+                    rgba(255,255,255,0.22) 0%,
+                    rgba(255,255,255,0.08) 100%
+                );
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.30),
+                0 2px 8px rgba(0,0,0,0.20);
+            border: 1px solid rgba(255,255,255,0.16);
+        }
+
+        .nav-tab-btn.nav-active i {
+            stroke-width: 2.5;
+            color: var(--emerald);
+        }
+
+        .nav-tab-btn.nav-active .nav-label {
+            color: var(--emerald);
+        }
+
+        body.light-mode .nav-tab-btn.nav-active {
+            color: rgba(0,0,0,0.85) !important;
+        }
+
+        body.light-mode .nav-tab-btn.nav-active .nav-tab-inner {
+            background:
+                linear-gradient(
+                    150deg,
+                    rgba(255,255,255,0.90) 0%,
+                    rgba(255,255,255,0.60) 100%
+                );
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,1),
+                0 2px 8px rgba(0,0,0,0.08);
+            border-color: rgba(255,255,255,0.9);
+        }
+
+        /* FAB + button */
+        /* Search wrap — right-anchored, expands leftward */
+        .nav-search-wrap {
+            position: relative;
+            flex-shrink: 0;
             display: flex;
+            flex-direction: column;
+            align-items: flex-end;   /* anchor to right */
+            pointer-events: auto;
+            width: 64px;
+            transition: width 0.34s cubic-bezier(0.32,0.72,0,1);
         }
 
-        .nav-search-btn {
-            width: 58px;
-            height: 58px;
-            border-radius: 999px;
+        .nav-search-wrap.search-expanded {
+            /* grow to cover the whole nav bar space */
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Floating + FAB — above the search pill */
+        .nav-fab {
+            position: absolute;
+            top: -80px;
+            right: 4px;
+            width: 62px;
+            height: 62px;
+            border-radius: 31px;
             border: 0;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.68);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            z-index: 2;
+            transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s ease, opacity 0.22s ease;
+            background: linear-gradient(145deg, var(--emerald), #059669);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.16),
+                0 10px 32px rgba(16,185,129,0.55),
+                inset 0 1px 0 rgba(255,255,255,0.30);
         }
 
-        .nav-search-btn i {
+        .nav-fab i {
             width: 28px;
             height: 28px;
             stroke-width: 2.4;
+            color: #000;
+            transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
         }
 
-        .nav-search-input {
+        .nav-fab:active { transform: scale(0.86); }
+        .nav-fab:active i { transform: rotate(45deg); }
+
+        /* Hide FAB when search is open */
+        .nav-search-wrap.search-expanded .nav-fab {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.7);
+        }
+
+        /* Back button hidden inside nav pill — slides in on search open */
+        .nav-back-in-pill {
+            flex: 0;
             width: 0;
+            height: 100%;
+            border: 0;
+            background: transparent;
+            color: rgba(255,255,255,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: flex 0.32s cubic-bezier(0.32,0.72,0,1),
+                        opacity 0.22s ease;
+            border-radius: 90px;
+        }
+
+        body.light-mode .nav-back-in-pill { color: rgba(0,0,0,0.6); }
+
+        .nav-back-in-pill .nav-tab-inner {
+            width: 52px;
+        }
+
+        .nav-back-in-pill i { width: 20px; height: 20px; stroke-width: 2.3; }
+
+        /* When search is open: back btn appears, tabs collapse */
+        .nav-pill.search-active .nav-back-in-pill {
+            flex: 1;
+            width: auto;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .nav-pill.search-active .nav-tab-btn {
+            flex: 0;
+            width: 0;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* The search glass pill — always right-anchored */
+        .nav-search-pill {
+            width: 64px;
+            height: 64px;
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            transition: width 0.34s cubic-bezier(0.32,0.72,0,1);
+
+            background:
+                linear-gradient(160deg,
+                    rgba(255,255,255,0.13) 0%,
+                    rgba(255,255,255,0.04) 40%,
+                    rgba(255,255,255,0.07) 100%);
+            backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+            -webkit-backdrop-filter: blur(32px) saturate(200%) brightness(1.08);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.22),
+                inset 0 -1px 0 rgba(0,0,0,0.18),
+                0 8px 32px rgba(0,0,0,0.38),
+                0 2px 8px rgba(0,0,0,0.22);
+        }
+
+        body.light-mode .nav-search-pill {
+            background: linear-gradient(160deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.48) 40%, rgba(255,255,255,0.60) 100%);
+            border-color: rgba(255,255,255,0.9);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 8px 32px rgba(0,0,0,0.12);
+        }
+
+        .nav-search-pill.search-expanded {
+            width: 100%;
+        }
+
+        .nav-search-btn {
+            width: 62px;
+            height: 62px;
+            flex-shrink: 0;
+            border: 0;
+            background: transparent;
+            color: rgba(255,255,255,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body.light-mode .nav-search-btn { color: rgba(0,0,0,0.42); }
+        .nav-search-btn i { width: 22px; height: 22px; stroke-width: 2.1; }
+
+        .nav-search-input {
+            flex: 1;
             min-width: 0;
             opacity: 0;
             border: 0;
@@ -1134,101 +1243,32 @@
             background: transparent;
             color: #fff;
             font-family: var(--font-main);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
-            letter-spacing: -0.3px;
-            transition: width 0.24s ease, opacity 0.18s ease, font-size 0.2s ease;
+            transition: opacity 0.22s ease 0.1s;
+            padding: 0;
+            pointer-events: none;
         }
 
-        .nav-search-input::placeholder {
-            color: rgba(255, 255, 255, 0.65);
-            font-weight: 400;
-        }
-
-        .nav-search-glass.search-expanded .nav-search-input {
-            width: 100%;
+        .nav-search-pill.search-expanded .nav-search-input {
             opacity: 1;
-            font-size: 16px;
-            font-weight: 500;
+            padding: 0 12px 0 4px;
+            pointer-events: auto;
         }
 
-        body.light-mode .nav-search-input {
-            color: var(--text);
-        }
-
-        body.light-mode .nav-search-input::placeholder {
-            color: #999;
-            font-weight: 400;
-        }
-
-        body.light-mode .nav-search-glass.search-expanded:focus-within {
-            border-color: rgba(0, 0, 0, 0.2);
-            background: rgba(255, 255, 255, 0.85);
-        }
-
-        /* Mobile Search Responsiveness */
-        @media (max-width: 600px) {
-            .nav-search-input {
-                font-size: 14px;
-            }
-            .nav-search-glass.search-expanded .nav-search-input {
-                font-size: 14px;
-            }
-            .nav-search-btn {
-                width: 48px;
-                height: 48px;
-            }
-            .nav-search-btn i {
-                width: 22px;
-                height: 22px;
-            }
-        }
-
-        @media (max-width: 393px) {
-            .nav-search-input {
-                font-size: 13px;
-            }
-            .nav-search-glass {
-                width: 60px;
-               
-            }
-            .nav-search-glass.search-expanded {
-                padding: 0 12px 0 10px;
-                gap: 6px;
-            }
-            .nav-search-btn {
-                width: 33px;
-                height: 33px;
-            }
-            .nav-search-btn i {
-                width: 15px;
-                height: 15px;
-            }
-        }
+        body.light-mode .nav-search-input { color: #111; }
+        .nav-search-input::placeholder { color: rgba(255,255,255,0.45); }
+        body.light-mode .nav-search-input::placeholder { color: rgba(0,0,0,0.35); }
 
         .nav-icon-btn {
-            width: 75px;
-            height: 60px;
-            border-radius: 999px;
-            color: var(--muted);
-            
-    
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            /* inherits from .nav-tab-btn */
         }
 
-        .nav-icon-btn.nav-active {
-            background: rgba(16, 185, 129, 0.15) !important;
-            color: var(--emerald) !important;
-            transform: none;
-        }
 
-        /* nav-plus-btn sizing handled by base rule */
 
         .main-scroll {
-            padding: 4px 18px 112px;
-            scroll-padding-bottom: 112px;
+            padding: 4px 18px calc(96px + env(safe-area-inset-bottom));
+            scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom));
         }
 
         .card,
@@ -1317,112 +1357,29 @@
         }
 
         @media (max-width: 380px) {
-            
             header {
                 padding-left: 16px !important;
                 padding-right: 16px !important;
             }
-
             #header-title {
                 font-size: 25px !important;
             }
-
-            nav.glass {
-                width: calc(100% - 24px) !important;
-            }
-
-            .app-bottom-nav {
-            
-                width: calc(100% - 16px);
-                gap: 4px;
-                padding: 0 8px;
-            }
-
-            .nav-tabs-glass,
-            .nav-search-glass {
-                height: 64px;
-                border-radius: 32px;
-            }
-
-            .nav-tab-btn {
-                height: 52px;
-                font-size: 9px;
-            }
-
-            .nav-tab-btn i {
-                width: 19px;
-                height: 19px;
-            }
-
-            .nav-search-glass {
-                width: 50px;
-                hight: 50px;
-            }
-
-            .nav-search-glass.search-expanded {
-                width: 100%;
-            }
-
-            .nav-plus-btn {
-                right: 12px;
-                width: 54px;
-                height: 54px;
-            }
-
-            .app-bottom-nav {
-                width: calc(100% - 20px);
-                bottom: 12px;
-                padding: 0 10px;
-            }
-
             .main-scroll {
                 padding-left: 16px;
                 padding-right: 16px;
             }
+            .nav-tab-btn span {
+                font-size: 9px;
+            }
         }
 
         @media (max-width: 340px) {
-            .app-bottom-nav {
-                width: calc(100% - 16px);
-                gap: 4px;
-                padding: 0 8px;
-            }
-
-            .nav-tabs-glass {
-                width: 100%;
-                grid-template-columns: repeat(4, minmax(0, 2fr));
-                gap: 4px;
-                padding: 0 4px;
-            }
-
-            .nav-tab-btn {
-                min-width: 0;
-                padding: 0 6px;
-                height: 48px;
-                font-size: 0;
-            }
-
             .nav-tab-btn span {
                 display: none;
             }
-
             .nav-tab-btn i {
                 width: 22px;
                 height: 22px;
-            }
-
-            .nav-search-glass {
-                width: 56px;
-            }
-
-            .nav-search-glass.search-expanded {
-                width: 100%;
-            }
-
-            .nav-plus-btn {
-                right: 8px;
-                width: 52px;
-                height: 52px;
             }
         }
     </style>
@@ -1461,41 +1418,55 @@
 
         <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
         <nav class="app-bottom-nav" aria-label="Main navigation">
-            <div class="nav-tabs-glass">
-                <button onclick="switchTab('home')" class="nav-tab-btn nav-icon-btn nav-active" data-tab="home">
-                    <i data-lucide="layout-grid"></i>
-                    <span>Home</span>
+            <!-- Main tabs pill -->
+            <div class="nav-pill" id="nav-pill-tabs">
+                <button onclick="switchTab('home')" class="nav-tab-btn nav-active" data-tab="home">
+                    <span class="nav-tab-inner">
+                        <i data-lucide="layout-grid"></i>
+                        <span class="nav-label">Home</span>
+                    </span>
                 </button>
-
-                <button onclick="switchTab('finance')" class="nav-tab-btn nav-icon-btn" data-tab="finance">
-                    <i data-lucide="pie-chart"></i>
-                    <span>Finance</span>
+                <button onclick="switchTab('finance')" class="nav-tab-btn" data-tab="finance">
+                    <span class="nav-tab-inner">
+                        <i data-lucide="pie-chart"></i>
+                        <span class="nav-label">Finance</span>
+                    </span>
                 </button>
-
-                <button onclick="switchTab('wallets')" class="nav-tab-btn nav-icon-btn" data-tab="wallets">
-                    <i data-lucide="wallet"></i>
-                    <span>Wallets</span>
+                <button onclick="switchTab('wallets')" class="nav-tab-btn" data-tab="wallets">
+                    <span class="nav-tab-inner">
+                        <i data-lucide="wallet"></i>
+                        <span class="nav-label">Wallets</span>
+                    </span>
                 </button>
-
-                <button onclick="switchTab('settings')" class="nav-tab-btn nav-icon-btn" data-tab="settings">
-                    <i data-lucide="user"></i>
-                    <span>Settings</span>
+                <button onclick="switchTab('settings')" class="nav-tab-btn" data-tab="settings">
+                    <span class="nav-tab-inner">
+                        <i data-lucide="user"></i>
+                        <span class="nav-label">Settings</span>
+                    </span>
+                </button>
+                <!-- Back button lives inside the pill, shown only when search is open -->
+                <button class="nav-back-in-pill" id="nav-back-pill" onclick="closeSearchMode()" aria-label="Back">
+                    <span class="nav-tab-inner">
+                        <i data-lucide="arrow-left"></i>
+                        <span class="nav-label">Back</span>
+                    </span>
                 </button>
             </div>
-           
-            <div id="nav-search-shell" class="nav-search-glass">
-                <button onclick="closeSearchMode()" class="nav-back-btn" aria-label="Back">
-                    <i data-lucide="arrow-left"></i>
+            <!-- Search pill + floating + button -->
+            <div class="nav-search-wrap" id="nav-search-shell">
+                <button class="nav-fab" onclick="openTransactionForm()" aria-label="Add transaction">
+                    <i data-lucide="plus"></i>
                 </button>
-                <button onclick="openSearch()" class="nav-search-btn" aria-label="Search">
-                    <i data-lucide="search"></i>
-                </button>
-                <input id="nav-search-input" class="nav-search-input" type="search" placeholder="Search"
-                    oninput="handleSearch(this.value)" onfocus="openSearch(false)">
+                <div class="nav-search-pill" id="nav-search-pill">
+                    <button class="nav-search-btn" onclick="openSearch()" aria-label="Search">
+                        <i data-lucide="search"></i>
+                    </button>
+                    <input id="nav-search-input" class="nav-search-input" type="search"
+                        placeholder="Search…"
+                        oninput="handleSearch(this.value)"
+                        onfocus="openSearch(false)" />
+                </div>
             </div>
-            <button class="nav-plus-btn" id="floating-plus-btn" aria-label="Add" onclick="openTransactionForm()">
-                <i data-lucide="plus"></i>
-            </button>
         </nav>
 
 
@@ -2008,9 +1979,8 @@
             const target = isFinanceTab ? 'finance' : tabId;
 
             // 2. تحديث الـ Active class
-            document.querySelectorAll('.nav-icon-btn').forEach(btn => {
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
                 btn.classList.remove('nav-active');
-                btn.style.strokeWidth = "2";
             });
 
             const activeBtn = document.querySelector(`[data-tab="${target}"]`) || document.querySelector(`[onclick*="switchTab('${target}')"]`);
@@ -2813,12 +2783,17 @@ IMPORTANT RULES:
 
         function syncSearchUI() {
             const isSearch = ui.currentTab === 'search';
-            const nav = document.querySelector('.app-bottom-nav');
-            const shell = document.getElementById('nav-search-shell');
+            const wrap = document.getElementById('nav-search-shell');
+            const pill = document.getElementById('nav-search-pill');
+            const tabsPill = document.getElementById('nav-pill-tabs');
             const navInput = document.getElementById('nav-search-input');
-            if (nav) nav.classList.toggle('search-mode', isSearch);
-            if (shell) shell.classList.toggle('search-expanded', isSearch);
-            if (navInput) navInput.value = ui.searchQuery || '';
+            if (wrap) wrap.classList.toggle('search-expanded', isSearch);
+            if (pill) pill.classList.toggle('search-expanded', isSearch);
+            if (tabsPill) tabsPill.classList.toggle('search-active', isSearch);
+            if (navInput) {
+                navInput.value = ui.searchQuery || '';
+                if (isSearch) setTimeout(() => navInput.focus(), 320);
+            }
             const pageInput = document.getElementById('search-input');
             if (pageInput) pageInput.value = ui.searchQuery || '';
             if (isSearch) renderSearchResults();
