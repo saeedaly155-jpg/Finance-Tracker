@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finance Pro">
     <meta name="theme-color" content="#07070a">
-    <!-- Apple touch icon: 180×180, no transparency, iOS adds its own rounding -->
+    <!-- Apple touch icon: 180Ã—180, no transparency, iOS adds its own rounding -->
     <link rel="apple-touch-icon" sizes="180x180" href="https://cdn-icons-png.flaticon.com/512/3135/3135679.png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135679.png">
     <link id="app-favicon" rel="icon" sizes="32x32" href="https://cdn-icons-png.flaticon.com/32/3914/3914398.png">
@@ -33,7 +33,7 @@
             --font-main: 'Google Sans Flex', 'Google Sans', sans-serif;
         }
 
-        /* ── Light Mode ── */
+        /* â”€â”€ Light Mode â”€â”€ */
         body.light-mode {
             --bg: #f2f2f7;
             --surface: #ffffff;
@@ -47,11 +47,7 @@
         body.light-mode .app { background: var(--surface); }
         body.light-mode header { background: #ffffff; }
 
-        /* Nav bar */
-        body.light-mode .nav-icon-btn { color: rgba(0,0,0,0.4); }
-        body.light-mode .nav-icon-btn.nav-active { color: var(--emerald) !important; }
-
-        /* ── Bottom Sheet Popup ── */
+        /* â”€â”€ Bottom Sheet Popup â”€â”€ */
         body.light-mode #bottom-sheet {
             background: #ffffff !important;
             border-top-color: rgba(0,0,0,0.08) !important;
@@ -63,7 +59,7 @@
         body.light-mode #sheet-content * {
             color: #1c1c1e;
         }
-        /* Restore accent colors inside the sheet — these must come AFTER the wildcard above */
+        /* Restore accent colors inside the sheet - these must come AFTER the wildcard above */
         body.light-mode #sheet-content [style*="color:var(--emerald)"],
         body.light-mode #sheet-content [style*="color: var(--emerald)"] { color: #10b981 !important; }
         body.light-mode #sheet-content [style*="color:var(--rose)"],
@@ -90,10 +86,10 @@
         body.light-mode .icon-box { background: rgba(0,0,0,0.05) !important; }
 
         /* Wallet card text */
-        /* wcard-balance is always white — handled in base CSS with !important */
-        /* Wallet card classes always use white text — no light mode override needed */
+        /* wcard-balance is always white - handled in base CSS with !important */
+        /* Wallet card classes always use white text - no light mode override needed */
 
-        /* Numbers — only reset the transparent gradient text fill from dark mode.
+        /* Numbers - only reset the transparent gradient text fill from dark mode.
            Do NOT override inline color styles (colored amounts stay emerald/rose). */
         body.light-mode .syne {
             /* reset the silver metallic gradient used in dark mode */
@@ -160,21 +156,21 @@
             transform: translateY(0);
         }
 
-        /* ── Apple iOS 26 / VisionOS Glass Effect ── */
+        /* â”€â”€ Apple iOS 26 / VisionOS Glass Effect â”€â”€ */
         .glass {
-            /* خلفية متدرجة بتدي إحساس إن الإزاز مقوس أو منفوخ */
+            /* Ø®Ù„ÙÙŠØ© Ù…ØªØ¯Ø±Ø¬Ø© Ø¨ØªØ¯ÙŠ Ø¥Ø­Ø³Ø§Ø³ Ø¥Ù† Ø§Ù„Ø¥Ø²Ø§Ø² Ù…Ù‚ÙˆØ³ Ø£Ùˆ Ù…Ù†ÙÙˆØ® */
 
-            /* تمويه قوي مع تشبع لوني عالي */
+            /* ØªÙ…ÙˆÙŠÙ‡ Ù‚ÙˆÙŠ Ù…Ø¹ ØªØ´Ø¨Ø¹ Ù„ÙˆÙ†ÙŠ Ø¹Ø§Ù„ÙŠ */
             backdrop-filter: blur(10px) saturate(200%);
             -webkit-backdrop-filter: blur(20px) saturate(200%);
 
-            /* إطار خارجي شفاف جداً */
+            /* Ø¥Ø·Ø§Ø± Ø®Ø§Ø±Ø¬ÙŠ Ø´ÙØ§Ù Ø¬Ø¯Ø§Ù‹ */
             border: 1px solid rgba(255, 255, 255, 0.15);
 
-            /* السحر بتاع الـ Liquid هنا: 
-               1. خط أبيض حاد جداً من فوق (بيعمل لمعة سطح الماية)
-               2. انعكاس خفيف من تحت
-               3. ظل عميق جداً عشان يبرز الـ Nav bar
+            /* Ø§Ù„Ø³Ø­Ø± Ø¨ØªØ§Ø¹ Ø§Ù„Ù€ Liquid Ù‡Ù†Ø§: 
+               1. Ø®Ø· Ø£Ø¨ÙŠØ¶ Ø­Ø§Ø¯ Ø¬Ø¯Ø§Ù‹ Ù…Ù† ÙÙˆÙ‚ (Ø¨ÙŠØ¹Ù…Ù„ Ù„Ù…Ø¹Ø© Ø³Ø·Ø­ Ø§Ù„Ù…Ø§ÙŠØ©)
+               2. Ø§Ù†Ø¹ÙƒØ§Ø³ Ø®ÙÙŠÙ Ù…Ù† ØªØ­Øª
+               3. Ø¸Ù„ Ø¹Ù…ÙŠÙ‚ Ø¬Ø¯Ø§Ù‹ Ø¹Ø´Ø§Ù† ÙŠØ¨Ø±Ø² Ø§Ù„Ù€ Nav bar
             */
 
         }
@@ -286,7 +282,7 @@
         .wallet-chip {
             background: var(--card-gradient);
 
-            /* إضاءة خفيفة جداً على الحواف تعطي عمقاً */
+            /* Ø¥Ø¶Ø§Ø¡Ø© Ø®ÙÙŠÙØ© Ø¬Ø¯Ø§Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ø­ÙˆØ§Ù ØªØ¹Ø·ÙŠ Ø¹Ù…Ù‚Ø§Ù‹ */
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7),
                 inset 0 1px 1px rgba(255, 255, 255, 0.1);
@@ -469,99 +465,281 @@
             clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
         }
 
-        /* تأثير الـ Hover لأيقونات الـ Nav Bar */
-        .nav-icon-btn {
+
+
+
+
+        /* Cards & Wallet screen */
+        .wallet-page {
+            min-height: 100vh;
+            padding-bottom: 122px;
+        }
+
+        .wallet-topbar {
+            display: grid;
+            grid-template-columns: 42px 1fr 42px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .wallet-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            color: #52525b;
-            /* الم muted */
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text);
             background: transparent;
-            border: none;
-            cursor: pointer;
-            margin: 0 auto;
+            transition: background 0.18s ease, transform 0.18s ease;
         }
 
-        .nav-icon-btn.nav-active {
-            color: #10b981 !important;
-            /* اللون الأخضر */
-            background: rgba(16, 185, 129, 0.1);
-            transform: scale(1.1);
+        .wallet-icon-btn:hover {
+            background: var(--surface2);
         }
 
-        /* تأثير عند الضغط (للموبايل) */
-        /* تأثير الـ Active عند اللمس */
-        .nav-icon-btn:active {
-            transform: scale(0.92);
-            filter: brightness(0.2);
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--emerald) !important;
+        .wallet-icon-btn:active {
+            transform: scale(0.94);
         }
 
-        .nav-icon-btn:hover {
-            color: #10b981;
-            background: rgba(16, 185, 129, 0.06);
-            transform: scale(1.08);
-        }
-
-        .nav-icon-btn i {
-            width: 22px;
-            height: 22px;
-            stroke-width: 2.5;
-            /* جعل الخطوط أوضح */
-        }
-
-
-
-
-
-        /* Apple Wallet Card Stack */
-        .wallet-container {
+        .wallet-card-stage {
             position: relative;
-            padding-top: 10px;
-            height: 100%;
-            min-height: 80vh;
+            margin: 0 -20px 18px;
+            overflow: hidden;
         }
 
-        .wallet-card-wrapper {
+        .wallet-card-track {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding: 2px max(20px, calc((100vw - 342px) / 2)) 16px;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            touch-action: none;
+            overscroll-behavior: contain;
+            cursor: grab;
+        }
+
+        .wallet-card-track:active {
+            cursor: grabbing;
+        }
+
+        .wallet-card-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .wallet-carousel-item {
+            flex: 0 0 min(342px, calc(100vw - 48px));
+            scroll-snap-align: center;
+            transform: scale(0.94);
+            opacity: 0.62;
+            transition: transform 0.24s ease, opacity 0.24s ease;
+        }
+
+        .wallet-carousel-item.is-active {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .wallet-carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: -4px;
+        }
+
+        .wallet-carousel-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--border);
+            transition: width 0.2s ease, background 0.2s ease;
+        }
+
+        .wallet-carousel-dot.is-active {
+            width: 18px;
+            background: var(--emerald);
+        }
+
+        .wallet-hero-card {
+            position: relative;
+            z-index: 1;
+            height: 192px;
+            border-radius: 22px;
+            padding: 24px;
+            overflow: hidden;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.16);
+            box-shadow: 0 24px 58px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.18);
+            transform: translateZ(0);
+        }
+
+        .wallet-hero-card::before {
+            content: "";
             position: absolute;
-            width: 100%;
-            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-            left: 0;
-            cursor: pointer;
-            will-change: transform, opacity;
-            top: 0;
-        }
-
-        .wallet-card-wrapper.expanded {
-            z-index: 50 ;
-        }
-
-        .wallet-card-wrapper.hidden-down {
-            opacity: 0;
+            inset: 0;
+            background: linear-gradient(145deg, rgba(255,255,255,0.22), transparent 44%, rgba(0,0,0,0.2));
             pointer-events: none;
+        }
+
+        .wallet-hero-card::after {
+            content: "";
+            position: absolute;
+            left: 18px;
+            right: 18px;
+            bottom: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.22);
+        }
+
+        .wallet-card-brand {
+            width: 42px;
+            height: 42px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            flex-shrink: 0;
+        }
+
+        .wallet-card-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: fit-content;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.8);
+            font-size: 10px;
+            font-weight: 850;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .wallet-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-width: 342px;
+            margin: 0 auto 24px;
+        }
+
+        .wallet-action-pill {
+            min-height: 42px;
+            border-radius: 14px;
+            background: var(--surface-glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 750;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: transform 0.18s ease, background 0.18s ease;
+        }
+
+        .wallet-action-pill:active {
+            transform: scale(0.97);
+        }
+
+        .wallet-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 2px 10px;
+        }
+
+        .wallet-account-list {
+            overflow: hidden;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: var(--surface-glass);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            box-shadow: var(--shadow-glass);
+        }
+
+        .wallet-account-row {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.18s ease;
+        }
+
+        .wallet-account-row:last-child {
+            border-bottom: 0;
+        }
+
+        .wallet-account-row:hover {
+            background: var(--surface2);
+        }
+
+        .wallet-account-row.is-selected {
+            background: rgba(16,185,129,0.08);
+        }
+
+        .wallet-mini-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .wallet-detail-card {
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface-glass);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            box-shadow: var(--shadow-glass);
+            overflow: hidden;
+        }
+
+        .wallet-detail-row {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .wallet-detail-row:last-child {
+            border-bottom: 0;
+        }
+
+        .wallet-detail-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
         }
 
         .wallet-details {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.35s ease, transform 0.35s ease;
-            pointer-events: none;
             display: none;
-            padding-bottom: 120px;
-        }
-
-        .wallet-details.active {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-            display: block;
-            margin-top: 240px;
         }
 
         /* AI FAB & Chat Styles */
@@ -752,8 +930,8 @@
             align-self: flex-start;
         }
 
-        /* ── Wallet Card: clean minimal text ── */
-        /* Wallet card text — cards always have dark gradient backgrounds,
+        /* â”€â”€ Wallet Card: clean minimal text â”€â”€ */
+        /* Wallet card text - cards always have dark gradient backgrounds,
            so text must always be white regardless of app theme */
         .wcard-label {
             font-family: var(--font-main);
@@ -892,10 +1070,10 @@
             -webkit-backdrop-filter: blur(26px) saturate(180%) !important;
         }
 
-        /* ── iOS 26 Liquid Glass Nav ── */
+        /* â”€â”€ iOS 26 Liquid Glass Nav â”€â”€ */
         .app-bottom-nav {
             position: fixed;
-            bottom: calc(14px + env(safe-area-inset-bottom));
+            bottom: calc(28px + env(safe-area-inset-bottom));
             left: 50%;
             transform: translateX(-50%);
             width: calc(100% - 32px);
@@ -969,6 +1147,23 @@
             pointer-events: none;
         }
 
+        .app-bottom-nav.search-expanded .nav-pill.search-active {
+            opacity: 1;
+            transform: none;
+            flex: 0 0 64px !important;
+            width: 64px !important;
+            min-width: 64px !important;
+            max-width: 64px !important;
+            height: 64px;
+            aspect-ratio: 1 / 1;
+            padding: 0 !important;
+            border-radius: 999px;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+
         /* Each tab button */
         .nav-tab-btn {
             flex: 1;
@@ -1006,7 +1201,7 @@
             transform: scale(0.88);
         }
 
-        /* Inner wrapper — the frosted capsule on active */
+        /* Inner wrapper - the frosted capsule on active */
         .nav-tab-inner {
             display: flex;
             flex-direction: column;
@@ -1033,7 +1228,7 @@
             line-height: 1;
         }
 
-        /* Active tab — frosted glass capsule */
+        /* Active tab - frosted glass capsule */
         .nav-tab-btn.nav-active {
             color: rgba(16, 214, 105, 0.95) !important;
         }
@@ -1078,7 +1273,7 @@
         }
 
         /* FAB + button */
-        /* Search wrap — right-anchored, expands leftward */
+        /* Search wrap - right-anchored, expands leftward */
         .nav-search-wrap {
             position: relative;
             flex-shrink: 0;
@@ -1096,7 +1291,7 @@
             flex: 1;
         }
 
-        /* Floating + FAB — above the search pill */
+        /* Floating + FAB - above the search pill */
         .nav-fab {
             position: absolute;
             top: -80px;
@@ -1137,11 +1332,11 @@
             transform: scale(0.7);
         }
 
-        /* Back button hidden inside nav pill — slides in on search open */
+        /* Back button hidden inside nav pill - slides in on search open */
         .nav-back-in-pill {
             flex: 0;
             width: 0;
-            height: 100%;
+            height: 64px;
             border: 0;
             background: transparent;
             color: rgba(255,255,255,0.85);
@@ -1155,23 +1350,36 @@
             -webkit-tap-highlight-color: transparent;
             transition: flex 0.32s cubic-bezier(0.32,0.72,0,1),
                         opacity 0.22s ease;
-            border-radius: 90px;
+            border-radius: 50%;
+            margin: 0;
         }
 
-        body.light-mode .nav-back-in-pill { color: rgba(0,0,0,0.6); }
+        body.light-mode .nav-back-in-pill {
+            background: rgba(0,0,0,0.07);
+            color: rgba(0,0,0,0.6);
+        }
 
         .nav-back-in-pill .nav-tab-inner {
-            width: 52px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
         }
 
         .nav-back-in-pill i { width: 20px; height: 20px; stroke-width: 2.3; }
 
         /* When search is open: back btn appears, tabs collapse */
         .nav-pill.search-active .nav-back-in-pill {
-            flex: 1;
-            width: auto;
+            flex: 0 0 64px;
+            width: 64px;
+            max-width: 64px;
+            height: 64px;
+            aspect-ratio: 1 / 1;
             opacity: 1;
             pointer-events: auto;
+        }
+
+        .nav-pill.search-active .nav-back-in-pill .nav-label {
+            display: none;
         }
 
         .nav-pill.search-active .nav-tab-btn {
@@ -1182,7 +1390,7 @@
             pointer-events: none;
         }
 
-        /* The search glass pill — always right-anchored */
+        /* The search glass pill - always right-anchored */
         .nav-search-pill {
             width: 64px;
             height: 64px;
@@ -1215,6 +1423,8 @@
 
         .nav-search-pill.search-expanded {
             width: 100%;
+            padding-left: 8px;
+            padding-right: 10px;
         }
 
         .nav-search-btn {
@@ -1229,10 +1439,29 @@
             justify-content: center;
             cursor: pointer;
             -webkit-tap-highlight-color: transparent;
+            border-radius: 50%;
+            transition: background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
         }
 
         body.light-mode .nav-search-btn { color: rgba(0,0,0,0.42); }
         .nav-search-btn i { width: 22px; height: 22px; stroke-width: 2.1; }
+
+        .nav-search-pill.search-expanded .nav-search-btn {
+            order: 0;
+            width: 58px;
+            height: 58px;
+            margin-left: 0;
+            margin-right: 6px;
+            background: transparent;
+            box-shadow: none;
+            color: rgba(255,255,255,0.88);
+        }
+
+        body.light-mode .nav-search-pill.search-expanded .nav-search-btn {
+            background: transparent;
+            box-shadow: none;
+            color: rgba(0,0,0,0.68);
+        }
 
         .nav-search-input {
             flex: 1;
@@ -1251,20 +1480,15 @@
         }
 
         .nav-search-pill.search-expanded .nav-search-input {
+            order: 1;
             opacity: 1;
-            padding: 0 12px 0 4px;
+            padding: 0 4px 0 2px;
             pointer-events: auto;
         }
 
         body.light-mode .nav-search-input { color: #111; }
         .nav-search-input::placeholder { color: rgba(255,255,255,0.45); }
         body.light-mode .nav-search-input::placeholder { color: rgba(0,0,0,0.35); }
-
-        .nav-icon-btn {
-            /* inherits from .nav-tab-btn */
-        }
-
-
 
         .main-scroll {
             padding: 4px 18px calc(96px + env(safe-area-inset-bottom));
@@ -1382,6 +1606,369 @@
                 height: 22px;
             }
         }
+
+        /* Apple design-system visual pass: keep layout, refine material and hierarchy. */
+        :root {
+            --bg: #07070b;
+            --surface: #101015;
+            --surface2: rgba(255, 255, 255, 0.07);
+            --surface-glass: rgba(34, 34, 40, 0.58);
+            --surface-glass-strong: rgba(24, 24, 30, 0.88);
+            --border: rgba(255, 255, 255, 0.13);
+            --text: #f7f7f8;
+            --muted: #a3a3ad;
+            --emerald: #12c875;
+            --rose: #ff4f69;
+            --amber: #ffb340;
+            --blue: #5aa9ff;
+            --shadow-glass: 0 18px 48px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            --focus-ring: 0 0 0 4px rgba(18, 200, 117, 0.18);
+        }
+
+        body.light-mode {
+            --bg: #f5f5f7;
+            --surface: #fbfbfd;
+            --surface2: rgba(0, 0, 0, 0.045);
+            --surface-glass: rgba(255, 255, 255, 0.68);
+            --surface-glass-strong: rgba(255, 255, 255, 0.92);
+            --border: rgba(0, 0, 0, 0.10);
+            --text: #1d1d1f;
+            --muted: #6e6e73;
+            --shadow-glass: 0 18px 42px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at 50% -18%, rgba(90, 169, 255, 0.13), transparent 34%),
+                radial-gradient(circle at 100% 10%, rgba(18, 200, 117, 0.09), transparent 28%),
+                var(--bg);
+        }
+
+        .app {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 34%),
+                var(--surface) !important;
+        }
+
+        body.light-mode .app {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 245, 247, 0.76)),
+                var(--surface) !important;
+        }
+
+        header {
+            background: linear-gradient(180deg, var(--surface) 68%, rgba(16, 16, 21, 0)) !important;
+        }
+
+        body.light-mode header {
+            background: linear-gradient(180deg, var(--surface) 68%, rgba(251, 251, 253, 0)) !important;
+        }
+
+        #header-title {
+            line-height: 1.05 !important;
+            letter-spacing: 0 !important;
+        }
+
+        .tag,
+        .section-title {
+            color: var(--muted) !important;
+            letter-spacing: 0.08em !important;
+        }
+
+        .card,
+        .tx-row,
+        .input,
+        header button,
+        .icon-box {
+            border-color: var(--border) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .card,
+        .tx-row {
+            background: rgba(255, 255, 255, 0.065);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+        }
+
+        body.light-mode .card,
+        body.light-mode .tx-row {
+            background: rgba(255, 255, 255, 0.74);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 1px 0 rgba(0, 0, 0, 0.03);
+        }
+
+        .input {
+            background: rgba(255, 255, 255, 0.055);
+            border-radius: 999px;
+        }
+
+        body.light-mode .input {
+            background: rgba(0, 0, 0, 0.045);
+        }
+
+        .input:focus {
+            border-color: rgba(18, 200, 117, 0.7) !important;
+            box-shadow: var(--focus-ring), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-primary {
+            border-radius: 999px;
+            box-shadow: 0 12px 30px rgba(18, 200, 117, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+        }
+
+        .nav-pill,
+        .nav-search-pill,
+        #bottom-sheet,
+        .ai-fab {
+            background:
+                linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.055) 42%, rgba(255, 255, 255, 0.085)),
+                var(--surface-glass) !important;
+            border-color: var(--border) !important;
+            box-shadow: var(--shadow-glass) !important;
+            backdrop-filter: blur(30px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+        }
+
+        body.light-mode .nav-pill,
+        body.light-mode .nav-search-pill,
+        body.light-mode #bottom-sheet,
+        body.light-mode .ai-fab {
+            background:
+                linear-gradient(160deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.54) 42%, rgba(255, 255, 255, 0.68)),
+                var(--surface-glass) !important;
+        }
+
+        .nav-tab-btn.nav-active .nav-tab-inner {
+            background: rgba(255, 255, 255, 0.13);
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .wallet-chip {
+            box-shadow: 0 18px 46px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+
+        #overlay {
+            background: rgba(0, 0, 0, 0.38) !important;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        /* HIG tab-bar pass: navigation stays stable, selection stays quiet. */
+        .app-bottom-nav {
+            max-width: 402px;
+        }
+
+        .nav-pill,
+        .nav-search-pill {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.055)),
+                rgba(31, 31, 37, 0.64) !important;
+            border: 1px solid rgba(255, 255, 255, 0.16) !important;
+            box-shadow:
+                0 14px 36px rgba(0, 0, 0, 0.30),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+        }
+
+        body.light-mode .nav-pill,
+        body.light-mode .nav-search-pill {
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.54)),
+                rgba(255, 255, 255, 0.72) !important;
+            border-color: rgba(255, 255, 255, 0.86) !important;
+        }
+
+        .nav-tab-btn {
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        body.light-mode .nav-tab-btn {
+            color: rgba(29, 29, 31, 0.52);
+        }
+
+        .nav-tab-inner {
+            gap: 3px;
+        }
+
+        .nav-tab-btn i {
+            width: 21px;
+            height: 21px;
+            stroke-width: 2.25;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .nav-tab-btn.nav-active {
+            color: var(--text) !important;
+        }
+
+        .nav-tab-btn.nav-active .nav-tab-inner {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        }
+
+        .nav-tab-btn.nav-active i,
+        .nav-tab-btn.nav-active .nav-label {
+            color: var(--emerald);
+        }
+
+        body.light-mode .nav-tab-btn.nav-active .nav-tab-inner {
+            background: rgba(255, 255, 255, 0.72);
+            border-color: rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.94);
+        }
+
+        .nav-search-btn {
+            color: rgba(255, 255, 255, 0.66);
+        }
+
+        body.light-mode .nav-search-btn {
+            color: rgba(29, 29, 31, 0.58);
+        }
+
+        .nav-fab {
+            box-shadow:
+                0 12px 30px rgba(18, 200, 117, 0.36),
+                inset 0 1px 0 rgba(255, 255, 255, 0.32);
+        }
+
+        @media (max-width: 340px) {
+            .nav-label {
+                display: block;
+                font-size: 8.5px;
+            }
+        }
+
+        /* Final nav interaction pass: smooth hover without changing layout. */
+        .nav-tab-btn,
+        .nav-search-btn,
+        .nav-back-in-pill,
+        .nav-fab {
+            will-change: transform;
+        }
+
+        .nav-tab-btn:hover {
+            color: rgba(255, 255, 255, 0.82);
+            background: transparent !important;
+            transform: translateY(-1px);
+        }
+
+        .nav-tab-btn:hover .nav-tab-inner {
+            background: rgba(255, 255, 255, 0.095);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+        }
+
+        .nav-tab-btn.nav-active:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-tab-btn.nav-active:hover .nav-tab-inner {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .nav-tab-btn:active {
+            transform: scale(0.94);
+            filter: none;
+            background: transparent !important;
+        }
+
+        body.light-mode .nav-tab-btn:hover {
+            color: rgba(29, 29, 31, 0.78);
+        }
+
+        body.light-mode .nav-tab-btn:hover .nav-tab-inner {
+            background: rgba(0, 0, 0, 0.055);
+            box-shadow: none;
+        }
+
+        body.light-mode .nav-tab-btn.nav-active:hover .nav-tab-inner {
+            background: rgba(255, 255, 255, 0.82);
+        }
+
+        .nav-search-btn:hover,
+        .nav-back-in-pill:hover {
+            color: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-search-pill.search-expanded .nav-search-btn:hover {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        body.light-mode .nav-search-btn:hover,
+        body.light-mode .nav-back-in-pill:hover {
+            color: rgba(29, 29, 31, 0.78);
+            background: rgba(0, 0, 0, 0.055);
+        }
+
+        body.light-mode .nav-search-pill.search-expanded .nav-search-btn:hover {
+            background: transparent;
+        }
+
+        .nav-fab:hover {
+            transform: translateY(-2px) scale(1.04);
+            box-shadow:
+                0 16px 34px rgba(18, 200, 117, 0.42),
+                inset 0 1px 0 rgba(255, 255, 255, 0.36);
+        }
+
+        .nav-fab:active {
+            transform: scale(0.92);
+            filter: none;
+        }
+
+        /* Final active tab state: CSS owns selection, JS only toggles the class. */
+        .nav-tab-btn.nav-active {
+            color: var(--emerald) !important;
+            transform: none !important;
+            background: transparent !important;
+        }
+
+        .nav-tab-btn.nav-active .nav-tab-inner {
+            background:
+                linear-gradient(180deg, rgba(18, 200, 117, 0.20), rgba(18, 200, 117, 0.09));
+            border: 1px solid rgba(18, 200, 117, 0.24);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.18),
+                0 0 0 1px rgba(18, 200, 117, 0.05);
+        }
+
+        .nav-tab-btn.nav-active i {
+            color: var(--emerald) !important;
+            stroke-width: 2.65;
+        }
+
+        .nav-tab-btn.nav-active .nav-label {
+            color: var(--emerald) !important;
+            font-weight: 800;
+        }
+
+        .nav-tab-btn.nav-active:hover {
+            transform: translateY(-1px) !important;
+        }
+
+        .nav-tab-btn.nav-active:hover .nav-tab-inner {
+            background:
+                linear-gradient(180deg, rgba(18, 200, 117, 0.24), rgba(18, 200, 117, 0.11));
+            border-color: rgba(18, 200, 117, 0.30);
+        }
+
+        body.light-mode .nav-tab-btn.nav-active .nav-tab-inner {
+            background:
+                linear-gradient(180deg, rgba(18, 200, 117, 0.18), rgba(18, 200, 117, 0.08));
+            border-color: rgba(18, 200, 117, 0.24);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92);
+        }
+
+        .app-bottom-nav.search-expanded .nav-tab-btn.nav-active {
+            transform: none !important;
+        }
     </style>
 </head>
 
@@ -1462,7 +2049,7 @@
                         <i data-lucide="search"></i>
                     </button>
                     <input id="nav-search-input" class="nav-search-input" type="search"
-                        placeholder="Search…"
+                        placeholder="Search..."
                         oninput="handleSearch(this.value)"
                         onfocus="openSearch(false)" />
                 </div>
@@ -1511,7 +2098,7 @@
     </script>
 
     <script>
-        // ─── DEFAULT DATA ─────────────────────────────────────────────────────
+        // â”€â”€â”€ DEFAULT DATA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const DEFAULT_STATE = {
             user: { name: 'Ahmed', email: 'ahmed@example.com', photo: null },
             currency: { code: 'EGP', symbol: 'E£' },
@@ -1572,191 +2159,191 @@
             { code: 'USD', symbol: '$', name: 'US Dollar' },
             { code: 'EUR', symbol: '€', name: 'Euro' },
             { code: 'GBP', symbol: '£', name: 'British Pound' },
-            { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
-            { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' }
+            { code: 'SAR', symbol: 'SAR', name: 'Saudi Riyal' },
+            { code: 'AED', symbol: 'AED', name: 'UAE Dirham' }
         ];
 
         const GRADIENT_COLORS = [
-            // ── Midnight Obsidian ──
+            // â”€â”€ Midnight Obsidian â”€â”€
             'linear-gradient(135deg, #0a0a0f 0%, #111118 40%, #0d0d14 100%)',
-            // ── Onyx Noir ──
+            // â”€â”€ Onyx Noir â”€â”€
             'linear-gradient(145deg, #111111 0%, #1c1c1c 50%, #080808 100%)',
-            // ── Phantom Black ──
+            // â”€â”€ Phantom Black â”€â”€
             'linear-gradient(160deg, #0d0d12 0%, #18181f 60%, #0a0a10 100%)',
 
-            // ── Sapphire Depths ──
+            // â”€â”€ Sapphire Depths â”€â”€
             'linear-gradient(135deg, #050d1a 0%, #0a1628 40%, #071020 70%, #0d1a35 100%)',
-            // ── Cobalt Abyss ──
+            // â”€â”€ Cobalt Abyss â”€â”€
             'linear-gradient(145deg, #050a14 0%, #0c1830 50%, #091422 100%)',
-            // ── Navy Steel ──
+            // â”€â”€ Navy Steel â”€â”€
             'linear-gradient(135deg, #060c1a 0%, #0f1e3a 50%, #07102a 100%)',
-            // ── Arctic Blue ──
+            // â”€â”€ Arctic Blue â”€â”€
             'linear-gradient(145deg, #030d1c 0%, #071c3a 45%, #0a2040 70%, #061530 100%)',
-            // ── Indigo Void ──
+            // â”€â”€ Indigo Void â”€â”€
             'linear-gradient(135deg, #0a0614 0%, #150d2a 50%, #100a22 100%)',
 
-            // ── Emerald Vault ──
+            // â”€â”€ Emerald Vault â”€â”€
             'linear-gradient(135deg, #030f0a 0%, #07200f 40%, #051a0c 70%, #0a2812 100%)',
-            // ── Forest Prestige ──
+            // â”€â”€ Forest Prestige â”€â”€
             'linear-gradient(145deg, #040e07 0%, #091a0d 50%, #062214 100%)',
-            // ── Jade Dynasty ──
+            // â”€â”€ Jade Dynasty â”€â”€
             'linear-gradient(135deg, #040d08 0%, #082016 50%, #051808 100%)',
-            // ── Deep Teal ──
+            // â”€â”€ Deep Teal â”€â”€
             'linear-gradient(145deg, #030d0e 0%, #071a1c 45%, #051518 100%)',
-            // ── Malachite Noir ──
+            // â”€â”€ Malachite Noir â”€â”€
             'linear-gradient(135deg, #030c07 0%, #071a0e 50%, #0a2214 100%)',
 
-            // ── Royal Amethyst ──
+            // â”€â”€ Royal Amethyst â”€â”€
             'linear-gradient(135deg, #0d0514 0%, #1a0a2e 50%, #130720 100%)',
-            // ── Velvet Plum ──
+            // â”€â”€ Velvet Plum â”€â”€
             'linear-gradient(145deg, #0a0410 0%, #180830 50%, #10061c 100%)',
-            // ── Deep Violet ──
+            // â”€â”€ Deep Violet â”€â”€
             'linear-gradient(135deg, #090512 0%, #150a28 50%, #0d0720 100%)',
-            // ── Byzantine ──
+            // â”€â”€ Byzantine â”€â”€
             'linear-gradient(145deg, #0c0314 0%, #200638 50%, #160428 100%)',
 
-            // ── Crimson Noir ──
+            // â”€â”€ Crimson Noir â”€â”€
             'linear-gradient(135deg, #110306 0%, #200510 50%, #180308 100%)',
-            // ── Ruby Obsidian ──
+            // â”€â”€ Ruby Obsidian â”€â”€
             'linear-gradient(145deg, #0f0204 0%, #1e0408 50%, #150306 100%)',
-            // ── Garnet Depths ──
+            // â”€â”€ Garnet Depths â”€â”€
             'linear-gradient(135deg, #100408 0%, #22060e 50%, #180408 100%)',
 
-            // ── Copper Smoke ──
+            // â”€â”€ Copper Smoke â”€â”€
             'linear-gradient(135deg, #120b04 0%, #221408 50%, #1a0e06 100%)',
-            // ── Amber Dusk ──
+            // â”€â”€ Amber Dusk â”€â”€
             'linear-gradient(145deg, #100c03 0%, #201806 50%, #180e04 100%)',
-            // ── Bronze Eclipse ──
+            // â”€â”€ Bronze Eclipse â”€â”€
             'linear-gradient(135deg, #110c04 0%, #241508 50%, #1a0e04 100%)',
 
-            // ── Slate Titanium ──
+            // â”€â”€ Slate Titanium â”€â”€
             'linear-gradient(135deg, #080b10 0%, #111620 50%, #0c1018 100%)',
-            // ── Iron Smoke ──
+            // â”€â”€ Iron Smoke â”€â”€
             'linear-gradient(145deg, #0a0c0f 0%, #141820 50%, #0e1018 100%)',
-            // ── Gunmetal ──
+            // â”€â”€ Gunmetal â”€â”€
             'linear-gradient(135deg, #090a0c 0%, #13161a 50%, #0d0f12 100%)',
-            // ── Carbon Fiber ──
+            // â”€â”€ Carbon Fiber â”€â”€
             'linear-gradient(145deg, #0a0a0a 0%, #161616 50%, #0c0c0c 100%)',
 
-            // ── Sapphire + Emerald ──
+            // â”€â”€ Sapphire + Emerald â”€â”€
             'linear-gradient(135deg, #05101a 0%, #071828 40%, #051a10 70%, #082010 100%)',
-            // ── Midnight Blue + Purple ──
+            // â”€â”€ Midnight Blue + Purple â”€â”€
             'linear-gradient(135deg, #06080f 0%, #0d1022 40%, #130a20 70%, #0a0618 100%)',
-            // ── Teal + Navy ──
+            // â”€â”€ Teal + Navy â”€â”€
             'linear-gradient(135deg, #040d10 0%, #071825 40%, #05151e 70%, #060e1a 100%)',
-            // ── Plum + Navy ──
+            // â”€â”€ Plum + Navy â”€â”€
             'linear-gradient(145deg, #0a0614 0%, #150828 40%, #0a1020 70%, #0c0820 100%)',
-            // ── Forest + Teal ──
+            // â”€â”€ Forest + Teal â”€â”€
             'linear-gradient(135deg, #040f07 0%, #071e0e 40%, #051518 70%, #061818 100%)',
-            // ── Crimson + Navy ──
+            // â”€â”€ Crimson + Navy â”€â”€
             'linear-gradient(145deg, #0f0306 0%, #1e0408 40%, #080c1a 70%, #0a1020 100%)',
-            // ── Gold + Obsidian ──
+            // â”€â”€ Gold + Obsidian â”€â”€
             'linear-gradient(135deg, #0e0e0e 0%, #1a1508 40%, #221a04 70%, #0e0e0e 100%)',
-            // ── Purple + Teal ──
+            // â”€â”€ Purple + Teal â”€â”€
             'linear-gradient(135deg, #0c0512 0%, #180a28 40%, #060e14 70%, #050d10 100%)',
 
-            // ── Subtle Gold Whisper ──
+            // â”€â”€ Subtle Gold Whisper â”€â”€
             'linear-gradient(135deg, #100e06 0%, #1e1a08 50%, #16120a 100%)',
-            // ── Antique Brass ──
+            // â”€â”€ Antique Brass â”€â”€
             'linear-gradient(145deg, #120f06 0%, #201a08 50%, #1a1408 100%)',
-            // ── Dark Champagne ──
+            // â”€â”€ Dark Champagne â”€â”€
             'linear-gradient(135deg, #0e0c05 0%, #1c1808 50%, #141006 100%)',
-            // ── Pewter Luxury ──
+            // â”€â”€ Pewter Luxury â”€â”€
             'linear-gradient(145deg, #0c0e10 0%, #18191e 50%, #101214 100%)',
-            // ── Celestial Ink ──
+            // â”€â”€ Celestial Ink â”€â”€
             'linear-gradient(135deg, #06060f 0%, #0d0d20 50%, #080814 100%)',
 
-            // ── Deep Prussian ──
+            // â”€â”€ Deep Prussian â”€â”€
             'linear-gradient(135deg, #040814 0%, #081220 50%, #060e1c 100%)',
-            // ── Dark Cyan ──
+            // â”€â”€ Dark Cyan â”€â”€
             'linear-gradient(145deg, #030c0e 0%, #071618 50%, #051214 100%)',
-            // ── Abyssal Green ──
+            // â”€â”€ Abyssal Green â”€â”€
             'linear-gradient(135deg, #040c05 0%, #081808 50%, #061008 100%)',
-            // ── Shadow Burgundy ──
+            // â”€â”€ Shadow Burgundy â”€â”€
             'linear-gradient(145deg, #0e0305 0%, #1c0608 50%, #140406 100%)',
-            // ── Astral Purple ──
+            // â”€â”€ Astral Purple â”€â”€
             'linear-gradient(135deg, #080410 0%, #14081e 50%, #0e0618 100%)',
-            // ── Storm Grey ──
+            // â”€â”€ Storm Grey â”€â”€
             'linear-gradient(145deg, #0a0c0e 0%, #141820 50%, #0c0e12 100%)',
-            // ── Volcanic Black ──
+            // â”€â”€ Volcanic Black â”€â”€
             'linear-gradient(135deg, #0c080a 0%, #1a1014 50%, #120c0e 100%)',
-            // ── Cosmic Slate ──
+            // â”€â”€ Cosmic Slate â”€â”€
             'linear-gradient(145deg, #07090f 0%, #10141e 50%, #0c1018 100%)',
-            // ── Obsidian Tide ──
+            // â”€â”€ Obsidian Tide â”€â”€
             'linear-gradient(135deg, #060a10 0%, #0e1620 50%, #080e18 100%)',
-            // ── Night Emerald ──
+            // â”€â”€ Night Emerald â”€â”€
             'linear-gradient(145deg, #050e08 0%, #0a1e0f 50%, #071410 100%)',
 
-            // ════════ VIBRANT COLORS ════════
+            // â•â•â•â•â•â•â•â• VIBRANT COLORS â•â•â•â•â•â•â•â•
 
-            // ── Electric Blue ──
+            // â”€â”€ Electric Blue â”€â”€
             'linear-gradient(135deg, #060d2e 0%, #0a1a5c 40%, #0d22a0 70%, #0518c8 100%)',
-            // ── Neon Sapphire ──
+            // â”€â”€ Neon Sapphire â”€â”€
             'linear-gradient(135deg, #020a28 0%, #0516a0 50%, #0820d4 100%)',
-            // ── Vivid Cobalt ──
+            // â”€â”€ Vivid Cobalt â”€â”€
             'linear-gradient(145deg, #030e3a 0%, #0a22b8 50%, #1030e8 100%)',
-            // ── Royal Blue Glow ──
+            // â”€â”€ Royal Blue Glow â”€â”€
             'linear-gradient(135deg, #030c30 0%, #0d28c8 60%, #1040f0 100%)',
 
-            // ── Emerald Vivid ──
+            // â”€â”€ Emerald Vivid â”€â”€
             'linear-gradient(135deg, #021a0a 0%, #037a30 50%, #04a03a 100%)',
-            // ── Neon Green ──
+            // â”€â”€ Neon Green â”€â”€
             'linear-gradient(135deg, #041408 0%, #046030 50%, #059040 100%)',
-            // ── Jade Bright ──
+            // â”€â”€ Jade Bright â”€â”€
             'linear-gradient(145deg, #021408 0%, #047035 55%, #059848 100%)',
-            // ── Vivid Teal ──
+            // â”€â”€ Vivid Teal â”€â”€
             'linear-gradient(135deg, #021418 0%, #037070 50%, #049898 100%)',
-            // ── Cyan Surge ──
+            // â”€â”€ Cyan Surge â”€â”€
             'linear-gradient(135deg, #021a1c 0%, #048888 50%, #06b8b8 100%)',
 
-            // ── Deep Violet Vivid ──
+            // â”€â”€ Deep Violet Vivid â”€â”€
             'linear-gradient(135deg, #14042a 0%, #5010b0 50%, #6820e0 100%)',
-            // ── Electric Purple ──
+            // â”€â”€ Electric Purple â”€â”€
             'linear-gradient(145deg, #0e0220 0%, #4a0ab8 50%, #6010e8 100%)',
-            // ── Neon Indigo ──
+            // â”€â”€ Neon Indigo â”€â”€
             'linear-gradient(135deg, #0a0420 0%, #3808c0 50%, #5012f0 100%)',
-            // ── Vivid Amethyst ──
+            // â”€â”€ Vivid Amethyst â”€â”€
             'linear-gradient(135deg, #120428 0%, #5a0ec0 55%, #7218e8 100%)',
 
-            // ── Crimson Vivid ──
+            // â”€â”€ Crimson Vivid â”€â”€
             'linear-gradient(135deg, #200208 0%, #a00818 50%, #c80a1e 100%)',
-            // ── Electric Rose ──
+            // â”€â”€ Electric Rose â”€â”€
             'linear-gradient(145deg, #1c0208 0%, #980614 50%, #c80818 100%)',
-            // ── Hot Pink ──
+            // â”€â”€ Hot Pink â”€â”€
             'linear-gradient(135deg, #200230 0%, #c0086a 50%, #e80a80 100%)',
-            // ── Magenta Blaze ──
+            // â”€â”€ Magenta Blaze â”€â”€
             'linear-gradient(135deg, #1a0220 0%, #a80870 55%, #d00a8a 100%)',
-            // ── Fuchsia Vivid ──
+            // â”€â”€ Fuchsia Vivid â”€â”€
             'linear-gradient(145deg, #180228 0%, #b00880 50%, #d80aa0 100%)',
 
-            // ── Amber Vivid ──
+            // â”€â”€ Amber Vivid â”€â”€
             'linear-gradient(135deg, #1a0e02 0%, #b86010 50%, #e07808 100%)',
-            // ── Orange Blaze ──
+            // â”€â”€ Orange Blaze â”€â”€
             'linear-gradient(135deg, #200a02 0%, #c84808 50%, #f06010 100%)',
-            // ── Gold Rush ──
+            // â”€â”€ Gold Rush â”€â”€
             'linear-gradient(145deg, #180e02 0%, #a87008 50%, #d09008 100%)',
-            // ── Saffron Glow ──
+            // â”€â”€ Saffron Glow â”€â”€
             'linear-gradient(135deg, #1a1002 0%, #b88008 55%, #e0a010 100%)',
 
-            // ── Blue → Purple Fusion ──
+            // â”€â”€ Blue â†’ Purple Fusion â”€â”€
             'linear-gradient(135deg, #04082a 0%, #1018b0 35%, #5010c0 65%, #8020e0 100%)',
-            // ── Purple → Pink Fusion ──
+            // â”€â”€ Purple â†’ Pink Fusion â”€â”€
             'linear-gradient(135deg, #14041e 0%, #5808b0 35%, #9008a0 65%, #c01080 100%)',
-            // ── Teal → Blue Fusion ──
+            // â”€â”€ Teal â†’ Blue Fusion â”€â”€
             'linear-gradient(135deg, #021418 0%, #047070 35%, #0830a0 65%, #0a20c0 100%)',
-            // ── Green → Teal Fusion ──
+            // â”€â”€ Green â†’ Teal Fusion â”€â”€
             'linear-gradient(135deg, #021408 0%, #047838 35%, #048888 65%, #0490a0 100%)',
-            // ── Red → Purple Fusion ──
+            // â”€â”€ Red â†’ Purple Fusion â”€â”€
             'linear-gradient(135deg, #1a0206 0%, #a00818 35%, #700890 65%, #5010b0 100%)',
-            // ── Amber → Red Fusion ──
+            // â”€â”€ Amber â†’ Red Fusion â”€â”€
             'linear-gradient(135deg, #1a0a02 0%, #c04008 35%, #a80818 65%, #800614 100%)',
-            // ── Cyan → Indigo Fusion ──
+            // â”€â”€ Cyan â†’ Indigo Fusion â”€â”€
             'linear-gradient(135deg, #021c1e 0%, #049898 35%, #0830c0 65%, #4010d0 100%)',
-            // ── Emerald → Blue Fusion ──
+            // â”€â”€ Emerald â†’ Blue Fusion â”€â”€
             'linear-gradient(135deg, #021808 0%, #048040 35%, #0830a8 65%, #0a20c8 100%)',
         ];
 
-        // ─── STATE & PERSISTENCE ─────────────────────────────────────────────
+        // â”€â”€â”€ STATE & PERSISTENCE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
         let state;
         let charts = {};
@@ -1782,7 +2369,7 @@
                 const saved = localStorage.getItem('velto_state_v4');
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    // ── Schema validation: must have core arrays ──
+                    // â”€â”€ Schema validation: must have core arrays â”€â”€
                     if (
                         parsed && typeof parsed === 'object' &&
                         Array.isArray(parsed.wallets) && parsed.wallets.length > 0 &&
@@ -1833,22 +2420,18 @@
                     state = JSON.parse(JSON.stringify(DEFAULT_STATE));
                 }
             } catch (e) {
-                console.warn('State load error – resetting to defaults', e);
+                console.warn('State load error - resetting to defaults', e);
                 state = JSON.parse(JSON.stringify(DEFAULT_STATE));
             }
             const now = new Date();
             ui = { currentTab: 'home', financeTab: 'budgets', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false, txMonth: now.getMonth(), txYear: now.getFullYear(), txFilter: 'all', milestonesExpanded: false };
         }
 
-        function saveState() {
-            try { localStorage.setItem('velto_state_v4', JSON.stringify(state)); } catch (e) { }
-        }
-
         let ui = {};
 
         
 
-        // ─── HELPERS ─────────────────────────────────────────────────────────
+        // â”€â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const fmtNum = (n) => Math.abs(n).toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         const fmt = (n) => `${state.currency.symbol}${fmtNum(n)}`;
         const today = () => new Date().toISOString().split('T')[0];
@@ -1859,7 +2442,7 @@
             return `${yyyymmdd}T${timeStr}`;
         };
 
-        // ─── SECURITY HELPERS ────────────────────────────────────────────────
+        // â”€â”€â”€ SECURITY HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Escape HTML to prevent XSS when rendering user-supplied strings into innerHTML
         function esc(str) {
             if (str === null || str === undefined) return '';
@@ -1877,7 +2460,7 @@
             return String(str).replace(/<[^>]*>/g, '').replace(/[<>"'`]/g, '').trim().slice(0, maxLen);
         }
 
-        // Validate a number — returns a finite safe number or 0
+        // Validate a number - returns a finite safe number or 0
         function safeNum(val, min = 0, max = 999_999_999) {
             const n = parseFloat(val);
             if (!isFinite(n)) return 0;
@@ -1915,7 +2498,7 @@
                         try {
                             state.transactions = state.transactions.slice(0, 200);
                             localStorage.setItem('velto_state_v4', JSON.stringify(state));
-                            showToast('Storage full — older transactions trimmed', 'warn');
+                            showToast('Storage full - older transactions trimmed', 'warn');
                         } catch (_) { /* silently fail */ }
                     }
                 }
@@ -1971,32 +2554,31 @@
 
 
 
-        // ─── TAB SWITCHING & NEW FINANCE PAGE ─────────────────────────────────
+        // â”€â”€â”€ TAB SWITCHING & NEW FINANCE PAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function switchTab(tabId) {
             ui.currentTab = tabId;
-            // 1. منطق ذكي لتوجيه التبويبات الفرعية للـ Finance
+            // 1. Ù…Ù†Ø·Ù‚ Ø°ÙƒÙŠ Ù„ØªÙˆØ¬ÙŠÙ‡ Ø§Ù„ØªØ¨ÙˆÙŠØ¨Ø§Øª Ø§Ù„ÙØ±Ø¹ÙŠØ© Ù„Ù„Ù€ Finance
             const isFinanceTab = ['income', 'budgets', 'debts'].includes(tabId);
             const target = isFinanceTab ? 'finance' : tabId;
 
-            // 2. تحديث الـ Active class
+            // 2. ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù€ Active class
             document.querySelectorAll('.nav-tab-btn').forEach(btn => {
                 btn.classList.remove('nav-active');
+                btn.removeAttribute('style');
             });
 
             const activeBtn = document.querySelector(`[data-tab="${target}"]`) || document.querySelector(`[onclick*="switchTab('${target}')"]`);
             if (activeBtn) {
                 activeBtn.classList.add('nav-active');
-                activeBtn.style.strokeWidth = "3";
             } else if (tabId === 'settings') {
-                // البحث البديل في حال لم يجد الرابط
+                // Ø§Ù„Ø¨Ø­Ø« Ø§Ù„Ø¨Ø¯ÙŠÙ„ ÙÙŠ Ø­Ø§Ù„ Ù„Ù… ÙŠØ¬Ø¯ Ø§Ù„Ø±Ø§Ø¨Ø·
                 const settingsBtn = document.querySelector('[onclick*="switchTab(\'settings\')"]');
                 if (settingsBtn) {
                     settingsBtn.classList.add('nav-active');
-                    settingsBtn.style.strokeWidth = "3";
                 }
             }
 
-            // 3. التحديث المرئي والمحتوى
+            // 3. Ø§Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø±Ø¦ÙŠ ÙˆØ§Ù„Ù…Ø­ØªÙˆÙ‰
             const main = document.getElementById('main-content');
             const title = document.getElementById('header-title');
 
@@ -2024,7 +2606,7 @@
                         chat: renderChatPage
                     };
 
-                    // استخدام الـ render المناسب أو العودة للـ Home
+                    // Ø§Ø³ØªØ®Ø¯Ø§Ù… Ø§Ù„Ù€ render Ø§Ù„Ù…Ù†Ø§Ø³Ø¨ Ø£Ùˆ Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù€ Home
                     main.innerHTML = (renders[tabId] || renderHome)();
                     if (tabId === 'chat') {
                         renderChatMessages();
@@ -2086,11 +2668,10 @@
             if (state.user.photo) { img.src = state.user.photo; img.style.display = 'block'; initials.style.display = 'none'; }
             else { img.style.display = 'none'; initials.style.display = 'block'; initials.textContent = (state.user.name || 'U').charAt(0).toUpperCase(); }
         }
-        // ── دالة رندرة واجهة عرض الاشتراكات ──
         function renderSubscriptions() {
             if (!state.subscriptions) state.subscriptions = [];
 
-            // حساب الإجمالي الكلي للاشتراكات بعد تحويل العملات إلى العملة الرئيسية للوحة التحكم
+            // Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„ÙƒÙ„ÙŠ Ù„Ù„Ø§Ø´ØªØ±Ø§ÙƒØ§Øª Ø¨Ø¹Ø¯ ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø¹Ù…Ù„Ø§Øª Ø¥Ù„Ù‰ Ø§Ù„Ø¹Ù…Ù„Ø© Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© Ù„Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ…
             const totalSubsCost = state.subscriptions.reduce((s, sub) => {
                 const w = state.wallets.find(x => x.id === sub.walletId) || { currency: state.currency.code };
                 return s + convertCurrency(sub.amount, w.currency, state.currency.code);
@@ -2142,7 +2723,7 @@
     </div>`;
         }
 
-        // ── فتح نافذة إضافة وتعديل اشتراك جديد داخل الـ Bottom Sheet ──
+        // â”€â”€ ÙØªØ­ Ù†Ø§ÙØ°Ø© Ø¥Ø¶Ø§ÙØ© ÙˆØªØ¹Ø¯ÙŠÙ„ Ø§Ø´ØªØ±Ø§Ùƒ Ø¬Ø¯ÙŠØ¯ Ø¯Ø§Ø®Ù„ Ø§Ù„Ù€ Bottom Sheet â”€â”€
         function openSubscriptionForm(editId = null) {
             const item = editId ? state.subscriptions.find(s => s.id === editId) : null;
             const icons = ['tv', 'music', 'zap', 'shield', 'smartphone', 'globe', 'code', 'database', 'play', 'cloud'];
@@ -2191,7 +2772,7 @@
             openSheet();
         }
 
-        // ── دالة حفظ الاشتراك السحابي والمحلي ──
+        // â”€â”€ Ø¯Ø§Ù„Ø© Ø­ÙØ¸ Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ Ø§Ù„Ø³Ø­Ø§Ø¨ÙŠ ÙˆØ§Ù„Ù…Ø­Ù„ÙŠ â”€â”€
         function saveSubscription(editId) {
             const name = document.getElementById('sub-name').value.trim();
             const amount = parseFloat(document.getElementById('sub-amount').value);
@@ -2220,7 +2801,7 @@
             showToast(editId ? 'Subscription Updated' : 'Subscription Tracked');
         }
 
-        // ── دالة حذف الاشتراك ──
+        // â”€â”€ Ø¯Ø§Ù„Ø© Ø­Ø°Ù Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ â”€â”€
         function deleteSubscription(id) {
             state.subscriptions = state.subscriptions.filter(s => s.id !== id);
             saveState();
@@ -2228,149 +2809,7 @@
             showToast('Subscription removed');
         }
 
-        // ── دالة رندرة واجهة عرض الاشتراكات ──
-        function renderSubscriptions() {
-            if (!state.subscriptions) state.subscriptions = [];
-
-            // حساب الإجمالي الكلي للاشتراكات بعد تحويل العملات إلى العملة الرئيسية للوحة التحكم
-            const totalSubsCost = state.subscriptions.reduce((s, sub) => {
-                const w = state.wallets.find(x => x.id === sub.walletId) || { currency: state.currency.code };
-                return s + convertCurrency(sub.amount, w.currency, state.currency.code);
-            }, 0);
-
-            return `<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">
-        <div class="card" style="padding:24px; margin-bottom:20px; background:linear-gradient(135deg, rgba(244,63,94,0.08), rgba(244,63,94,0.02)); border-color:rgba(244,63,94,0.15);">
-            <p class="tag" style="color:var(--rose); margin-bottom:4px;">Monthly Subscriptions Total</p>
-            <h2 class="syne" style="font-size:32px; font-weight:800; color:var(--text);">${fmt(totalSubsCost)}<small style="font-size:12px; font-weight:400; color:var(--muted);">/mo</small></h2>
-        </div>
-
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <p class="section-title" style="margin:0;">Active Subscriptions</p>
-            <button onclick="openSubscriptionForm()" style="color:var(--emerald); background:none; border:none; cursor:pointer;"><i data-lucide="plus-circle" style="width:20px; height:20px;"></i></button>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:10px;">
-            ${state.subscriptions.map(sub => {
-                const wallet = state.wallets.find(w => w.id === sub.walletId) || {};
-                const wCurr = wallet.currency || state.currency.code;
-                return `
-                <div class="card" style="padding:16px;">
-                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <div class="icon-box" style="background:rgba(255,255,255,0.04);"><i data-lucide="${sub.icon || 'tv'}" style="width:16px; height:16px; color:var(--text);"></i></div>
-                            <div>
-                                <p style="font-size:14px; font-weight:600;">${sub.name}</p>
-                                <p style="font-size:10px; color:var(--muted);">${wallet.name || 'Wallet'} · ${sub.frequency}</p>
-                            </div>
-                        </div>
-                        <div style="display:flex; gap: 8px;">
-                            <button onclick="openSubscriptionForm(${sub.id})" style="color:var(--muted); background:none; border:none; padding:4px; cursor:pointer;"><i data-lucide="edit-3" style="width:14px; height:14px;"></i></button>
-                            <button onclick="deleteSubscription(${sub.id})" style="color:var(--rose); background:none; border:none; padding:4px; cursor:pointer;"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
-                        </div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <span class="syne" style="font-size:20px; font-weight:800;">${wCurr} ${fmtNum(sub.amount)}</span>
-                            <p style="font-size:9px; color:var(--rose); margin-top:2px;">Next bill: ${fmtDate(sub.nextBillDate)}</p>
-                        </div>
-                        <button onclick="renewSubscription(${sub.id})" style="padding:8px 14px; border-radius:12px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.2); color:var(--emerald); font-size:11px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                            <i data-lucide="credit-card" style="width:14px; height:14px;"></i> Pay Bill
-                        </button>
-                    </div>
-                </div>`;
-            }).join('')}
-            ${state.subscriptions.length === 0 ? '<p style="text-align:center; font-size:12px; color:var(--muted); padding:20px;">No active subscriptions tracked yet.</p>' : ''}
-        </div>
-    </div>`;
-        }
-
-        // ── فتح نافذة إضافة وتعديل اشتراك جديد داخل الـ Bottom Sheet ──
-        function openSubscriptionForm(editId = null) {
-            const item = editId ? state.subscriptions.find(s => s.id === editId) : null;
-            const icons = ['tv', 'music', 'zap', 'shield', 'smartphone', 'globe', 'code', 'database', 'play', 'cloud'];
-
-            document.getElementById('sheet-content').innerHTML = `
-        <h2 class="syne" style="font-size:20px; font-weight:800; margin-bottom:20px;">${item ? 'Edit' : 'Add'} Subscription</h2>
-        <div style="display:flex; flex-direction:column; gap:12px;">
-            <input type="text" id="sub-name" class="input" placeholder="Subscription Name (e.g. Netflix)" value="${item?.name || ''}">
-            <input type="number" id="sub-amount" class="input" placeholder="Amount" value="${item?.amount || ''}" inputmode="decimal">
-            
-            <div>
-                <p class="section-title">Billing Cycle</p>
-                <select id="sub-frequency" class="input">
-                    <option value="monthly" ${item?.frequency === 'monthly' ? 'selected' : ''}>Monthly</option>
-                    <option value="yearly" ${item?.frequency === 'yearly' ? 'selected' : ''}>Yearly</option>
-                </select>
-            </div>
-            
-            <div>
-                <p class="section-title">Pay From Wallet</p>
-                <select id="sub-wallet" class="input">
-                    ${state.wallets.map(w => `<option value="${w.id}" ${item?.walletId === w.id ? 'selected' : ''}>${w.name}</option>`).join('')}
-                </select>
-            </div>
-
-            <div>
-                <p class="section-title">Next Renew Date</p>
-                <input type="date" id="sub-date" class="input" value="${item?.nextBillDate || today()}">
-            </div>
-
-            <div>
-                <p class="section-title">Icon</p>
-                <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                    ${icons.map(i => `
-                        <button onclick="document.querySelectorAll('.sub-icon-opt').forEach(b=>b.style.background='var(--bg)'); this.style.background='rgba(255,255,255,0.1)'; document.getElementById('sub-icon').value='${i}'" class="sub-icon-opt" style="width:38px; height:38px; border-radius:12px; background:${item?.icon === i ? 'rgba(255,255,255,0.1)' : 'var(--bg)'}; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; cursor:pointer;">
-                            <i data-lucide="${i}" style="width:15px; height:15px; color:var(--muted);"></i>
-                        </button>
-                    `).join('')}
-                </div>
-                <input type="hidden" id="sub-icon" value="${item?.icon || 'tv'}">
-            </div>
-
-            <button onclick="saveSubscription(${editId || 'null'})" class="btn-primary" style="margin-top:10px;">${item ? 'Save Changes' : 'Track Subscription'}</button>
-        </div>`;
-
-            openSheet();
-        }
-
-        // ── دالة حفظ الاشتراك السحابي والمحلي ──
-        function saveSubscription(editId) {
-            const name = document.getElementById('sub-name').value.trim();
-            const amount = parseFloat(document.getElementById('sub-amount').value);
-            if (!name || !amount) return showToast('Please fill all fields', 'error');
-
-            const item = {
-                name,
-                amount,
-                frequency: document.getElementById('sub-frequency').value,
-                walletId: parseInt(document.getElementById('sub-wallet').value),
-                nextBillDate: document.getElementById('sub-date').value || today(),
-                icon: document.getElementById('sub-icon').value
-            };
-
-            if (editId) {
-                const idx = state.subscriptions.findIndex(s => s.id === editId);
-                if (idx >= 0) state.subscriptions[idx] = { ...state.subscriptions[idx], ...item };
-            } else {
-                item.id = genId();
-                state.subscriptions.push(item);
-            }
-
-            saveState();
-            closeSheet();
-            switchFinanceTab('subscriptions');
-            showToast(editId ? 'Subscription Updated' : 'Subscription Tracked');
-        }
-
-        // ── دالة حذف الاشتراك ──
-        function deleteSubscription(id) {
-            state.subscriptions = state.subscriptions.filter(s => s.id !== id);
-            saveState();
-            switchFinanceTab('subscriptions');
-            showToast('Subscription removed');
-        }
-
-        // ── دالة دفع فاتورة الاشتراك وخصمها من المحفظة وتسجيلها كمعاملة مصروفات فورية ──
+        // â”€â”€ Ø¯Ø§Ù„Ø© Ø¯ÙØ¹ ÙØ§ØªÙˆØ±Ø© Ø§Ù„Ø§Ø´ØªØ±Ø§Ùƒ ÙˆØ®ØµÙ…Ù‡Ø§ Ù…Ù† Ø§Ù„Ù…Ø­ÙØ¸Ø© ÙˆØªØ³Ø¬ÙŠÙ„Ù‡Ø§ ÙƒÙ…Ø¹Ø§Ù…Ù„Ø© Ù…ØµØ±ÙˆÙØ§Øª ÙÙˆØ±ÙŠØ© â”€â”€
         function renewSubscription(id) {
             const item = state.subscriptions.find(s => s.id === id);
             if (!item) return;
@@ -2379,10 +2818,10 @@
             if (!wallet) return showToast('Associated wallet not found', 'error');
             if (wallet.balance < item.amount) return showToast('Insufficient wallet balance', 'error');
 
-            // الخصم من رصيد المحفظة المحددة للاشتراك
+            // Ø§Ù„Ø®ØµÙ… Ù…Ù† Ø±ØµÙŠØ¯ Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø§Ù„Ù…Ø­Ø¯Ø¯Ø© Ù„Ù„Ø§Ø´ØªØ±Ø§Ùƒ
             wallet.balance -= item.amount;
 
-            // تسجيل فاتورة المصروفات وتصنيفها كـ "bills" بشكل فوري لتظهر بالداشبورد
+            // ØªØ³Ø¬ÙŠÙ„ ÙØ§ØªÙˆØ±Ø© Ø§Ù„Ù…ØµØ±ÙˆÙØ§Øª ÙˆØªØµÙ†ÙŠÙÙ‡Ø§ ÙƒÙ€ "bills" Ø¨Ø´ÙƒÙ„ ÙÙˆØ±ÙŠ Ù„ØªØ¸Ù‡Ø± Ø¨Ø§Ù„Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯
             state.transactions.unshift({
                 id: genId(),
                 name: `Sub Pay: ${item.name}`,
@@ -2394,7 +2833,7 @@
                 note: 'Paid via automated tracking'
             });
 
-            // تحديث موعد الفاتورة القادمة تلقائياً (إضافة شهر أو سنة بناءً على الدورة المحددة)
+            // ØªØ­Ø¯ÙŠØ« Ù…ÙˆØ¹Ø¯ Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø§Ù„Ù‚Ø§Ø¯Ù…Ø© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§Ù‹ (Ø¥Ø¶Ø§ÙØ© Ø´Ù‡Ø± Ø£Ùˆ Ø³Ù†Ø© Ø¨Ù†Ø§Ø¡Ù‹ Ø¹Ù„Ù‰ Ø§Ù„Ø¯ÙˆØ±Ø© Ø§Ù„Ù…Ø­Ø¯Ø¯Ø©)
             const currentBillDate = new Date(item.nextBillDate);
             if (item.frequency === 'yearly') {
                 currentBillDate.setFullYear(currentBillDate.getFullYear() + 1);
@@ -2405,13 +2844,13 @@
 
             saveState();
             switchFinanceTab('subscriptions');
-            showToast(`Paid ${wallet.currency || state.currency.code} ${fmtNum(item.amount)} to ${item.name}! 🚀`);
+            showToast(`Paid ${wallet.currency || state.currency.code} ${fmtNum(item.amount)} to ${item.name}!`);
         }
-        // ─── AI CHAT ──────────────────────────────────────────────────────────
+        // â”€â”€â”€ AI CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function openAIChat() {
             const apiKey = localStorage.getItem('velto_gemini_key');
             if (!apiKey) {
-                showToast('برجاء إدخال الـ API Key أولاً في الإعدادات', 'warn');
+                showToast('Please add your API key in Settings first.', 'warn');
                 return;
             }
 
@@ -2433,10 +2872,10 @@
                         </div>
                     </div>
                     <div id="chat-messages" style="display:flex;flex-direction:column;gap:12px;max-height:62vh;overflow-y:auto;padding:8px 0;" class="scroll-hide">
-                        ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">أهلاً! أنا مساعدك المالي الذكي 🤖✨<br>ممكن أضيف معاملات، أحلل مصاريفك، أنشئ أهداف، أنقل فلوس بين المحافظ، أمسح ديون — وكتير أكتر. قولي إيه اللي تحتاجه!</div>` : ''}
+                        ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">Hi! I can help you add transactions, analyze spending, create goals, transfer money between wallets, settle debts, and more.<br>What do you need?</div>` : ''}
                     </div>
                     <div style="display:flex;gap:10px;align-items:flex-end;margin-top:16px;">
-                        <textarea id="chat-input" class="input scroll-hide" placeholder="اسألني أي شيء..." style="flex:1;resize:none;min-height:56px;max-height:110px;padding:16px;border-radius:22px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
+                        <textarea id="chat-input" class="input scroll-hide" placeholder="Ask me anything..." style="flex:1;resize:none;min-height:56px;max-height:110px;padding:16px;border-radius:22px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
                         <button onclick="sendChatMessage()" style="width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#f97316,#ef4444 50%,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(239,68,68,0.3);">
                             <i data-lucide="send" style="width:20px;height:20px;"></i>
                         </button>
@@ -2476,7 +2915,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
             if (!apiKey) {
                 document.getElementById(loadingId)?.remove();
-                chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--amber);">برجاء إدخال الـ Gemini API Key في الإعدادات أولاً 🔑</div>`;
+                chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--amber);">Please add your Gemini API key in Settings first.</div>`;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 return;
             }
@@ -2495,16 +2934,16 @@
                     }
                 };
 
-                const sysPrompt = `You are a powerful AI assistant built into Velto Finance — the user's personal finance app. You can do anything they ask: answer questions, analyze their finances, AND execute real actions in the app.
+                const sysPrompt = `You are a powerful AI assistant built into Velto Finance - the user's personal finance app. You can do anything they ask: answer questions, analyze their finances, AND execute real actions in the app.
 
             Language: Reply in the same language the user writes in.If they write Arabic, reply in friendly Egyptian Arabic.If English, reply in English.
 
 CURRENT APP DATA:
 ${JSON.stringify(aiState)}
 
-═══════════════════════════════════════
+========================================
 ACTIONS YOU CAN EXECUTE
-═══════════════════════════════════════
+========================================
 When you need to perform an action, output a JSON block at the END of your message like this:
             \`\`\`json
 { "actions": [ ... ] }
@@ -2551,7 +2990,7 @@ You can include MULTIPLE actions in one response. Supported actions:
 13. NAVIGATE TO TAB:
 { "type": "navigate", "data": { "tab": "home|wallets|finance|settings" } }
 
-14. SHOW SUMMARY (just answer, no action needed — omit the JSON block)
+14. SHOW SUMMARY (just answer, no action needed - omit the JSON block)
 
 IMPORTANT RULES:
 - Use EXACT ids from the data above when referencing existing items
@@ -2561,7 +3000,7 @@ IMPORTANT RULES:
 - You can chain multiple actions (e.g., add a transaction AND navigate to home)
 - If you're not sure about an amount or name, ask for clarification
 - If no action is needed, just answer normally without any JSON block
-- The message field in your response is your reply text (shown to user) — keep it friendly and concise`;
+- The message field in your response is your reply text (shown to user) - keep it friendly and concise`;
 
                 const reqBody = {
                     systemInstruction: { parts: [{ text: sysPrompt }] },
@@ -2596,7 +3035,7 @@ IMPORTANT RULES:
                 lucide.createIcons();
             } catch (err) {
                 document.getElementById(loadingId)?.remove();
-                chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--rose);">حصلت مشكلة: ${err.message}</div>`;
+                chatContainer.innerHTML += `<div class="chat-bubble chat-bot" style="color:var(--rose);">Something went wrong: ${err.message}</div>`;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         }
@@ -2719,49 +3158,6 @@ IMPORTANT RULES:
             } catch (e) { console.error('executeAIAction error', action.type, e); }
         }
 
-        // ─── SEARCH ───────────────────────────────────────────────────────────
-        function openSearch() {
-            document.getElementById('sheet-content').innerHTML = `
-        <div style="position:sticky;top:0;background:#12121a;padding-bottom:14px;z-index:10;border-bottom:1px solid var(--border);">
-            <div style="display:flex;gap:12px;align-items:center;">
-                <div style="flex:1;position:relative;">
-                    <i data-lucide="search" style="position:absolute;left:14px;top:14px;width:18px;height:18px;color:var(--muted);"></i>
-                    <input type="search" id="search-input" class="input" placeholder="Find anywhere in the app..." oninput="handleSearch()" style="padding-left:42px;background:var(--surface2);">
-                </div>
-                <button onclick="closeSheet()" style="color:var(--muted);font-size:13px;font-weight:700;">Cancel</button>
-            </div>
-        </div>
-        <div id="search-results" style="display:flex;flex-direction:column;gap:8px;margin-top:16px;max-height:60vh;overflow-y:auto;" class="scroll-hide">
-            <div style="text-align:center;padding:40px 20px;color:var(--muted);">
-                <i data-lucide="search" style="width:32px;height:32px;margin:0 auto 10px;opacity:0.5;"></i>
-                <p style="font-size:13px;">Find transactions, wallets, goals & more</p>
-            </div>
-        </div>`;
-            openSheet();
-            lucide.createIcons();
-            setTimeout(() => document.getElementById('search-input').focus(), 100);
-        }
-
-        function handleSearch() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const resDiv = document.getElementById('search-results');
-            if (!query) { resDiv.innerHTML = '<p style="text-align:center;color:var(--muted);padding:30px;font-size:13px;">Find anywhere in the app...</p>'; return; }
-            let html = '';
-            const wallets = state.wallets.filter(w => w.name.toLowerCase().includes(query) || (w.currency && w.currency.toLowerCase().includes(query)));
-            if (wallets.length) { html += '<p class="section-title" style="margin-top:10px;">Wallets</p>'; html += wallets.map(w => `<div class="tx-row" onclick="closeSheet(); switchTab('wallets');"><div class="icon-box" style="background:rgba(255,255,255,0.05);"><i data-lucide="${w.icon}" style="color:var(--muted);"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${w.name}</p><p style="font-size:10px;color:var(--muted);">${w.currency || state.currency.code} ${fmtNum(w.balance)}</p></div></div>`).join(''); }
-            const goals = state.goals.filter(g => g.name.toLowerCase().includes(query));
-            if (goals.length) { html += '<p class="section-title" style="margin-top:10px;">Goals</p>'; html += goals.map(g => `<div class="tx-row" onclick="openGoalForm(${g.id})"><div class="icon-box" style="background:${g.color}18;"><i data-lucide="${g.icon}" style="color:${g.color};"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${g.name}</p><p style="font-size:10px;color:var(--muted);">${fmt(g.saved)} / ${fmt(g.target)}</p></div></div>`).join(''); }
-            const txs = state.transactions.filter(t => { const cat = getCat(t.categoryId); return t.name.toLowerCase().includes(query) || (t.note && t.note.toLowerCase().includes(query)) || cat.name.toLowerCase().includes(query); });
-            if (txs.length) {
-                html += '<p class="section-title" style="margin-top:10px;">Transactions</p>';
-                html += txs.map(t => { const cat = getCat(t.categoryId); const wallet = state.wallets.find(w => w.id === t.walletId) || {}; const wCurr = wallet.currency || state.currency.code; return `<div class="tx-row" onclick="openEditTransaction(${t.id})"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div><div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div><div style="text-align:right;"><p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p></div></div>`; }).join('');
-            }
-            if (!html) { resDiv.innerHTML = '<p style="text-align:center;color:var(--muted);padding:30px;font-size:13px;">No results found</p>'; return; }
-            resDiv.innerHTML = html;
-            lucide.createIcons();
-        }
-
-        // ─── HOME ─────────────────────────────────────────────────────────────
         function openSearch(shouldFocus = true) {
             ui.searchQuery = ui.searchQuery || '';
             if (ui.currentTab !== 'search') ui.searchReturnTab = ui.currentTab || 'home';
@@ -2985,7 +3381,7 @@ IMPORTANT RULES:
     </div>`;
         }
 
-        // ─── MONTH NAV & TX FILTER ────────────────────────────────────────────
+        // â”€â”€â”€ MONTH NAV & TX FILTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function shiftMonth(dir) {
             let m = ui.txMonth + dir;
             let y = ui.txYear;
@@ -3005,7 +3401,7 @@ IMPORTANT RULES:
             switchTab('home');
         }
 
-        // ─── CHARTS ───────────────────────────────────────────────────────────
+        // â”€â”€â”€ CHARTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function setChartPeriod(p) {
             ui.chartPeriod = p;
             document.querySelectorAll('[id^="period-"]').forEach(btn => { btn.style.background = ''; btn.style.color = 'var(--muted)'; });
@@ -3207,7 +3603,7 @@ IMPORTANT RULES:
             if (typeof lucide !== 'undefined') lucide.createIcons({ nodes: iconsDiv.querySelectorAll('[data-lucide]') });
         }
 
-        // ─── BUDGETS & GOALS ──────────────────────────────────────────────────
+        // â”€â”€â”€ BUDGETS & GOALS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderBudgets() {
             const totalSaved = state.goals.reduce((s, g) => s + g.saved, 0);
             let html = `<div class="fade-up">
@@ -3238,7 +3634,7 @@ IMPORTANT RULES:
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;"><span class="syne" style="font-size:22px;font-weight:800;color:var(--text);">${fmt(g.saved)}</span><span style="font-size:11px;color:${done ? g.color : 'var(--muted)'};font-weight:700;">${pct}%</span></div>
                     <div class="progress-bar" style="height:8px;border-radius:8px;background:rgba(255,255,255,0.04);margin-bottom:12px;"><div class="progress-fill" style="width:${pct}%;background:${done ? g.color : `linear-gradient(90deg, ${g.color}88, ${g.color})`};"></div></div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;color:var(--muted);">${g.deadline ? fmtDate(g.deadline) : 'No deadline'}</span>${done ? `<span style="font-size:10px;color:${g.color};font-weight:700;">Goal Reached! 🎉</span>` : `<span style="font-size:10px;color:var(--muted);">${fmt(g.target - g.saved)} left</span>`}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:10px;color:var(--muted);">${g.deadline ? fmtDate(g.deadline) : 'No deadline'}</span>${done ? `<span style="font-size:10px;color:${g.color};font-weight:700;">Goal reached</span>` : `<span style="font-size:10px;color:var(--muted);">${fmt(g.target - g.saved)} left</span>`}</div>
                 </div>`;
             }).join('')}
             ${state.goals.length === 0 ? '<div class="card" style="padding:40px 20px;text-align:center;color:var(--muted);"><p style="font-size:15px;font-weight:600;">No saving goals</p></div>' : ''}
@@ -3323,7 +3719,7 @@ IMPORTANT RULES:
             saveState(); closeSheet(); switchFinanceTab('budgets'); showToast(`Added ${fmt(addedToBase)} to goal!`);
         }
 
-        // ─── TRANSACTION FORM ─────────────────────────────────────────────────
+        // â”€â”€â”€ TRANSACTION FORM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function openTransactionForm(prefill = null) {
             if (prefill) { ui.editingTransaction = prefill.id; } else { ui.editingTransaction = null; }
             const tx = prefill || { type: 'expense', walletId: ui.selectedWalletId || state.wallets[0]?.id, categoryId: 'food', amount: '', name: '', date: today(), note: '' };
@@ -3349,7 +3745,7 @@ IMPORTANT RULES:
     <div id="amount-display-area" style="text-align:center;padding:8px 0 20px;position:relative;">
         <p id="tx-currency-label" style="font-size:11px;font-weight:600;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">${(state.wallets.find(w => w.id === tx.walletId) || {}).currency || state.currency.code}</p>
         <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-            <span id="sign-label" style="font-size:48px;font-weight:800;color:${tx.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};line-height:1;">${tx.type === 'expense' ? '−' : '+'}</span>
+            <span id="sign-label" style="font-size:48px;font-weight:800;color:${tx.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};line-height:1;">${tx.type === 'expense' ? '-' : '+'}</span>
             <input
                 type="text"
                 id="tx-amount"
@@ -3445,7 +3841,7 @@ IMPORTANT RULES:
         }
 
         function syncAmountDisplay(input) {
-            // Visual feedback — shrink font if value gets long
+            // Visual feedback - shrink font if value gets long
             const len = input.value.length;
             input.style.fontSize = len > 10 ? '32px' : len > 7 ? '40px' : '48px';
         }
@@ -3457,7 +3853,7 @@ IMPORTANT RULES:
             // Guard against empty or operator-only strings
             if (!/[0-9]/.test(cleaned)) return NaN;
             try {
-                // Use Function to evaluate — safe because we stripped all non-numeric/operator chars
+                // Use Function to evaluate - safe because we stripped all non-numeric/operator chars
                 // eslint-disable-next-line no-new-func
                 const result = Function('"use strict"; return (' + cleaned + ')')();
                 return typeof result === 'number' && isFinite(result) ? result : NaN;
@@ -3474,7 +3870,7 @@ IMPORTANT RULES:
             if (type === 'expense') {
                 btnE.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(244,63,94,0.35);';
                 btnI.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;color:var(--muted);';
-                if (sign) { sign.style.color = 'var(--rose)'; sign.textContent = '−'; }
+                if (sign) { sign.style.color = 'var(--rose)'; sign.textContent = '-'; }
             } else {
                 btnI.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;background:var(--emerald);color:#000;box-shadow:0 4px 12px rgba(16,185,129,0.35);';
                 btnE.style.cssText = 'flex:1;padding:11px 0;border-radius:12px;font-size:13px;font-weight:700;transition:all 0.22s;color:var(--muted);';
@@ -3639,7 +4035,7 @@ IMPORTANT RULES:
             openSheet(); lucide.createIcons();
         }
 
-        // ─── INCOME ───────────────────────────────────────────────────────────
+        // â”€â”€â”€ INCOME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderIncome() {
             const totalExpected = state.incomeSources.reduce((s, i) => { const w = state.wallets.find(x => x.id === i.walletId) || { currency: state.currency.code }; return s + convertCurrency(i.amount, w.currency, state.currency.code); }, 0);
             return `<div class="fade-up">
@@ -3679,18 +4075,18 @@ IMPORTANT RULES:
             wallet.balance += item.amount;
             const catId = state.categories.income.find(c => c.name.toLowerCase().includes('salary'))?.id || state.categories.income[0]?.id || 'other';
             state.transactions.unshift({ id: genId(), name: `${item.name}`, categoryId: catId, type: 'income', amount: item.amount, walletId: item.walletId, date: nowWithTime(), note: 'Received from sources' });
-            saveState(); showToast(`Received ${wallet.currency || state.currency.code} ${fmtNum(item.amount)}! 🎉`); switchFinanceTab('income');
+            saveState(); showToast(`Received ${wallet.currency || state.currency.code} ${fmtNum(item.amount)}!`); switchFinanceTab('income');
         }
 
-        function fmtDate(iso) { if (!iso) return '—'; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }); }
+        function fmtDate(iso) { if (!iso) return '-'; const d = new Date(iso + 'T00:00:00'); return d.toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' }); }
 
-        // ─── DEBTS ────────────────────────────────────────────────────────────
+        // â”€â”€â”€ DEBTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderDebts() {
             const totalInstall = state.debts.installments.reduce((s, d) => s + convertCurrency(d.amount, (state.wallets.find(w => w.id === d.walletId) || { currency: state.currency.code }).currency, state.currency.code), 0);
             const totalOwe = state.debts.oweTo.reduce((s, d) => s + d.amount, 0);
             const totalOwed = state.debts.owedToMe.reduce((s, d) => s + d.amount, 0);
 
-            // ── Calendar Logic ──
+            // â”€â”€ Calendar Logic â”€â”€
             if (!ui.calendarMonth) { const n = new Date(); ui.calendarMonth = n.getMonth(); ui.calendarYear = n.getFullYear(); }
             const cm = ui.calendarMonth; const cy = ui.calendarYear;
             const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -3707,7 +4103,7 @@ IMPORTANT RULES:
                 events[day].push({ label, color, amount });
             };
 
-            // Installments — due date OR startDate recurring monthly
+            // Installments - due date OR startDate recurring monthly
             state.debts.installments.forEach(d => {
                 if (d.left <= 0) return;
                 // recurring monthly payment on same day as startDate
@@ -3727,7 +4123,7 @@ IMPORTANT RULES:
                     }
                 }
             });
-            // oweTo debts — date added
+            // oweTo debts - date added
             state.debts.oweTo.forEach(d => {
                 const dt = new Date(d.date);
                 if (dt.getMonth() === cm && dt.getFullYear() === cy) {
@@ -3845,7 +4241,7 @@ IMPORTANT RULES:
                     items.push({ label: d.name, sub: 'Installment · ' + wCurr + ' ' + fmtNum(d.amount) + '/mo', color: '#f43f5e', icon: d.icon || 'credit-card', action: `payInstallment(${d.id})`, actionLabel: 'Pay Now' });
                 }
                 if (d.dueDate === dateStr) {
-                    items.push({ label: d.name + ' — Final Payment', sub: 'Last installment', color: '#f97316', icon: 'flag', action: `payInstallment(${d.id})`, actionLabel: 'Pay Final' });
+                    items.push({ label: d.name + ' - Final Payment', sub: 'Last installment', color: '#f97316', icon: 'flag', action: `payInstallment(${d.id})`, actionLabel: 'Pay Final' });
                 }
             });
             state.debts.oweTo.forEach(d => {
@@ -3953,7 +4349,7 @@ IMPORTANT RULES:
             saveState();
             closeSheet();
             switchFinanceTab('debts');
-            showToast('Settled successfully! 🎉');
+            showToast('Settled successfully!');
         }
         function openDebtForm(type, editId = null) {
             const item = editId ? state.debts[type].find(d => d.id === editId) : null;
@@ -3975,81 +4371,332 @@ IMPORTANT RULES:
             const wallet = state.wallets.find(w => w.id === item.walletId); if (!wallet) return showToast('Wallet not found', 'error'); if (wallet.balance < item.amount) return showToast('Insufficient balance', 'error');
             wallet.balance -= item.amount; item.paidAmount = parseFloat(((item.paidAmount || 0) + item.amount).toFixed(2)); item.left = Math.max(0, item.left - 1);
             state.transactions.unshift({ id: genId(), name: `Payment: ${item.name}`, categoryId: 'bills', type: 'expense', amount: item.amount, walletId: item.walletId, date: nowWithTime(), note: `Installment (${item.total - item.left}/${item.total})` });
-            if (item.left === 0) { state.debts.installments = state.debts.installments.filter(d => d.id !== id); saveState(); switchFinanceTab('debts'); return showToast(`${item.name} fully paid! 🎉`); }
+            if (item.left === 0) { state.debts.installments = state.debts.installments.filter(d => d.id !== id); saveState(); switchFinanceTab('debts'); return showToast(`${item.name} fully paid!`); }
             saveState(); switchFinanceTab('debts'); showToast(`Paid! ${item.left} months left`);
         }
         function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Removed'); }
 
-        // ─── WALLETS ──────────────────────────────────────────────────────────
+        // â”€â”€â”€ WALLETS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderWallets() {
             ui.currentTab = 'wallets';
-            const sorted = state.wallets;
+            const wallets = state.wallets;
+            const featured = wallets.find(w => w.id === ui.featuredWalletId) || wallets[0];
+            if (!featured) return `<div class="fade-up wallet-page"><p style="text-align:center;color:var(--muted);padding:40px 0;">No wallets yet</p></div>`;
 
-            let html = `<div class="fade-up" style="padding-bottom: 10px; overflow-x: hidden; min-height: 100vh;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; position:relative;">
-            <h2 class="syne" style="font-size:20px;font-weight:700;">Cards</h2>
-            <div style="display:flex;gap:8px;align-items:center;">
-                <button onclick="openTransferForm()" style="height:42px;padding:0 14px;border-radius:14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);display:flex;align-items:center;gap:6px;color:#3b82f6;font-size:12px;font-weight:700;" title="Transfer between wallets">
-                    <i data-lucide="arrow-right-left" style="width:15px;height:15px;"></i>
-                    <span>Transfer</span>
-                </button>
-                <button onclick="openWalletForm()" style="width:42px;height:42px;border-radius:14px;background:var(--surface2);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);color:var(--text);">
-                    <i data-lucide="plus" style="width:20px;height:20px;"></i>
-                </button>
+            ui.featuredWalletId = featured.id;
+            const featuredCurr = featured.currency || state.currency.code;
+            const converted = featuredCurr !== state.currency.code ? convertCurrency(featured.balance, featuredCurr, state.currency.code) : null;
+            const totalLinked = wallets.reduce((sum, w) => sum + convertCurrency(w.balance, w.currency || state.currency.code, state.currency.code), 0);
+            const featuredTxCount = state.transactions.filter(t => t.walletId === featured.id).length;
+            const carouselWallets = wallets.length > 1
+                ? Array.from({ length: 5 }, (_, cycle) => wallets.map(wallet => ({ wallet, cycle }))).flat()
+                : wallets.map(wallet => ({ wallet, cycle: 0 }));
+            const walletCardHTML = ({ wallet, cycle }, duplicateIndex) => {
+                const curr = wallet.currency || state.currency.code;
+                const convertedValue = curr !== state.currency.code ? convertCurrency(wallet.balance, curr, state.currency.code) : null;
+                const activeCycle = wallets.length > 1 ? 2 : 0;
+                const isActive = wallet.id === featured.id && cycle === activeCycle;
+                return `<div class="wallet-carousel-item ${isActive ? 'is-active' : ''}" data-wallet-id="${wallet.id}" data-cycle="${cycle}" data-duplicate-index="${duplicateIndex}">
+            <button class="wallet-hero-card" onclick="selectWalletCard(${wallet.id}, event)" style="width:100%;text-align:left;background:${wallet.color || 'linear-gradient(135deg,#111827,#10b981)'};" aria-label="Select wallet">
+                <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;">
+                        <div style="min-width:0;">
+                            <p style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.64);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px;">${wallet.name}</p>
+                            <span class="wallet-card-badge">${curr} Wallet</span>
+                        </div>
+                        <div class="wallet-card-brand">
+                            <i data-lucide="${wallet.icon || 'wallet'}" style="width:20px;height:20px;color:rgba(255,255,255,0.92);"></i>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;">
+                        <div>
+                            <p class="wcard-label">Card Balance</p>
+                            <p class="wcard-balance" style="font-size:24px;">${curr} ${fmtNum(wallet.balance)}</p>
+                            ${convertedValue !== null ? `<p class="wcard-sub">~ ${state.currency.symbol} ${fmtNum(convertedValue)}</p>` : ''}
+                        </div>
+                        ${wallet.isFrozen ? `<span style="font-size:9px;font-weight:900;color:#93c5fd;background:rgba(147,197,253,0.14);border:1px solid rgba(147,197,253,0.24);border-radius:999px;padding:5px 8px;">Frozen</span>` : ''}
+                    </div>
+                </div>
+            </button>
+        </div>`;
+            };
+
+            const html = `<div class="fade-up wallet-page">
+        <div class="wallet-topbar">
+            <button class="wallet-icon-btn" onclick="switchTab('home')" aria-label="Back to home">
+                <i data-lucide="chevron-left" style="width:20px;height:20px;"></i>
+            </button>
+            <h2 class="syne" style="font-size:16px;font-weight:800;text-align:center;">Cards & Wallet</h2>
+            <button class="wallet-icon-btn" onclick="openWalletForm()" aria-label="Add wallet">
+                <i data-lucide="plus" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+
+        <div class="wallet-card-stage">
+            <div class="wallet-card-track" id="wallet-card-carousel" onscroll="handleWalletCarouselScroll(this)" onpointerdown="startWalletSwipe(event)" onpointermove="trackWalletSwipe(event)" onpointerup="endWalletSwipe(event)" onpointercancel="cancelWalletSwipe()" onwheel="handleWalletCarouselWheel(event)">
+                ${carouselWallets.map(walletCardHTML).join('')}
+            </div>
+            <div class="wallet-carousel-dots">
+                ${wallets.map(w => `<span class="wallet-carousel-dot ${w.id === featured.id ? 'is-active' : ''}"></span>`).join('')}
             </div>
         </div>
 
-        <div class="wallet-container" id="wallet-stack">`;
+        <div class="wallet-actions">
+            <button id="wallet-freeze-btn" class="wallet-action-pill" onclick="toggleWalletFreeze(${featured.id})">
+                <i data-lucide="${featured.isFrozen ? 'snowflake' : 'asterisk'}" style="width:15px;height:15px;"></i>
+                <span>${featured.isFrozen ? 'Unfreeze Card' : 'Freeze Card'}</span>
+            </button>
+            <button id="wallet-details-btn" class="wallet-action-pill" onclick="openTransactionForm({type:'expense', walletId:${featured.id}})">
+                <i data-lucide="receipt" style="width:15px;height:15px;"></i>
+                <span>Add Transaction</span>
+            </button>
+        </div>
 
-            sorted.forEach((w, index) => {
-                const wCurr = w.currency || state.currency.code;
-                const mainCurr = state.currency.code;
-                let conversionHTML = '';
-                if (wCurr !== mainCurr) {
-                    const convertedVal = convertCurrency(w.balance, wCurr, mainCurr);
-                    conversionHTML = `<p class="wcard-sub">≈ ${state.currency.symbol} ${fmtNum(convertedVal)}</p>`;
-                }
+        <div class="wallet-section-head">
+            <p class="section-title" style="margin:0;">Card Transactions</p>
+            <button id="wallet-panel-edit-btn" onclick="openTransactionForm({type:'expense', walletId:${featured.id}})" style="font-size:11px;font-weight:750;color:var(--muted);padding:6px 2px;">Add</button>
+        </div>
 
-                html += `
-        <div class="wallet-card-wrapper stacked"
-             id="wallet-card-${w.id}"
-             onclick="toggleWalletCard(event, ${w.id})"
-             style="transform: translateY(${index * 50}px); z-index: ${index + 1};">
-             
-            <div style="height: 220px; border-radius: 22px; background: ${w.color}; padding: 24px; box-shadow: 0 2px 0 rgba(255,255,255,0.06) inset, 0 20px 50px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
-                <!-- gloss sheen -->
-                <div style="position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0) 100%);border-radius:22px 22px 0 0;pointer-events:none;"></div>
-                <!-- ambient orb -->
-                <div style="position:absolute;top:-50px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,0.03);border-radius:50%;filter:blur(40px);pointer-events:none;"></div>
+        <div class="wallet-detail-card" id="wallet-card-transactions">
+            ${renderWalletCardTransactions(featured)}
+        </div>
 
-                <!-- TOP ROW: name + icon -->
-                <div style="display:flex;justify-content:space-between;align-items:center; z-index: 2; position:relative;">
-                    <p class="wcard-name">${w.name}</p>
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        ${w.excludeFromTotal ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;background:rgba(245,158,11,0.2);color:#f59e0b;border:1px solid rgba(245,158,11,0.3);padding:3px 7px;border-radius:6px;">Excluded</span>` : ''}
-                        <div style="width:34px;height:34px;background:rgba(255,255,255,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.1);">
-                            <i data-lucide="${w.icon}" style="width:15px;height:15px;color:rgba(255,255,255,0.85);"></i>
+        <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:14px;">Total wallet balance ${state.currency.symbol} ${fmtNum(totalLinked)}</p>
+    </div>`;
+            setTimeout(() => initWalletCarousel(), 0);
+            return html;
+        }
+
+        function renderWalletCardTransactions(wallet) {
+            const curr = wallet.currency || state.currency.code;
+            const txs = state.transactions
+                .filter(t => t.walletId === wallet.id)
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 8);
+            if (!txs.length) {
+                return `<div style="padding:28px 18px;text-align:center;">
+                    <div class="wallet-mini-icon" style="width:42px;height:42px;border-radius:14px;margin:0 auto 12px;">
+                        <i data-lucide="receipt" style="width:18px;height:18px;color:var(--muted);"></i>
+                    </div>
+                    <p style="font-size:14px;font-weight:750;color:var(--text);">No transactions yet</p>
+                    <p style="font-size:11px;color:var(--muted);margin-top:4px;">New card activity will appear here.</p>
+                </div>`;
+            }
+            return txs.map(t => {
+                const cat = getCat(t.categoryId, t.type);
+                const isExp = t.type === 'expense';
+                return `<button class="wallet-detail-row" onclick="openEditTransaction(${t.id})" style="width:100%;text-align:left;color:var(--text);">
+                    <div class="wallet-detail-label">
+                        <div class="wallet-mini-icon" style="background:${cat.color}18;border-color:${cat.color}24;">
+                            <i data-lucide="${cat.icon}" style="width:15px;height:15px;color:${cat.color};"></i>
+                        </div>
+                        <div style="min-width:0;">
+                            <p style="font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;">${t.name || cat.name}</p>
+                            <p style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;">${cat.name} · ${dateLabel(t.date)}</p>
                         </div>
                     </div>
-                </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <p class="syne" style="font-size:13px;font-weight:850;color:${isExp ? 'var(--rose)' : 'var(--emerald)'};">${isExp ? '-' : '+'} ${curr} ${fmtNum(t.amount)}</p>
+                        ${t.excludeFromTotals || t.isTransfer ? `<p style="font-size:9px;color:var(--muted);margin-top:2px;">${t.isTransfer ? 'Transfer' : 'Excluded'}</p>` : ''}
+                    </div>
+                </button>`;
+            }).join('');
+        }
 
-                <!-- BOTTOM ROW: label + balance + conversion -->
-                <div style="position:relative; z-index:2;">
-                    <p class="wcard-label">Balance</p>
-                    <p class="wcard-balance">${wCurr} ${fmtNum(w.balance)}</p>
-                    ${conversionHTML}
-                </div>
-            </div>
-        </div>`;
+        function selectWalletCard(walletId, event = null) {
+            if (ui.walletSwipeMoved) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                setTimeout(() => { ui.walletSwipeMoved = false; }, 0);
+                return;
+            }
+            ui.featuredWalletId = walletId;
+            const track = document.getElementById('wallet-card-carousel');
+            if (!track) {
+                switchTab('wallets');
+                return;
+            }
+            scrollWalletCarouselTo(walletId, 'smooth');
+            updateWalletCarouselSelection(track, walletId);
+        }
+
+        function initWalletCarousel() {
+            const track = document.getElementById('wallet-card-carousel');
+            if (!track) return;
+            const cards = Array.from(track.querySelectorAll('.wallet-carousel-item'));
+            if (!cards.length) return;
+            const targetId = ui.featuredWalletId || state.wallets[0]?.id;
+            ui.walletCarouselCycle = state.wallets.length > 1 ? 2 : 0;
+            const targetCard = cards.find(card => parseInt(card.dataset.walletId) === targetId && parseInt(card.dataset.cycle) === ui.walletCarouselCycle) || cards[0];
+            ui.walletCarouselJumping = true;
+            centerWalletCarouselCard(track, targetCard, 'auto');
+            updateWalletCarouselSelection(track, parseInt(targetCard.dataset.walletId), parseInt(targetCard.dataset.cycle));
+            setTimeout(() => { ui.walletCarouselJumping = false; }, 60);
+        }
+
+        function centerWalletCarouselCard(track, card, behavior = 'smooth') {
+            const left = card.offsetLeft - (track.clientWidth - card.clientWidth) / 2;
+            track.scrollTo({ left, behavior });
+        }
+
+        function scrollWalletCarouselTo(walletId, behavior = 'smooth', cycle = ui.walletCarouselCycle ?? 2) {
+            const track = document.getElementById('wallet-card-carousel');
+            if (!track) return;
+            const cards = Array.from(track.querySelectorAll('.wallet-carousel-item'));
+            const card = cards.find(item => parseInt(item.dataset.walletId) === walletId && parseInt(item.dataset.cycle) === cycle)
+                || cards.find(item => parseInt(item.dataset.walletId) === walletId);
+            if (card) centerWalletCarouselCard(track, card, behavior);
+        }
+
+        function moveWalletCarousel(direction) {
+            if (!state.wallets.length) return;
+            const currentId = ui.featuredWalletId || state.wallets[0].id;
+            const currentIndex = Math.max(0, state.wallets.findIndex(w => w.id === currentId));
+            const normalizedDirection = direction >= 0 ? 1 : -1;
+            let targetCycle = ui.walletCarouselCycle ?? (state.wallets.length > 1 ? 2 : 0);
+            let nextIndex = currentIndex + normalizedDirection;
+            if (nextIndex >= state.wallets.length) {
+                nextIndex = 0;
+                targetCycle += 1;
+            } else if (nextIndex < 0) {
+                nextIndex = state.wallets.length - 1;
+                targetCycle -= 1;
+            }
+            if (targetCycle < 0) targetCycle = 0;
+            if (targetCycle > 4) targetCycle = 4;
+            const nextWallet = state.wallets[nextIndex];
+            if (!nextWallet) return;
+            ui.featuredWalletId = nextWallet.id;
+            ui.walletCarouselCycle = targetCycle;
+            ui.walletGestureLock = true;
+            const track = document.getElementById('wallet-card-carousel');
+            scrollWalletCarouselTo(nextWallet.id, 'smooth', targetCycle);
+            if (track) updateWalletCarouselSelection(track, nextWallet.id, targetCycle);
+            setTimeout(() => {
+                if (state.wallets.length > 1 && targetCycle !== 2) {
+                    ui.walletCarouselCycle = 2;
+                    scrollWalletCarouselTo(nextWallet.id, 'auto', 2);
+                    if (track) updateWalletCarouselSelection(track, nextWallet.id, 2);
+                }
+                ui.walletGestureLock = false;
+            }, 390);
+        }
+
+        function startWalletSwipe(event) {
+            ui.walletSwipeStart = { x: event.clientX, y: event.clientY, time: Date.now() };
+            ui.walletSwipeMoved = false;
+            try { event.currentTarget.setPointerCapture(event.pointerId); } catch {}
+        }
+
+        function trackWalletSwipe(event) {
+            if (!ui.walletSwipeStart) return;
+            const dx = event.clientX - ui.walletSwipeStart.x;
+            const dy = event.clientY - ui.walletSwipeStart.y;
+            if (Math.hypot(dx, dy) > 10) {
+                ui.walletSwipeMoved = true;
+                event.preventDefault();
+            }
+        }
+
+        function cancelWalletSwipe() {
+            ui.walletSwipeStart = null;
+            setTimeout(() => { ui.walletSwipeMoved = false; }, 0);
+        }
+
+        function endWalletSwipe(event) {
+            if (!ui.walletSwipeStart) return;
+            const dx = event.clientX - ui.walletSwipeStart.x;
+            const dy = event.clientY - ui.walletSwipeStart.y;
+            const distance = Math.hypot(dx, dy);
+            ui.walletSwipeStart = null;
+            if (distance < 34) {
+                setTimeout(() => { ui.walletSwipeMoved = false; }, 0);
+                return;
+            }
+            const useHorizontal = Math.abs(dx) >= Math.abs(dy);
+            let direction = useHorizontal ? (dx < 0 ? 1 : -1) : (dy < 0 ? 1 : -1);
+            const currentIndex = state.wallets.findIndex(w => w.id === ui.featuredWalletId);
+            if (useHorizontal && dx > 0 && currentIndex === state.wallets.length - 1) direction = 1;
+            if (useHorizontal && dx < 0 && currentIndex === 0) direction = 1;
+            event.preventDefault();
+            moveWalletCarousel(direction);
+            setTimeout(() => { ui.walletSwipeMoved = false; }, 220);
+        }
+
+        function handleWalletCarouselWheel(event) {
+            const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+            if (Math.abs(delta) < 18) return;
+            event.preventDefault();
+            clearTimeout(ui.walletWheelTimer);
+            ui.walletWheelTimer = setTimeout(() => moveWalletCarousel(delta > 0 ? 1 : -1), 20);
+        }
+
+        function handleWalletCarouselScroll(track) {
+            if (ui.walletGestureLock || ui.walletSwipeStart) return;
+            clearTimeout(ui.walletCarouselTimer);
+            ui.walletCarouselTimer = setTimeout(() => {
+                if (ui.walletGestureLock || ui.walletSwipeStart) return;
+                const cards = Array.from(track.querySelectorAll('.wallet-carousel-item'));
+                if (!cards.length) return;
+                const center = track.scrollLeft + track.clientWidth / 2;
+                let nearest = cards[0];
+                let nearestDistance = Infinity;
+                cards.forEach(card => {
+                    const cardCenter = card.offsetLeft + card.clientWidth / 2;
+                    const distance = Math.abs(cardCenter - center);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearest = card;
+                    }
+                });
+
+                updateWalletCarouselSelection(track, parseInt(nearest.dataset.walletId), parseInt(nearest.dataset.cycle));
+            }, 80);
+        }
+
+        function updateWalletCarouselSelection(track, walletId, cycle = ui.walletCarouselCycle ?? 2) {
+            const wallet = state.wallets.find(w => w.id === walletId);
+            if (!wallet) return;
+            ui.featuredWalletId = walletId;
+            ui.walletCarouselCycle = cycle;
+            track.querySelectorAll('.wallet-carousel-item').forEach(card => {
+                card.classList.toggle('is-active', parseInt(card.dataset.walletId) === walletId && parseInt(card.dataset.cycle) === cycle);
+            });
+            document.querySelectorAll('.wallet-carousel-dot').forEach((dot, index) => {
+                dot.classList.toggle('is-active', state.wallets[index]?.id === walletId);
+            });
+            document.querySelectorAll('.wallet-account-row').forEach(row => {
+                row.classList.toggle('is-selected', row.getAttribute('onclick') === `selectWalletCard(${walletId})`);
             });
 
-            html += `<div class="wallet-details" id="wallet-details-container"></div>`;
-            html += `</div></div>`;
+            const freezeBtn = document.getElementById('wallet-freeze-btn');
+            if (freezeBtn) {
+                freezeBtn.setAttribute('onclick', `toggleWalletFreeze(${walletId})`);
+                const icon = freezeBtn.querySelector('i');
+                const label = freezeBtn.querySelector('span');
+                if (icon) icon.setAttribute('data-lucide', wallet.isFrozen ? 'snowflake' : 'asterisk');
+                if (label) label.textContent = wallet.isFrozen ? 'Unfreeze Card' : 'Freeze Card';
+            }
+            const detailsBtn = document.getElementById('wallet-details-btn');
+            if (detailsBtn) detailsBtn.setAttribute('onclick', `openTransactionForm({type:'expense', walletId:${walletId}})`);
+            const panelEditBtn = document.getElementById('wallet-panel-edit-btn');
+            if (panelEditBtn) panelEditBtn.setAttribute('onclick', `openTransactionForm({type:'expense', walletId:${walletId}})`);
+            const transactionsPanel = document.getElementById('wallet-card-transactions');
+            if (transactionsPanel) {
+                transactionsPanel.innerHTML = renderWalletCardTransactions(wallet);
+            }
+            if (window.lucide) lucide.createIcons();
+        }
 
-            ui.isWalletExpanded = false;
-            ui.expandedWalletId = null;
-
-            return html;
+        function toggleWalletFreeze(walletId) {
+            const wallet = state.wallets.find(w => w.id === walletId);
+            if (!wallet) return;
+            wallet.isFrozen = !wallet.isFrozen;
+            saveState();
+            switchTab('wallets');
+            showToast(wallet.isFrozen ? 'Card frozen' : 'Card unfrozen');
         }
 
         function toggleWalletCard(event, walletId) {
@@ -4257,34 +4904,34 @@ IMPORTANT RULES:
     const fromCurr = wFrom.currency || state.currency.code || 'EGP'; 
     const toCurr = wTo.currency || state.currency.code || 'EGP'; 
 
-    // 1. جدول أسعار الصرف الثابتة والمستقلة مرجعية للجنيه المصري (EGP)
+    // 1. Ø¬Ø¯ÙˆÙ„ Ø£Ø³Ø¹Ø§Ø± Ø§Ù„ØµØ±Ù Ø§Ù„Ø«Ø§Ø¨ØªØ© ÙˆØ§Ù„Ù…Ø³ØªÙ‚Ù„Ø© Ù…Ø±Ø¬Ø¹ÙŠØ© Ù„Ù„Ø¬Ù†ÙŠÙ‡ Ø§Ù„Ù…ØµØ±ÙŠ (EGP)
     const exchangeRates = {
         'EGP': 1.0,
-        'USD': 47.5, // 1 دولار = 47.5 جنيه
-        'EUR': 51.2, // 1 يورو = 51.2 جنيه
-        'SAR': 12.6, // 1 ريال = 12.6 جنيه
-        'AED': 12.9  // 1 درهم = 12.9 جنيه
+        'USD': 47.5, // 1 USD = 47.5 EGP
+        'EUR': 51.2, // 1 EUR = 51.2 EGP
+        'SAR': 12.6, // 1 SAR = 12.6 EGP
+        'AED': 12.9  // 1 AED = 12.9 EGP
     };
 
-    // 2. خطوة التحويل الذكي: تحويل المبلغ المدخل إلى الجنيه المصري أولاً
+    // 2. Ø®Ø·ÙˆØ© Ø§Ù„ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø°ÙƒÙŠ: ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø¯Ø®Ù„ Ø¥Ù„Ù‰ Ø§Ù„Ø¬Ù†ÙŠÙ‡ Ø§Ù„Ù…ØµØ±ÙŠ Ø£ÙˆÙ„Ø§Ù‹
     let amountInEGP = amount;
     if (exchangeRates[fromCurr]) {
         amountInEGP = amount * exchangeRates[fromCurr];
     }
 
-    // 3. خطوة التحويل الثانية: تحويل القيمة المصرية إلى عملة المحفظة المستقبلة
+    // 3. Ø®Ø·ÙˆØ© Ø§Ù„ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ø«Ø§Ù†ÙŠØ©: ØªØ­ÙˆÙŠÙ„ Ø§Ù„Ù‚ÙŠÙ…Ø© Ø§Ù„Ù…ØµØ±ÙŠØ© Ø¥Ù„Ù‰ Ø¹Ù…Ù„Ø© Ø§Ù„Ù…Ø­ÙØ¸Ø© Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„Ø©
     let convertedAmount = amountInEGP;
     if (exchangeRates[toCurr]) {
         convertedAmount = amountInEGP / exchangeRates[toCurr];
     }
 
-    // 4. تطبيق خصم الأرصدة وإضافتها بالقيم الجديدة
+    // 4. ØªØ·Ø¨ÙŠÙ‚ Ø®ØµÙ… Ø§Ù„Ø£Ø±ØµØ¯Ø© ÙˆØ¥Ø¶Ø§ÙØªÙ‡Ø§ Ø¨Ø§Ù„Ù‚ÙŠÙ… Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©
     wFrom.balance -= amount; 
     wTo.balance += convertedAmount;
 
     const dateStr = nowWithTime();
 
-    // 5. إضافة المعاملات المزدوجة للأرشيف مع تدوين الحسبة في الملاحظات (Notes)
+    // 5. Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ù…Ø¹Ø§Ù…Ù„Ø§Øª Ø§Ù„Ù…Ø²Ø¯ÙˆØ¬Ø© Ù„Ù„Ø£Ø±Ø´ÙŠÙ Ù…Ø¹ ØªØ¯ÙˆÙŠÙ† Ø§Ù„Ø­Ø³Ø¨Ø© ÙÙŠ Ø§Ù„Ù…Ù„Ø§Ø­Ø¸Ø§Øª (Notes)
     state.transactions.unshift({ 
         id: genId(), 
         name: `Transfer to ${wTo.name}`, 
@@ -4309,23 +4956,23 @@ IMPORTANT RULES:
         isTransfer: true 
     });
 
-    // 6. حفظ البيانات وتحديث واجهة المستخدم
+    // 6. Ø­ÙØ¸ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª ÙˆØªØ­Ø¯ÙŠØ« ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
     saveState(); 
     closeSheet(); 
     switchTab('wallets'); 
     
-    // إشعار نجاح يوضح التفاصيل والعملات بشكل احترافي
-    showToast(`Transfer Successful! 💸 (Received ${toCurr} ${convertedAmount.toFixed(2)})`);
+    // Ø¥Ø´Ø¹Ø§Ø± Ù†Ø¬Ø§Ø­ ÙŠÙˆØ¶Ø­ Ø§Ù„ØªÙØ§ØµÙŠÙ„ ÙˆØ§Ù„Ø¹Ù…Ù„Ø§Øª Ø¨Ø´ÙƒÙ„ Ø§Ø­ØªØ±Ø§ÙÙŠ
+    showToast(`Transfer successful! Received ${toCurr} ${convertedAmount.toFixed(2)}`);
 }
-        // ─── SETTINGS ─────────────────────────────────────────────────────────
+        // â”€â”€â”€ SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderSettings() {
             const apiKey = localStorage.getItem('velto_gemini_key') || '';
             const photo = state.user.photo || ''; const initial = (state.user.name || 'U').charAt(0).toUpperCase();
             const gd = gdrive; const driveStatusColor = (gd.autoSyncEnabled && gd.connected) ? 'var(--emerald)' : '#52525b';
-            const driveStatusText = gd.syncing ? 'Syncing…' : (gd.autoSyncEnabled && gd.connected) ? 'Auto-sync active' : gd.autoSyncEnabled ? 'Session expired - Tap top sync' : 'Sync not enabled';
+            const driveStatusText = gd.syncing ? 'Syncing...' : (gd.autoSyncEnabled && gd.connected) ? 'Auto-sync active' : gd.autoSyncEnabled ? 'Session expired - Tap top sync' : 'Sync not enabled';
             const dotClass = gd.syncing ? 'syncing' : (gd.autoSyncEnabled && gd.connected) ? 'connected' : 'disconnected';
 
-            // حساب الـ Milestones
+            // Ø­Ø³Ø§Ø¨ Ø§Ù„Ù€ Milestones
             let milestonesHTML = '';
             const allGoals = state.goals || [];
             const allDebts = state.debts.installments || [];
@@ -4479,7 +5126,7 @@ IMPORTANT RULES:
         function confirmReset() { document.getElementById('sheet-content').innerHTML = `<div style="text-align:center;padding:10px 0;"><div style="width:60px;height:60px;border-radius:20px;background:rgba(244,63,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i data-lucide="alert-triangle" style="width:28px;height:28px;color:var(--rose);"></i></div><h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:8px;">Reset Everything?</h2><p style="font-size:13px;color:var(--muted);margin-bottom:24px;">This will permanently delete all your data.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="closeSheet()" style="padding:14px;border-radius:16px;background:var(--surface2);color:var(--text);font-weight:700;">Cancel</button><button onclick="resetData()" style="padding:14px;border-radius:16px;background:var(--rose);color:#fff;font-weight:700;">Reset</button></div></div>`; openSheet(); lucide.createIcons(); }
         function resetData() { state = JSON.parse(JSON.stringify(DEFAULT_STATE)); saveState(); closeSheet(); switchTab('home'); showToast('Data reset'); }
 
-        // ─── CATEGORY SETTINGS ────────────────────────────────────────────────
+        // â”€â”€â”€ CATEGORY SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const CAT_ICONS = [
             // Food & Drink
             'utensils','coffee','pizza','beef','cake','wine','beer','milk','sandwich','salad',
@@ -4546,18 +5193,18 @@ IMPORTANT RULES:
                 <div style="display:flex;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:4px;gap:4px;margin-bottom:14px;">
                     <button onclick="ui.catSettingsType='expense';ui.catSearchQuery='';renderCategorySettingsSheet();lucide.createIcons();"
                         style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='expense'?'background:var(--rose);color:#fff;box-shadow:0 4px 12px rgba(244,63,94,0.3);':'color:var(--muted);'}">
-                        💸 Expense (${(state.categories.expense||[]).length})
+                        Expense (${(state.categories.expense||[]).length})
                     </button>
                     <button onclick="ui.catSettingsType='income';ui.catSearchQuery='';renderCategorySettingsSheet();lucide.createIcons();"
                         style="flex:1;padding:10px;border-radius:11px;font-size:12px;font-weight:700;transition:all 0.2s;${type==='income'?'background:var(--emerald);color:#000;box-shadow:0 4px 12px rgba(16,185,129,0.3);':'color:var(--muted);'}">
-                        💰 Income (${(state.categories.income||[]).length})
+                        Income (${(state.categories.income||[]).length})
                     </button>
                 </div>
 
                 <!-- Search -->
                 <div style="position:relative;margin-bottom:16px;">
                     <i data-lucide="search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted);pointer-events:none;"></i>
-                    <input type="text" id="cat-search" class="input" placeholder="Search categories…"
+                    <input type="text" id="cat-search" class="input" placeholder="Search categories..."
                         value="${esc(ui.catSearchQuery || '')}"
                         oninput="ui.catSearchQuery=this.value;renderCategorySettingsSheet();lucide.createIcons();"
                         style="padding-left:36px;font-size:13px;">
@@ -4773,7 +5420,7 @@ IMPORTANT RULES:
             if (!cat) return;
             cat.name = name; cat.color = color; cat.icon = icon;
             saveState();
-            showToast('Category updated! ✓');
+            showToast('Category updated!');
             ui.catSearchQuery = '';
             renderCategorySettingsSheet();
             lucide.createIcons();
@@ -4791,7 +5438,7 @@ IMPORTANT RULES:
             state.categories[type] = state.categories[type] || [];
             state.categories[type].push({ id, name, icon, color });
             saveState();
-            showToast('Category added! ✓');
+            showToast('Category added!');
             ui.catSearchQuery = '';
             renderCategorySettingsSheet();
             lucide.createIcons();
@@ -4831,12 +5478,12 @@ IMPORTANT RULES:
             lucide.createIcons();
         }
 
-        // ─── SHEET & TOAST ────────────────────────────────────────────────────
+        // â”€â”€â”€ SHEET & TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function openSheet() { document.getElementById('bottom-sheet').classList.add('open'); document.getElementById('overlay').style.opacity = '1'; document.getElementById('overlay').style.pointerEvents = 'auto'; lucide.createIcons(); }
         function closeSheet() { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('overlay').style.opacity = '0'; document.getElementById('overlay').style.pointerEvents = 'none'; ui.isManagingCategories = false; ui.editingTransaction = null; }
         function showToast(msg, type = 'success') { const existing = document.querySelector('.toast-el'); if (existing) existing.remove(); const el = document.createElement('div'); el.className = 'toast-el toast-anim'; el.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--font-main);z-index:1000;pointer-events:none;white-space:nowrap;background:${type === 'error' ? 'var(--rose)' : type === 'warn' ? '#f59e0b' : 'var(--emerald)'};color:#000;`; el.textContent = msg; document.body.appendChild(el); setTimeout(() => { el.style.transition = 'opacity 0.3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2200); }
 
-        // ─── ANALYTICS PAGE ──────────────────────────────────────────────────
+        // â”€â”€â”€ ANALYTICS PAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderAnalytics() {
             const now = new Date();
             const thisMonth = now.getMonth();
@@ -4911,7 +5558,7 @@ IMPORTANT RULES:
                             <div class="card" style="padding:20px;margin-bottom:14px;background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.02));border-color:rgba(245,158,11,0.15);">
                                 <p class="tag" style="color:var(--amber);margin-bottom:6px;">This Month Total</p>
                                 <h2 class="syne" style="font-size:34px;font-weight:800;">${fmt(monthOut)}</h2>
-                                <p style="font-size:11px;color:var(--muted);margin-top:4px;">${savings >= 0 ? '✅ Saving' : '⚠️ Overspending'} ${fmt(Math.abs(savings))} ${savings >= 0 ? 'this month' : 'over income'}</p>
+                                <p style="font-size:11px;color:var(--muted);margin-top:4px;">${savings >= 0 ? 'Saving' : 'Overspending'} ${fmt(Math.abs(savings))} ${savings >= 0 ? 'this month' : 'over income'}</p>
                             </div>
                             <p class="section-title" style="margin-bottom:10px;">Top Categories</p>
                             ${catEntries.length === 0 ? '<p style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">No expenses recorded this month</p>' : catEntries.map(([catId, val]) => {
@@ -5117,7 +5764,7 @@ IMPORTANT RULES:
             }
         }
 
-        // ─── THEME TOGGLE ─────────────────────────────────────────────────────
+        // â”€â”€â”€ THEME TOGGLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function toggleTheme() {
             const isLight = document.body.classList.toggle('light-mode');
             localStorage.setItem('velto_theme', isLight ? 'light' : 'dark');
@@ -5127,7 +5774,7 @@ IMPORTANT RULES:
             // AI fab icon: dark blue in dark mode, muted purple in light mode
             const fabIcon = document.getElementById('ai-fab-icon');
             if (fabIcon) fabIcon.style.color = isLight ? '#1e3a5f' : '#ffffff';
-            showToast(isLight ? '☀️ Light Mode' : '🌙 Dark Mode');
+            showToast(isLight ? 'Light Mode' : 'Dark Mode');
         }
 
         function applyTheme() {
@@ -5143,7 +5790,7 @@ IMPORTANT RULES:
             }
         }
 
-        // ─── BALANCE VISIBILITY ────────────────────────────────────────────────
+        // â”€â”€â”€ BALANCE VISIBILITY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function toggleBalanceVisibility() {
             ui.balanceHidden = !ui.balanceHidden;
             const icon = document.getElementById('balance-eye-icon');
@@ -5156,14 +5803,14 @@ IMPORTANT RULES:
             if (main) {
                 // patch all balance amounts visible on screen
                 document.querySelectorAll('.balance-val').forEach(el => {
-                    el.textContent = ui.balanceHidden ? '••••' : el.dataset.val;
+                    el.textContent = ui.balanceHidden ? '****' : el.dataset.val;
                 });
                 // re-render current tab to apply
                 switchTab(ui.currentTab || 'home');
             }
         }
 
-        // ─── GOOGLE DRIVE AUTO-SYNC ───────────────────────────────────────────
+        // â”€â”€â”€ GOOGLE DRIVE AUTO-SYNC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const GDRIVE_CLIENT_ID = '608503657584-kk54fp09cl297frfnfro32g0m0tp7o5t.apps.googleusercontent.com';
         let gdrive = { connected: false, syncing: false, fileId: localStorage.getItem('velto_gdrive_fileId') || null, autoSyncEnabled: localStorage.getItem('velto_autosync') === 'true' };
         let tokenClient; let accessToken = null;
@@ -5172,7 +5819,7 @@ IMPORTANT RULES:
             if (typeof google === 'undefined') return;
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: GDRIVE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file',
-                callback: (tokenResponse) => { if (tokenResponse && tokenResponse.access_token) { accessToken = tokenResponse.access_token; gdrive.connected = true; if (!gdrive.autoSyncEnabled) performFirstSync(); else { updateSyncButtonUI(); if (typeof showToast === 'function') showToast('Auto-sync connected ✓'); if (ui.currentTab === 'settings') switchTab('settings'); } } },
+                callback: (tokenResponse) => { if (tokenResponse && tokenResponse.access_token) { accessToken = tokenResponse.access_token; gdrive.connected = true; if (!gdrive.autoSyncEnabled) performFirstSync(); else { updateSyncButtonUI(); if (typeof showToast === 'function') showToast('Auto-sync connected'); if (ui.currentTab === 'settings') switchTab('settings'); } } },
             });
             updateSyncButtonUI();
         }
@@ -5196,7 +5843,7 @@ IMPORTANT RULES:
         function setSyncingUI(isSyncing) { gdrive.syncing = isSyncing; const icon = document.getElementById('sync-icon'); if (icon) { if (isSyncing) { icon.classList.add('spin'); icon.style.color = 'var(--emerald)'; } else { icon.classList.remove('spin'); updateSyncButtonUI(); } } }
         function updateSyncButtonUI() { const icon = document.getElementById('sync-icon'); const btn = document.getElementById('top-sync-btn'); if (icon && btn) { if (gdrive.autoSyncEnabled && accessToken) { icon.style.color = 'var(--emerald)'; btn.style.borderColor = 'rgba(16,185,129,0.3)'; } else if (gdrive.autoSyncEnabled && !accessToken) { icon.style.color = '#f59e0b'; btn.style.borderColor = 'rgba(245,158,11,0.3)'; } else { icon.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--border)'; } } }
 
-        // ─── INIT ─────────────────────────────────────────────────────────────
+        // â”€â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         loadState();
         applyTheme();
         window.addEventListener('load', async () => {
@@ -5205,18 +5852,18 @@ IMPORTANT RULES:
             switchTab('home');
         });
 
-        // ─── SWIPE TO CLOSE POPUP (BOTTOM SHEET) ─────────────────────────────
+        // â”€â”€â”€ SWIPE TO CLOSE POPUP (BOTTOM SHEET) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const bottomSheet = document.getElementById('bottom-sheet');
         let dragStartY = 0;
         let currentDragY = 0;
         let isDraggingSheet = false;
 
         bottomSheet.addEventListener('touchstart', (e) => {
-            // مش هنبدأ السحب غير لو المحتوى بتاع الـ popup معموله سكرول لفوق خالص
+            // Ù…Ø´ Ù‡Ù†Ø¨Ø¯Ø£ Ø§Ù„Ø³Ø­Ø¨ ØºÙŠØ± Ù„Ùˆ Ø§Ù„Ù…Ø­ØªÙˆÙ‰ Ø¨ØªØ§Ø¹ Ø§Ù„Ù€ popup Ù…Ø¹Ù…ÙˆÙ„Ù‡ Ø³ÙƒØ±ÙˆÙ„ Ù„ÙÙˆÙ‚ Ø®Ø§Ù„Øµ
             if (bottomSheet.scrollTop <= 0) {
                 dragStartY = e.touches[0].clientY;
                 isDraggingSheet = true;
-                // بنوقف الـ Animation مؤقتاً عشان الـ popup يتحرك مع صباعك بالمللي
+                // Ø¨Ù†ÙˆÙ‚Ù Ø§Ù„Ù€ Animation Ù…Ø¤Ù‚ØªØ§Ù‹ Ø¹Ø´Ø§Ù† Ø§Ù„Ù€ popup ÙŠØªØ­Ø±Ùƒ Ù…Ø¹ ØµØ¨Ø§Ø¹Ùƒ Ø¨Ø§Ù„Ù…Ù„Ù„ÙŠ
                 bottomSheet.style.transition = 'none';
             }
         }, { passive: true });
@@ -5227,9 +5874,9 @@ IMPORTANT RULES:
             currentDragY = e.touches[0].clientY;
             const deltaY = currentDragY - dragStartY;
 
-            // بنسمح بالسحب لتحت بس (قيمة موجبة)
+            // Ø¨Ù†Ø³Ù…Ø­ Ø¨Ø§Ù„Ø³Ø­Ø¨ Ù„ØªØ­Øª Ø¨Ø³ (Ù‚ÙŠÙ…Ø© Ù…ÙˆØ¬Ø¨Ø©)
             if (deltaY > 0) {
-                // بنمنع الشاشة اللي ورا إنها تتحرك
+                // Ø¨Ù†Ù…Ù†Ø¹ Ø§Ù„Ø´Ø§Ø´Ø© Ø§Ù„Ù„ÙŠ ÙˆØ±Ø§ Ø¥Ù†Ù‡Ø§ ØªØªØ­Ø±Ùƒ
                 if (e.cancelable) e.preventDefault();
                 bottomSheet.style.transform = `translateY(${deltaY}px)`;
             }
@@ -5239,24 +5886,24 @@ IMPORTANT RULES:
             if (!isDraggingSheet) return;
             isDraggingSheet = false;
 
-            // بنرجع الـ Animation تاني عشان يقفل بنعومة أو يرجع مكانه
+            // Ø¨Ù†Ø±Ø¬Ø¹ Ø§Ù„Ù€ Animation ØªØ§Ù†ÙŠ Ø¹Ø´Ø§Ù† ÙŠÙ‚ÙÙ„ Ø¨Ù†Ø¹ÙˆÙ…Ø© Ø£Ùˆ ÙŠØ±Ø¬Ø¹ Ù…ÙƒØ§Ù†Ù‡
             bottomSheet.style.transition = 'transform 0.38s cubic-bezier(0.32, 0.72, 0, 1)';
 
             const deltaY = currentDragY - dragStartY;
 
-            // لو سحب مسافة أكتر من 120 بيكسل، اقفل الـ Popup
+            // Ù„Ùˆ Ø³Ø­Ø¨ Ù…Ø³Ø§ÙØ© Ø£ÙƒØªØ± Ù…Ù† 120 Ø¨ÙŠÙƒØ³Ù„ØŒ Ø§Ù‚ÙÙ„ Ø§Ù„Ù€ Popup
             if (deltaY > 120) {
                 closeSheet();
             }
 
-            // في كل الحالات بنشيل الـ transform المكتوب عشان الـ CSS الأساسي يشتغل
+            // ÙÙŠ ÙƒÙ„ Ø§Ù„Ø­Ø§Ù„Ø§Øª Ø¨Ù†Ø´ÙŠÙ„ Ø§Ù„Ù€ transform Ø§Ù„Ù…ÙƒØªÙˆØ¨ Ø¹Ø´Ø§Ù† Ø§Ù„Ù€ CSS Ø§Ù„Ø£Ø³Ø§Ø³ÙŠ ÙŠØ´ØªØºÙ„
             bottomSheet.style.transform = '';
             currentDragY = 0;
         });
 
     </script>
     <script>
-        // ─── GLOBAL ERROR BOUNDARY ────────────────────────────────────────────
+        // â”€â”€â”€ GLOBAL ERROR BOUNDARY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         window.addEventListener('error', function(e) {
             console.error('Uncaught error:', e.message, e.filename, e.lineno);
             // Don't show UI toast for script load errors (CDN failures etc.)
