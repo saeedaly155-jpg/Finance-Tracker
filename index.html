@@ -240,17 +240,19 @@
         @keyframes fade-up {
             from {
                 opacity: 0;
-                transform: translateY(14px);
+                transform: scale(0.985);
+                filter: blur(8px);
             }
 
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: scale(1);
+                filter: blur(0);
             }
         }
 
         .fade-up {
-            animation: fade-up 0.35s ease both;
+            animation: fade-up 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
 
         @keyframes spin {
@@ -517,13 +519,8 @@
             padding: 2px max(20px, calc((100vw - 342px) / 2)) 16px;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
-            touch-action: none;
+            touch-action: pan-x;
             overscroll-behavior: contain;
-            cursor: grab;
-        }
-
-        .wallet-card-track:active {
-            cursor: grabbing;
         }
 
         .wallet-card-track::-webkit-scrollbar {
@@ -546,8 +543,10 @@
         .wallet-carousel-dots {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 6px;
             margin-top: -4px;
+            padding: 0 20px;
         }
 
         .wallet-carousel-dot {
@@ -561,6 +560,23 @@
         .wallet-carousel-dot.is-active {
             width: 18px;
             background: var(--emerald);
+        }
+
+        .wallet-summary-strip {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .wallet-summary-item {
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: var(--surface-glass);
+            padding: 14px;
+            box-shadow: var(--shadow-glass);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
         .wallet-hero-card {
@@ -580,7 +596,10 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(145deg, rgba(255,255,255,0.22), transparent 44%, rgba(0,0,0,0.2));
+            background:
+                radial-gradient(circle at 18% 12%, rgba(255,255,255,0.34), transparent 24%),
+                radial-gradient(circle at 82% 18%, rgba(255,255,255,0.22), transparent 28%),
+                linear-gradient(145deg, rgba(255,255,255,0.2), transparent 46%, rgba(0,0,0,0.28));
             pointer-events: none;
         }
 
@@ -592,6 +611,18 @@
             bottom: 0;
             height: 1px;
             background: rgba(255,255,255,0.22);
+        }
+
+        .wallet-hero-card > div::after {
+            content: "";
+            position: absolute;
+            inset: auto -34px -72px auto;
+            width: 180px;
+            height: 180px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.14);
+            filter: blur(8px);
+            pointer-events: none;
         }
 
         .wallet-card-brand {
@@ -736,6 +767,24 @@
             align-items: center;
             gap: 10px;
             min-width: 0;
+        }
+
+        /* Apple-style pill controls */
+        button:not(.wallet-hero-card):not(.wallet-detail-row):not(.wallet-account-row):not(.home-mini-card):not(.home-stat-card):not(.home-budget-card){
+            border-radius: 999px !important;
+        }
+
+        .btn-primary,
+        .nav-tab-btn,
+        .wallet-action-pill,
+        .wallet-icon-btn,
+        .icon-btn,
+        .tab-pill {
+            border-radius: 999px !important;
+        }
+
+        .wallet-hero-card {
+            border-radius: 22px !important;
         }
 
         .wallet-details {
@@ -928,6 +977,246 @@
             border: 1px solid rgba(139, 92, 246, 0.3);
             border-bottom-left-radius: 4px;
             align-self: flex-start;
+        }
+
+        .ai-glass-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 95;
+            display: none;
+            padding: 18px 18px 0;
+            background: rgba(8, 8, 12, 0.48);
+            backdrop-filter: blur(28px) saturate(150%);
+            -webkit-backdrop-filter: blur(28px) saturate(150%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .ai-glass-overlay.open {
+            display: flex;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .ai-glass-panel {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 430px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ai-orb {
+            width: 76px;
+            height: 76px;
+            border-radius: 999px;
+            position: relative;
+            background:
+                radial-gradient(circle at 30% 22%, rgba(255,255,255,0.95), transparent 18%),
+                conic-gradient(from var(--angle, 0deg), #ff6b35, #ff3d8b, #835cff, #20d6ff, #2ef2a0, #ffcf54, #ff6b35);
+            box-shadow: 0 0 42px rgba(131, 92, 255, 0.42), 0 0 72px rgba(32, 214, 255, 0.28);
+            animation: border-rotate 4s linear infinite, siri-pulse 2.6s ease-in-out infinite;
+        }
+
+        .ai-orb::before,
+        .ai-orb::after {
+            content: '';
+            position: absolute;
+            inset: -12px;
+            border-radius: inherit;
+            background: inherit;
+            filter: blur(18px);
+            opacity: 0.45;
+            z-index: -1;
+        }
+
+        .ai-orb::after {
+            inset: 12px;
+            filter: blur(10px);
+            opacity: 0.6;
+            background: radial-gradient(circle, rgba(255,255,255,0.9), transparent 62%);
+        }
+
+        @keyframes siri-pulse {
+            0%, 100% { transform: scale(1); border-radius: 48% 52% 50% 50%; }
+            35% { transform: scale(1.05); border-radius: 58% 42% 54% 46%; }
+            70% { transform: scale(0.97); border-radius: 44% 56% 45% 55%; }
+        }
+
+        .ai-overlay-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding-top: 6px;
+            z-index: 2;
+        }
+
+        .ai-close-btn,
+        .ai-attach-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .ai-messages {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+            padding: 22px 0 150px;
+        }
+
+        .ai-welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 16px;
+            padding: 54px 16px 20px;
+            color: var(--text);
+        }
+
+        .ai-compose {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(26, 26, 34, 0.72);
+            backdrop-filter: blur(24px) saturate(145%);
+            -webkit-backdrop-filter: blur(24px) saturate(145%);
+            box-shadow: 0 22px 70px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: bottom 0.36s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.36s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .ai-compose.input-focused {
+            bottom: 8px;
+            transform: scale(0.992);
+        }
+
+        .ai-compose-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .ai-compose textarea {
+            flex: 1;
+            min-height: 46px;
+            max-height: 118px;
+            resize: none;
+            padding: 13px 4px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--text);
+            font-size: 15px;
+            line-height: 1.35;
+        }
+
+        .ai-send-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: conic-gradient(from var(--angle, 0deg), #ff6b35, #ff3d8b, #835cff, #20d6ff, #2ef2a0, #ff6b35);
+            animation: border-rotate 5s linear infinite;
+            box-shadow: 0 0 24px rgba(131, 92, 255, 0.38);
+        }
+
+        .ai-attachment-strip,
+        .tx-attachment-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .ai-attachment-chip,
+        .tx-attachment-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            padding: 6px 8px 6px 6px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .ai-attachment-chip img,
+        .tx-attachment-chip img {
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            object-fit: cover;
+        }
+
+        .tx-attachment-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .tx-attachment-btn {
+            min-height: 48px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .tx-thumb {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            object-fit: cover;
+            border: 1px solid rgba(255,255,255,0.14);
+            flex-shrink: 0;
+        }
+
+        body.light-mode .ai-glass-overlay {
+            background: rgba(242, 242, 247, 0.58);
+        }
+
+        body.light-mode .ai-compose,
+        body.light-mode .ai-close-btn,
+        body.light-mode .ai-attach-btn,
+        body.light-mode .ai-attachment-chip,
+        body.light-mode .tx-attachment-chip {
+            background: rgba(255,255,255,0.76);
+            border-color: rgba(0,0,0,0.08);
         }
 
         /* â”€â”€ Wallet Card: clean minimal text â”€â”€ */
@@ -1969,6 +2258,397 @@
         .app-bottom-nav.search-expanded .nav-tab-btn.nav-active {
             transform: none !important;
         }
+
+        /* Final Apple roundness + wallet metal balance pass */
+        :root {
+            --apple-radius-card: 28px;
+            --apple-radius-row: 22px;
+            --apple-radius-control: 999px;
+        }
+
+        .card,
+        .glass,
+        .wallet-detail-card,
+        .wallet-summary-item {
+            border-radius: var(--apple-radius-card) !important;
+        }
+
+        .tx-row,
+        .wallet-detail-row {
+            border-radius: var(--apple-radius-row) !important;
+        }
+
+        .input,
+        select.input,
+        textarea.input,
+        .btn-primary,
+        .tab-pill,
+        .cat-btn,
+        .wallet-action-pill {
+            border-radius: var(--apple-radius-control) !important;
+        }
+
+        .icon-box,
+        .wallet-mini-icon,
+        .wallet-card-brand {
+            border-radius: 18px !important;
+        }
+
+        .wallet-hero-card {
+            border-radius: 30px !important;
+        }
+
+        .wcard-balance {
+            color: transparent !important;
+            -webkit-text-fill-color: transparent !important;
+            background:
+                linear-gradient(115deg,
+                    #f8fbff 0%,
+                    #a9b4c7 16%,
+                    #ffffff 31%,
+                    #777f90 48%,
+                    #f2f6ff 64%,
+                    #b6bfd2 78%,
+                    #ffffff 100%) !important;
+            background-size: 220% 100% !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.38)) drop-shadow(0 0 10px rgba(255,255,255,0.16));
+            animation: wallet-metal-sheen 5.4s ease-in-out infinite;
+        }
+
+        @keyframes wallet-metal-sheen {
+            0%, 100% { background-position: 0% 50%; }
+            45% { background-position: 100% 50%; }
+        }
+
+        #wallet-card-transactions.wallet-detail-card {
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            overflow: visible !important;
+        }
+
+        #wallet-card-transactions .wallet-detail-row {
+            background: transparent !important;
+            border-radius: 0 !important;
+            border-bottom: 1px solid rgba(255,255,255,0.09) !important;
+            padding-left: 2px !important;
+            padding-right: 2px !important;
+            box-shadow: none !important;
+        }
+
+        body.light-mode #wallet-card-transactions .wallet-detail-row {
+            border-bottom-color: rgba(0,0,0,0.08) !important;
+        }
+
+        .home-transactions .tx-row {
+            background: transparent !important;
+            border: 0 !important;
+            border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            padding-left: 2px !important;
+            padding-right: 2px !important;
+        }
+
+        body.light-mode .home-transactions .tx-row {
+            background: transparent !important;
+            border-bottom-color: rgba(0,0,0,0.08) !important;
+        }
+
+        .finance-panel {
+            will-change: transform, opacity, clip-path;
+        }
+
+        .finance-panel.finance-swipe-in {
+            animation: finance-swipe-drop 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+
+        @keyframes finance-swipe-drop {
+            from {
+                opacity: 0;
+                transform: translate3d(var(--finance-x, 18px), -18px, 0) scale(0.985);
+                clip-path: inset(0 0 12% 0 round 28px);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+                clip-path: inset(0 0 0 0 round 0);
+            }
+        }
+
+        .wallet-mini-graph {
+            width: 96px;
+            height: 34px;
+            flex-shrink: 0;
+            opacity: 0.95;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.24));
+        }
+
+        .home-finance-snapshot {
+            margin: 8px 0 18px;
+        }
+
+        .home-balance-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .home-balance-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 650;
+            margin-bottom: 2px;
+        }
+
+        .home-balance-value {
+            font-size: 34px;
+            line-height: 1;
+            font-weight: 850;
+            letter-spacing: 0;
+            color: var(--text);
+        }
+
+        .home-balance-value small {
+            font-size: 16px;
+            font-weight: 750;
+            color: var(--muted);
+        }
+
+        .home-view-link {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            padding: 4px 0;
+        }
+
+        .home-card-strip {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(72px, 1fr);
+            gap: 8px;
+            overflow-x: auto;
+            padding: 2px 2px 4px;
+            margin-bottom: 20px;
+        }
+
+        .home-mini-card {
+            min-width: 72px;
+            height: 52px;
+            border-radius: 10px;
+            padding: 8px;
+            color: #fff;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 22px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.16);
+        }
+
+        .home-mini-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 42%, rgba(0,0,0,0.12));
+            pointer-events: none;
+        }
+
+        .home-card-brand-dot {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            width: 14px;
+            height: 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.88);
+            box-shadow: -7px 0 0 rgba(255, 90, 70, 0.9);
+        }
+
+        .home-card-balance {
+            font-size: 11px;
+            line-height: 1;
+            font-weight: 850;
+            color: #fff;
+            z-index: 1;
+        }
+
+        .home-add-card {
+            min-width: 72px;
+            height: 52px;
+            border-radius: 0px ;
+            border: 1.5px dashed rgba(142,142,147,0.42);
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(142,142,147,0.05);
+        }
+
+        .home-duo-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .home-block-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .home-stat-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .home-stat-card,
+        .home-budget-card {
+            min-height: 90px;
+            border-radius: 22px;
+            padding: 12px;
+            text-align: left;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.12);
+        }
+
+        .home-stat-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .home-stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .home-stat-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .home-stat-delta {
+            font-size: 10px;
+            font-weight: 850;
+            border-radius: 999px;
+            padding: 4px 6px;
+            color: var(--emerald);
+            background: rgba(16,185,129,0.12);
+        }
+
+        .home-stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 3px;
+        }
+
+        .home-stat-amount {
+            font-size: 21px;
+            font-weight: 850;
+            color: var(--text);
+        }
+
+        .home-budget-card {
+            align-items:left;
+            height: 210px;
+            margin-bottom: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .home-budget-card::before {
+            content: '';
+            position: absolute;
+            inset: -40px -50px auto auto;
+            width: 130px;
+            height: 130px;
+            border-radius: 999px;
+            background: rgba(16,185,129,0.12);
+            filter: blur(26px);
+        }
+
+        .home-budget-head {
+            display: flex;
+            align-items:left;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .home-budget-pill {
+            font-size: 10px;
+            color: var(--muted);
+            background: rgba(142,142,147,0.14);
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-weight: 750;
+        }
+
+        .home-budget-ring {
+            width: 92px;
+            height: 92px;
+            border-radius: 999px;
+            margin: 8px auto 10px;
+            background: conic-gradient(var(--emerald) var(--budget-pct, 42%), rgba(255,255,255,0.08) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 0 10px rgba(255,255,255,0.03);
+        }
+
+        .home-budget-ring::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: inherit;
+            background: var(--surface);
+        }
+
+        .home-budget-ring span {
+            position: relative;
+            z-index: 1;
+            padding: 7px 9px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.78);
+            color: #111;
+            font-size: 11px;
+            font-weight: 850;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.16);
+        }
+
+        body.light-mode .home-stat-card,
+        body.light-mode .home-budget-card {
+            background: #fff;
+            border-color: rgba(0,0,0,0.05);
+            box-shadow: 0 18px 32px rgba(28,28,30,0.06);
+        }
+
+        body.light-mode .home-budget-ring::before {
+            background: #fff;
+        }
     </style>
 </head>
 
@@ -2004,6 +2684,7 @@
         </header>
 
         <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
+        <div id="ai-overlay" class="ai-glass-overlay" aria-hidden="true"></div>
         <nav class="app-bottom-nav" aria-label="Main navigation">
             <!-- Main tabs pill -->
             <div class="nav-pill" id="nav-pill-tabs">
@@ -2105,15 +2786,15 @@
             wallets: [
                 {
                     id: 1, name: 'Main Account', balance: 5000, icon: 'wallet',
-                    color: 'linear-gradient(135deg, #1a4a3a 0%, #0e7f8a 40%, #1a2d6b 100%)', currency: 'EGP'
+                    color: 'linear-gradient(135deg, #171820 0%, #252638 68%, #11121a 100%)', currency: 'EGP'
                 },
                 {
                     id: 2, name: 'USD Savings', balance: 1200, icon: 'landmark',
-                    color: 'linear-gradient(135deg, #2d1b69 0%, #0a6b7a 50%, #1a4a3a 100%)', currency: 'USD'
+                    color: 'linear-gradient(135deg, #2878ff 0%, #3b6ff8 58%, #2447df 100%)', currency: 'USD'
                 },
                 {
                     id: 3, name: 'Virtual Visa', balance: 3200, icon: 'credit-card',
-                    color: 'linear-gradient(135deg, #0a2d4a 0%, #0e6b8a 45%, #3d1b6b 100%)', currency: 'EGP'
+                    color: 'linear-gradient(135deg, #f2f0eb 0%, #d8d5cb 58%, #aaa69b 100%)', currency: 'EGP'
                 }
             ],
             categories: {
@@ -2164,6 +2845,40 @@
         ];
 
         const GRADIENT_COLORS = [
+            // Reference dashboard card palette
+            'linear-gradient(135deg, #171820 0%, #252638 68%, #11121a 100%)',
+            'linear-gradient(135deg, #2878ff 0%, #3b6ff8 58%, #2447df 100%)',
+            'linear-gradient(135deg, #f2f0eb 0%, #d8d5cb 58%, #aaa69b 100%)',
+            'linear-gradient(135deg, #0b0c10 0%, #222831 55%, #090a0f 100%)',
+            'linear-gradient(135deg, #eff5ff 0%, #b9d4ff 58%, #7da7ff 100%)',
+            'linear-gradient(135deg, #fff5e8 0%, #ffd08a 55%, #ff9f43 100%)',
+            'linear-gradient(135deg, #fbf0ff 0%, #d7a7ff 55%, #8b5cf6 100%)',
+            'linear-gradient(135deg, #e9fff6 0%, #8ff4ca 52%, #10b981 100%)',
+            'linear-gradient(135deg, #fff0f6 0%, #ff9ec4 55%, #ec4899 100%)',
+            'linear-gradient(135deg, #eef9ff 0%, #8ddfff 52%, #06b6d4 100%)',
+            'linear-gradient(135deg, #1b1e2b 0%, #444b62 55%, #141722 100%)',
+            'linear-gradient(135deg, #202124 0%, #4b5563 56%, #111827 100%)',
+            'linear-gradient(135deg, #192231 0%, #4f46e5 58%, #121629 100%)',
+            'linear-gradient(135deg, #1d1724 0%, #a855f7 55%, #2e1065 100%)',
+            'linear-gradient(135deg, #241318 0%, #fb7185 55%, #881337 100%)',
+            'linear-gradient(135deg, #25170c 0%, #f59e0b 58%, #78350f 100%)',
+            'linear-gradient(135deg, #092018 0%, #34d399 56%, #064e3b 100%)',
+            'linear-gradient(135deg, #071d26 0%, #22d3ee 56%, #164e63 100%)',
+            'linear-gradient(135deg, #0d1b32 0%, #60a5fa 54%, #1e3a8a 100%)',
+            'linear-gradient(135deg, #f8fafc 0%, #cbd5e1 56%, #94a3b8 100%)',
+
+            // Digital Cards inspired palette
+            'linear-gradient(135deg, #10131f 0%, #2631ff 42%, #8e5cff 72%, #f7d6ff 100%)',
+            'linear-gradient(135deg, #12121c 0%, #00d4ff 34%, #2ef2a0 68%, #f4ff8f 100%)',
+            'linear-gradient(135deg, #160b24 0%, #ff3d8b 38%, #ff8a3d 70%, #ffe2a8 100%)',
+            'linear-gradient(135deg, #0f1020 0%, #6c5cff 32%, #20d6ff 66%, #d9f7ff 100%)',
+            'linear-gradient(135deg, #17121f 0%, #ff5acf 35%, #7b61ff 68%, #bde7ff 100%)',
+            'linear-gradient(135deg, #111827 0%, #00c2a8 36%, #2563eb 72%, #dbeafe 100%)',
+            'linear-gradient(135deg, #1b1020 0%, #ff4f7b 35%, #7c3aed 70%, #fff1f8 100%)',
+            'linear-gradient(135deg, #101820 0%, #f7b733 35%, #fc4a1a 72%, #fff0c7 100%)',
+            'linear-gradient(135deg, #0b1220 0%, #38bdf8 32%, #6366f1 65%, #e0e7ff 100%)',
+            'linear-gradient(135deg, #11110f 0%, #eab308 38%, #fb7185 72%, #fff7ad 100%)',
+
             // â”€â”€ Midnight Obsidian â”€â”€
             'linear-gradient(135deg, #0a0a0f 0%, #111118 40%, #0d0d14 100%)',
             // â”€â”€ Onyx Noir â”€â”€
@@ -2349,6 +3064,7 @@
         let charts = {};
         let liveRates = {};
         let chatHistory = [];
+        let aiPendingAttachments = [];
 
         async function fetchRates() {
             try {
@@ -2395,7 +3111,20 @@
                             typeof w.name === 'string' &&
                             typeof w.balance === 'number' && isFinite(w.balance)
                         );
-                        state.wallets.forEach(w => { if (!w.currency) w.currency = state.currency.code; });
+                        state.wallets.forEach((w, index) => {
+                            if (!w.currency) w.currency = state.currency.code;
+                            const oldPalette = [
+                                'linear-gradient(135deg, #1a4a3a 0%, #0e7f8a 40%, #1a2d6b 100%)',
+                                'linear-gradient(135deg, #2d1b69 0%, #0a6b7a 50%, #1a4a3a 100%)',
+                                'linear-gradient(135deg, #0a2d4a 0%, #0e6b8a 45%, #3d1b6b 100%)',
+                                'linear-gradient(135deg, #10131f 0%, #2631ff 42%, #8e5cff 72%, #f7d6ff 100%)',
+                                'linear-gradient(135deg, #12121c 0%, #00d4ff 34%, #2ef2a0 68%, #f4ff8f 100%)',
+                                'linear-gradient(135deg, #160b24 0%, #ff3d8b 38%, #ff8a3d 70%, #ffe2a8 100%)'
+                            ];
+                            if (!w.color || oldPalette.includes(w.color)) {
+                                w.color = GRADIENT_COLORS[index % GRADIENT_COLORS.length];
+                            }
+                        });
                         // Sanitize transactions
                         state.transactions = state.transactions.filter(t =>
                             t && typeof t === 'object' &&
@@ -2408,6 +3137,7 @@
                         state.transactions.forEach(t => {
                             t.name = String(t.name || '').slice(0, 120);
                             if (t.note) t.note = String(t.note).slice(0, 300);
+                            if (t.attachment && (!t.attachment.dataUrl || !String(t.attachment.dataUrl).startsWith('data:image/'))) delete t.attachment;
                         });
                         // Ensure at least one wallet survived
                         if (state.wallets.length === 0) {
@@ -2458,6 +3188,41 @@
         function sanitizeText(str, maxLen = 120) {
             if (!str) return '';
             return String(str).replace(/<[^>]*>/g, '').replace(/[<>"'`]/g, '').trim().slice(0, maxLen);
+        }
+
+        function compressImageFile(file, maxSize = 1000, quality = 0.74) {
+            return new Promise((resolve, reject) => {
+                if (!file || !file.type.startsWith('image/')) return reject(new Error('Choose an image file'));
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.max(1, Math.round(img.width * scale));
+                        canvas.height = Math.max(1, Math.round(img.height * scale));
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        resolve({
+                            name: sanitizeText(file.name || 'image.jpg', 60),
+                            type: 'image/jpeg',
+                            dataUrl
+                        });
+                    };
+                    img.onerror = () => reject(new Error('Could not read image'));
+                    img.src = reader.result;
+                };
+                reader.onerror = () => reject(new Error('Could not read file'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function dataUrlToGeminiPart(attachment) {
+            if (!attachment?.dataUrl) return null;
+            const match = attachment.dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+            if (!match) return null;
+            return { inlineData: { mimeType: match[1], data: match[2] } };
         }
 
         // Validate a number - returns a finite safe number or 0
@@ -2626,18 +3391,34 @@
         }
 
         function switchFinanceTab(tab) {
+            const order = ['income', 'budgets', 'debts', 'subscriptions', 'analytics'];
+            const previous = ui.financeTab || 'budgets';
+            const direction = order.indexOf(tab) >= order.indexOf(previous) ? 1 : -1;
             ui.financeTab = tab;
+            if (ui.currentTab === 'finance') {
+                const contentEl = document.getElementById('finance-content');
+                if (contentEl) {
+                    contentEl.style.setProperty('--finance-x', `${direction * 24}px`);
+                    contentEl.classList.remove('finance-swipe-in');
+                    contentEl.innerHTML = getFinanceTabContent();
+                    void contentEl.offsetWidth;
+                    contentEl.classList.add('finance-swipe-in');
+                    const nav = document.getElementById('finance-subnav');
+                    if (nav) nav.innerHTML = getFinanceSubnav();
+                    lucide.createIcons();
+                    return;
+                }
+            }
             switchTab('finance');
         }
 
-        function renderFinance() {
+        function getFinanceSubnav() {
             if (!ui.financeTab) ui.financeTab = 'budgets';
-
             const isLight = document.body.classList.contains('light-mode');
             const subNavBg = isLight ? 'rgba(255,255,255,0.9)' : 'rgba(22, 22, 30, 0.85)';
             const subNavBorder = isLight ? '1px solid rgba(0,0,0,0.08)' : '1px solid var(--border)';
-            const subNav = `
-        <div style="display:flex; background:${subNavBg}; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:${subNavBorder}; border-radius:16px; padding:6px; margin-bottom:20px; gap:4px; position:sticky; top:0; z-index:10; animation: fade-up 0.35s ease both; overflow-x: auto;" class="scroll-hide">
+            return `
+        <div style="display:flex; background:${subNavBg}; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:${subNavBorder}; border-radius:999px; padding:6px; margin-bottom:20px; gap:4px; position:sticky; top:0; z-index:10; overflow-x: auto;" class="scroll-hide">
             <button onclick="switchFinanceTab('income')" style="flex:1; white-space:nowrap; padding:10px 12px; border-radius:12px; font-size:11px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'income' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Income</button>
             <button onclick="switchFinanceTab('budgets')" style="flex:1; white-space:nowrap; padding:10px 12px; border-radius:12px; font-size:11px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'budgets' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Plan</button>
             <button onclick="switchFinanceTab('debts')" style="flex:1; white-space:nowrap; padding:10px 12px; border-radius:12px; font-size:11px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'debts' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Debts</button>
@@ -2645,22 +3426,32 @@
             <button onclick="switchFinanceTab('analytics')" style="flex:1; white-space:nowrap; padding:10px 12px; border-radius:12px; font-size:11px; font-weight:700; transition:all 0.25s; ${ui.financeTab === 'analytics' ? 'background:var(--emerald); color:#000; box-shadow:0 4px 12px rgba(16,185,129,0.3);' : 'color:var(--muted);'}">Analytics</button>
         </div>
     `;
+        }
 
+        function getFinanceTabContent() {
             let content = '';
 
             if (ui.financeTab === 'income') {
-                content = renderIncome().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+                content = renderIncome().replace('<div class="fade-up">', '<div style="padding-top: 4px;">');
             } else if (ui.financeTab === 'budgets') {
-                content = renderBudgets().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+                content = renderBudgets().replace('<div class="fade-up">', '<div style="padding-top: 4px;">');
             } else if (ui.financeTab === 'debts') {
-                content = renderDebts().replace('<div class="fade-up">', '<div style="animation: fade-up 0.25s ease both; padding-top: 4px;">');
+                content = renderDebts().replace('<div class="fade-up">', '<div style="padding-top: 4px;">');
             } else if (ui.financeTab === 'subscriptions') {
-                content = renderSubscriptions();
+                content = renderSubscriptions().replace('animation: fade-up 0.25s ease both;', '');
             } else if (ui.financeTab === 'analytics') {
-                content = renderAnalytics();
+                content = renderAnalytics().replace('animation:fade-up 0.25s ease both;', '');
             }
+            return content;
+        }
 
-            return subNav + content;
+        function renderFinance() {
+            if (!ui.financeTab) ui.financeTab = 'budgets';
+
+            return `<div>
+                <div id="finance-subnav">${getFinanceSubnav()}</div>
+                <div id="finance-content" class="finance-panel finance-swipe-in">${getFinanceTabContent()}</div>
+            </div>`;
         }
         function updateHeaderAvatar() {
             const img = document.getElementById('header-avatar');
@@ -2848,40 +3639,70 @@
         }
         // â”€â”€â”€ AI CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function openAIChat() {
-            const apiKey = localStorage.getItem('velto_gemini_key');
-            if (!apiKey) {
-                showToast('Please add your API key in Settings first.', 'warn');
-                return;
-            }
-
             if (document.getElementById('bottom-sheet').classList.contains('open')) closeSheet();
-            ui.chatReturnTab = ui.currentTab === 'chat' ? (ui.chatReturnTab || 'home') : (ui.currentTab || 'home');
-            switchTab('chat');
+            ui.chatReturnTab = ui.currentTab || 'home';
+            renderAIOverlay();
         }
 
         function renderChatPage() {
             return `
-                <div class="fade-up" style="padding:20px 0;">
-                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-                        <button onclick="closeChatPage()" style="width:44px;height:44px;border-radius:16px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);display:flex;align-items:center;justify-content:center;">
-                            <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
-                        </button>
-                        <div>
-                            <p class="tag" style="margin:0;color:var(--muted);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;">AI Chat</p>
-                            <h2 class="syne" style="margin:6px 0 0;font-size:24px;line-height:1.1;">Smart Assistant</h2>
-                        </div>
-                    </div>
-                    <div id="chat-messages" style="display:flex;flex-direction:column;gap:12px;max-height:62vh;overflow-y:auto;padding:8px 0;" class="scroll-hide">
-                        ${chatHistory.length === 0 ? `<div class="chat-bubble chat-bot">Hi! I can help you add transactions, analyze spending, create goals, transfer money between wallets, settle debts, and more.<br>What do you need?</div>` : ''}
-                    </div>
-                    <div style="display:flex;gap:10px;align-items:flex-end;margin-top:16px;">
-                        <textarea id="chat-input" class="input scroll-hide" placeholder="Ask me anything..." style="flex:1;resize:none;min-height:56px;max-height:110px;padding:16px;border-radius:22px;" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
-                        <button onclick="sendChatMessage()" style="width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#f97316,#ef4444 50%,#8b5cf6);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(239,68,68,0.3);">
-                            <i data-lucide="send" style="width:20px;height:20px;"></i>
-                        </button>
-                    </div>
+                <div style="padding:20px 0;">
+                    <button onclick="closeChatPage()" class="ai-close-btn" style="margin-bottom:16px;"><i data-lucide="arrow-left" style="width:20px;height:20px;"></i></button>
+                    <div id="chat-messages" class="ai-messages scroll-hide"></div>
+                    ${renderAICompose()}
                 </div>
             `;
+        }
+
+        function renderAICompose() {
+            return `
+                <div class="ai-compose" id="ai-compose">
+                    <div class="ai-attachment-strip scroll-hide" id="ai-attachment-strip"></div>
+                    <div class="ai-compose-row">
+                        <button class="ai-attach-btn" onclick="pickAIAttachment('camera')" aria-label="Camera">
+                            <i data-lucide="camera" style="width:19px;height:19px;"></i>
+                        </button>
+                        <button class="ai-attach-btn" onclick="pickAIAttachment('file')" aria-label="Attach image">
+                            <i data-lucide="paperclip" style="width:19px;height:19px;"></i>
+                        </button>
+                        <textarea id="chat-input" class="scroll-hide" placeholder="Ask about this month or all time..." onfocus="setAIInputFocus(true)" onblur="setAIInputFocus(false)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
+                        <button onclick="sendChatMessage()" class="ai-send-btn" aria-label="Send">
+                            <i data-lucide="send" style="width:19px;height:19px;"></i>
+                        </button>
+                    </div>
+                    <input id="ai-camera-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleAIAttachmentFile(this)">
+                    <input id="ai-file-input" type="file" accept="image/*" style="display:none" onchange="handleAIAttachmentFile(this)">
+                </div>
+            `;
+        }
+
+        function renderAIOverlay() {
+            const overlay = document.getElementById('ai-overlay');
+            if (!overlay) return;
+            overlay.innerHTML = `
+                <div class="ai-glass-panel">
+                    <div class="ai-overlay-head">
+                        <div style="display:flex;align-items:center;gap:13px;">
+                            <div class="ai-orb" aria-hidden="true"></div>
+                            <div>
+                                <p class="tag" style="margin:0;color:var(--muted);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;">Velto Intelligence</p>
+                                <h2 class="syne" style="font-size:24px;line-height:1.05;margin-top:5px;">Ask your money</h2>
+                            </div>
+                        </div>
+                        <button onclick="closeChatPage()" class="ai-close-btn" aria-label="Close AI">
+                            <i data-lucide="x" style="width:20px;height:20px;"></i>
+                        </button>
+                    </div>
+                    <div id="chat-messages" class="ai-messages scroll-hide"></div>
+                    ${renderAICompose()}
+                </div>
+            `;
+            overlay.classList.add('open');
+            overlay.setAttribute('aria-hidden', 'false');
+            renderChatMessages();
+            renderAIAttachmentStrip();
+            lucide.createIcons();
+            setTimeout(() => document.getElementById('chat-input')?.focus(), 140);
         }
 
         function renderChatMessages() {
@@ -2890,28 +3711,154 @@
             if (chatHistory.length > 0) {
                 chatContainer.innerHTML = '';
                 chatHistory.forEach(msg => {
-                    chatContainer.innerHTML += `<div class="chat-bubble ${msg.role === 'user' ? 'chat-user' : 'chat-bot'}">${msg.text}</div>`;
+                    const attachments = (msg.attachments || []).map(a => `<img src="${a.dataUrl}" class="tx-thumb" alt="Attachment">`).join('');
+                    chatContainer.innerHTML += `<div class="chat-bubble ${msg.role === 'user' ? 'chat-user' : 'chat-bot'}">${attachments ? `<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">${attachments}</div>` : ''}${esc(msg.text).replace(/\n/g, '<br>')}</div>`;
                 });
+            } else {
+                chatContainer.innerHTML = `
+                    <div class="ai-welcome">
+                        <div class="ai-orb" aria-hidden="true"></div>
+                        <div>
+                            <h2 class="syne" style="font-size:26px;line-height:1.05;margin-bottom:8px;">What do you need?</h2>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.45;">I can read your current month, all-time history, and any image you attach.</p>
+                        </div>
+                    </div>
+                `;
             }
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function closeChatPage() {
-            switchTab(ui.chatReturnTab || 'home');
+            const overlay = document.getElementById('ai-overlay');
+            if (!overlay) return;
+            overlay.classList.remove('open');
+            overlay.setAttribute('aria-hidden', 'true');
+            setTimeout(() => { if (!overlay.classList.contains('open')) overlay.innerHTML = ''; }, 340);
+        }
+
+        function setAIInputFocus(isFocused) {
+            document.getElementById('ai-compose')?.classList.toggle('input-focused', isFocused);
+        }
+
+        function pickAIAttachment(mode) {
+            document.getElementById(mode === 'camera' ? 'ai-camera-input' : 'ai-file-input')?.click();
+        }
+
+        async function handleAIAttachmentFile(input) {
+            const file = input?.files?.[0];
+            if (!file) return;
+            try {
+                const attachment = await compressImageFile(file, 1200, 0.76);
+                aiPendingAttachments = [attachment];
+                renderAIAttachmentStrip();
+                lucide.createIcons();
+            } catch (err) {
+                showToast(err.message || 'Could not attach image', 'error');
+            } finally {
+                input.value = '';
+            }
+        }
+
+        function removeAIAttachment(index) {
+            aiPendingAttachments.splice(index, 1);
+            renderAIAttachmentStrip();
+        }
+
+        function renderAIAttachmentStrip() {
+            const strip = document.getElementById('ai-attachment-strip');
+            if (!strip) return;
+            strip.innerHTML = aiPendingAttachments.map((a, i) => `
+                <span class="ai-attachment-chip">
+                    <img src="${a.dataUrl}" alt="">
+                    <span style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.name || 'Image')}</span>
+                    <button onclick="removeAIAttachment(${i})" style="width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--muted);">
+                        <i data-lucide="x" style="width:13px;height:13px;"></i>
+                    </button>
+                </span>
+            `).join('');
+        }
+
+        function buildAIStateSnapshot() {
+            const now = new Date();
+            const month = now.getMonth();
+            const year = now.getFullYear();
+            const summarize = (txs) => {
+                const summary = { income: 0, expense: 0, net: 0, byCategory: {} };
+                txs.forEach(t => {
+                    if (t.excludeFromTotals || t.isTransfer) return;
+                    const wallet = state.wallets.find(w => w.id === t.walletId) || { currency: state.currency.code };
+                    const amount = convertCurrency(t.amount, wallet.currency, state.currency.code);
+                    if (t.type === 'income') summary.income += amount;
+                    else summary.expense += amount;
+                    const cat = getCat(t.categoryId);
+                    const key = cat?.name || t.categoryId || 'Other';
+                    summary.byCategory[key] = (summary.byCategory[key] || 0) + (t.type === 'expense' ? amount : 0);
+                });
+                summary.net = summary.income - summary.expense;
+                return summary;
+            };
+            const txPayload = (t) => ({
+                id: t.id,
+                name: t.name,
+                amount: t.amount,
+                type: t.type,
+                categoryId: t.categoryId,
+                walletId: t.walletId,
+                date: t.date,
+                note: t.note || '',
+                hasAttachment: !!t.attachment
+            });
+            const currentMonthTransactions = state.transactions.filter(t => {
+                const d = new Date(t.date);
+                return d.getMonth() === month && d.getFullYear() === year;
+            });
+            return {
+                currentDate: today(),
+                baseCurrency: state.currency.code,
+                wallets: state.wallets.map(({ id, name, balance, currency }) => ({ id, name, balance, currency })),
+                categories: {
+                    expense: state.categories.expense.map(({ id, name }) => ({ id, name })),
+                    income: state.categories.income.map(({ id, name }) => ({ id, name }))
+                },
+                currentMonth: {
+                    label: now.toLocaleDateString('en', { month: 'long', year: 'numeric' }),
+                    ...summarize(currentMonthTransactions),
+                    transactions: currentMonthTransactions.map(txPayload)
+                },
+                allTime: {
+                    ...summarize(state.transactions),
+                    transactions: state.transactions.map(txPayload)
+                },
+                budgets: state.budgets.map(b => {
+                    const catName = getCat(b.categoryId).name;
+                    return { id: b.id, categoryId: b.categoryId, category: catName, limit: b.limit, currentlySpent: getCurrentMonthSpend(b.categoryId) };
+                }),
+                goals: state.goals.map(({ id, name, target, saved, deadline }) => ({ id, name, target, saved, deadline })),
+                debts: {
+                    oweTo: state.debts.oweTo.map(({ id, name, amount, date }) => ({ id, name, amount, date })),
+                    owedToMe: state.debts.owedToMe.map(({ id, name, amount, date }) => ({ id, name, amount, date })),
+                    installments: state.debts.installments.map(({ id, name, amount, total, left, paidAmount }) => ({ id, name, amount, total, left, paidAmount }))
+                }
+            };
         }
 
         async function sendChatMessage() {
             const apiKey = localStorage.getItem('velto_gemini_key');
             const inputEl = document.getElementById('chat-input');
             const text = inputEl ? inputEl.value.trim() : '';
-            if (!text) return;
+            const sentAttachments = [...aiPendingAttachments];
+            if (!text && sentAttachments.length === 0) return;
             const chatContainer = document.getElementById('chat-messages');
-            chatContainer.innerHTML += `<div class="chat-bubble chat-user">${text}</div>`;
-            chatHistory.push({ role: 'user', text });
+            const attachmentHTML = sentAttachments.map(a => `<img src="${a.dataUrl}" class="tx-thumb" alt="Attachment">`).join('');
+            if (chatHistory.length === 0) chatContainer.innerHTML = '';
+            chatContainer.innerHTML += `<div class="chat-bubble chat-user">${attachmentHTML ? `<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;">${attachmentHTML}</div>` : ''}${esc(text || 'Analyze this image').replace(/\n/g, '<br>')}</div>`;
+            chatHistory.push({ role: 'user', text: text || 'Analyze this image', attachments: sentAttachments });
             inputEl.value = '';
+            aiPendingAttachments = [];
+            renderAIAttachmentStrip();
             chatContainer.scrollTop = chatContainer.scrollHeight;
             const loadingId = 'loading-' + Date.now();
-            chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex;gap:6px;align-items:center;"><div class="sync-status-dot syncing" style="background:#8b5cf6;"></div> Thinking...</div>`;
+            chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex;gap:8px;align-items:center;"><span class="ai-orb" style="width:24px;height:24px;flex-shrink:0;"></span> Thinking...</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
             if (!apiKey) {
                 document.getElementById(loadingId)?.remove();
@@ -2920,26 +3867,18 @@
                 return;
             }
             try {
-                const aiState = {
-                    currentDate: today(), baseCurrency: state.currency.code,
-                    wallets: state.wallets.map(({ id, name, balance, currency }) => ({ id, name, balance, currency })),
-                    categories: { expense: state.categories.expense.map(({ id, name }) => ({ id, name })), income: state.categories.income.map(({ id, name }) => ({ id, name })) },
-                    recentTransactions: state.transactions.slice(0, 30).map(({ id, name, amount, type, categoryId, walletId, date, note }) => ({ id, name, amount, type, categoryId, walletId, date, note })),
-                    budgets: state.budgets.map(b => { const catName = getCat(b.categoryId).name; return { id: b.id, categoryId: b.categoryId, category: catName, limit: b.limit, currentlySpent: getCurrentMonthSpend(b.categoryId) }; }),
-                    goals: state.goals.map(({ id, name, target, saved, deadline }) => ({ id, name, target, saved, deadline })),
-                    debts: {
-                        oweTo: state.debts.oweTo.map(({ id, name, amount, date }) => ({ id, name, amount, date })),
-                        owedToMe: state.debts.owedToMe.map(({ id, name, amount, date }) => ({ id, name, amount, date })),
-                        installments: state.debts.installments.map(({ id, name, amount, total, left, paidAmount }) => ({ id, name, amount, total, left, paidAmount }))
-                    }
-                };
-
-                const sysPrompt = `You are a powerful AI assistant built into Velto Finance - the user's personal finance app. You can do anything they ask: answer questions, analyze their finances, AND execute real actions in the app.
+                const aiState = buildAIStateSnapshot();
+                const sysPrompt = `You are a powerful AI assistant built into Velto Finance - the user's personal finance app. You can do anything they ask: answer questions, analyze their finances, read attached images, AND execute real actions in the app.
 
             Language: Reply in the same language the user writes in.If they write Arabic, reply in friendly Egyptian Arabic.If English, reply in English.
 
 CURRENT APP DATA:
 ${JSON.stringify(aiState)}
+
+You can see:
+- currentMonth: income, expenses, category spending, and this month's transactions
+- allTime: totals and every saved transaction history item
+- attached user images in the message parts when the user adds camera/attachment images
 
 ========================================
 ACTIONS YOU CAN EXECUTE
@@ -2995,16 +3934,19 @@ You can include MULTIPLE actions in one response. Supported actions:
 IMPORTANT RULES:
 - Use EXACT ids from the data above when referencing existing items
 - For categoryId, use the exact ids from the categories list
-- For walletId, use the exact ids from the wallets list  
+- For walletId, use the exact ids from the wallets list
+- If attached image looks like a receipt, extract merchant, amount, date, and suggest/add a transaction only when confident
 - If the user asks to delete something, confirm the right item from the data and delete it
 - You can chain multiple actions (e.g., add a transaction AND navigate to home)
 - If you're not sure about an amount or name, ask for clarification
 - If no action is needed, just answer normally without any JSON block
 - The message field in your response is your reply text (shown to user) - keep it friendly and concise`;
 
+                const historyParts = chatHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }));
+                const userParts = [{ text: text || 'Analyze the attached image in context of my finances.' }, ...sentAttachments.map(dataUrlToGeminiPart).filter(Boolean)];
                 const reqBody = {
                     systemInstruction: { parts: [{ text: sysPrompt }] },
-                    contents: [...chatHistory.slice(0, -1).map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] })), { role: 'user', parts: [{ text }] }]
+                    contents: [...historyParts, { role: 'user', parts: userParts }]
                 };
                 const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(reqBody) });
                 if (!response.ok) { const errData = await response.json(); throw new Error(errData.error?.message || `HTTP Error ${response.status}`); }
@@ -3029,7 +3971,7 @@ IMPORTANT RULES:
                     } catch (e) { console.warn('AI action parse error', e); }
                 }
                 botText = botText.replace(/```json[\s\S]*?```/, '').trim();
-                chatContainer.innerHTML += `<div class="chat-bubble chat-bot">${botText.replace(/\n/g, '<br>')}</div>`;
+                chatContainer.innerHTML += `<div class="chat-bubble chat-bot">${esc(botText).replace(/\n/g, '<br>')}</div>`;
                 chatHistory.push({ role: 'bot', text: botText });
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 lucide.createIcons();
@@ -3254,11 +4196,92 @@ IMPORTANT RULES:
                     const cat = getCat(t.categoryId);
                     const wallet = state.wallets.find(w => w.id === t.walletId) || {};
                     const wCurr = wallet.currency || state.currency.code;
-                    return `<div class="tx-row" onclick="openEditTransaction(${t.id})"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div><div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</p><p style="font-size:10px;color:var(--muted);">${cat.name} - ${dateLabel(t.date)}</p></div><div style="text-align:right;"><p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p></div></div>`;
+                    return `<div class="tx-row" onclick="openEditTransaction(${t.id})"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>${renderTxAttachmentThumb(t)}<div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</p><p style="font-size:10px;color:var(--muted);">${cat.name} - ${dateLabel(t.date)}</p></div><div style="text-align:right;"><p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p></div></div>`;
                 }).join('');
             }
             if (!html) return '<p style="text-align:center;color:var(--muted);padding:34px 20px;font-size:13px;">No results found</p>';
             return html;
+        }
+
+        function renderHomeMiniCards() {
+            const visibleWallets = state.wallets.filter(w => !w.excludeFromTotal).slice(0, 5);
+            return `
+                <div class="home-card-strip scroll-hide">
+                    ${visibleWallets.map(w => {
+                        const curr = w.currency || state.currency.code;
+                        return `<button class="home-mini-card" onclick="switchTab('wallets')" style="background:${w.color || GRADIENT_COLORS[0]};">
+                           
+                            <span style="font-size:8px;font-weight:850;letter-spacing:0.08em;opacity:0.9;z-index:1;">${curr}</span>
+                            <span class="home-card-balance">${curr} ${fmtNum(w.balance)}</span>
+                        </button>`;
+                    }).join('')}
+                    <button class="home-add-card" onclick="openWalletForm()" aria-label="Add wallet">
+                        <i data-lucide="plus" style="width:18px;height:18px;"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderHomeOverview(total, monthIn, monthOut) {
+            const primaryBudget = state.budgets[0] || null;
+            const budgetSpent = primaryBudget ? getCurrentMonthSpend(primaryBudget.categoryId) : monthOut;
+            const budgetLimit = primaryBudget ? primaryBudget.limit : Math.max(monthOut * 1.6, 1);
+            const budgetPct = Math.min(100, Math.round((budgetSpent / budgetLimit) * 100));
+            return `
+                <section class="home-finance-snapshot">
+                    <div class="home-balance-head">
+                        <div>
+                            <p class="home-balance-label">Total Balance</p>
+                            <h2 class="home-balance-value">${fmt(total)}<small>${Object.keys(liveRates).length > 0 ? ' live' : ''}</small></h2>
+                        </div>
+                        <button onclick="switchTab('wallets')" class="home-view-link">View all</button>
+                    </div>
+                    ${renderHomeMiniCards()}
+                    <div class="home-duo-grid">
+                        <div>
+                            <p class="home-block-title">Statistics</p>
+                            <div class="home-stat-stack">
+                                <button class="home-stat-card" onclick="switchFinanceTab('income')">
+                                    <div class="home-stat-top">
+                                        <span class="home-stat-icon" style="background:linear-gradient(135deg,#2ef2a0,#06b6d4);"><i data-lucide="arrow-down-left" style="width:13px;height:13px;"></i></span>
+                                        <span class="home-stat-delta">+5%</span>
+                                    </div>
+                                    <div>
+                                        <p class="home-stat-label">Income</p>
+                                        <p class="home-stat-amount">+${fmt(monthIn)}</p>
+                                    </div>
+                                </button>
+                                <button class="home-stat-card" onclick="setTxFilter('expense')">
+                                    <div class="home-stat-top">
+                                        <span class="home-stat-icon" style="background:linear-gradient(135deg,#ff8a3d,#ff3d8b);"><i data-lucide="arrow-up-right" style="width:13px;height:13px;"></i></span>
+                                        <span class="home-stat-delta">+3%</span>
+                                    </div>
+                                    <div>
+                                        <p class="home-stat-label">Spendings</p>
+                                        <p class="home-stat-amount">-${fmt(monthOut)}</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="home-budget-head">
+                                <p class="home-block-title" style="margin:0;">Budget</p>
+                                <span class="home-budget-pill">Personal</span>
+                            </div>
+                            <button class="home-budget-card" onclick="switchFinanceTab('budgets')" style="width:100%;text-align:left;">
+                                <div class="home-budget-ring" style="--budget-pct:${budgetPct}%;">
+                                    <span>${fmt(budgetSpent)}</span>
+                                </div>
+                                <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">${fmt(budgetSpent)} spent of ${fmt(budgetLimit)}</p>
+                                <div style="display:flex;align-items:center;justify-content:space-between;">
+                                    <p class="home-stat-amount">${fmt(budgetLimit)}</p>
+                                    <i data-lucide="chevron-right" style="width:17px;height:17px;color:var(--muted);"></i>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            `;
         }
 
         function renderHome() {
@@ -3276,21 +4299,7 @@ IMPORTANT RULES:
             const alerts = state.budgets.filter(b => getCurrentMonthSpend(b.categoryId) >= b.limit * 0.8);
 
             return `<div class="fade-up">
-        <div style="margin-top:25px; margin-bottom:20px;position:relative;overflow:hidden;">
-            <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;filter:blur(20px);"></div>
-            <h2 class="syne" style="font-size:60px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1;">${fmt(total)}</h2>
-            <p class="tag" style="margin-top:5px;margin-bottom:20px;color:var(--muted);">Total Balance ${Object.keys(liveRates).length > 0 ? '· Live rates' : ''} ${state.wallets.filter(w => w.excludeFromTotal).length ? `· <span style="color:#f59e0b;">${state.wallets.filter(w => w.excludeFromTotal).length} wallet${state.wallets.filter(w => w.excludeFromTotal).length > 1 ? 's' : ''} excluded</span>` : ''}</p>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div style="background:rgba(16,185,129,0.08);border-radius:14px;padding:12px; margin-top:10px;">
-                    <p class="tag" style="color:var(--emerald);margin-bottom:4px;">Income</p>
-                    <p class="syne" style="font-size:16px;font-weight:700;color:var(--text);">${fmt(monthIn)}</p>
-                </div>
-                <div style="background:rgba(244,63,94,0.08);border-radius:14px;padding:12px;margin-top:10px;">
-                    <p class="tag" style="color:var(--rose);margin-bottom:4px;">Expenses</p>
-                    <p class="syne" style="font-size:16px;font-weight:700;color:var(--text);">${fmt(monthOut)}</p>
-                </div>
-            </div>
-        </div>
+        ${renderHomeOverview(total, monthIn, monthOut)}
 
         <div style="width:100%;margin:20px 0 10px 0;position:relative;z-index:2;">
             <button class="ai-mode-btn" onclick="openAIChat()" aria-label="AI Mode" style="width:100%;max-width:100%;">
@@ -3358,7 +4367,7 @@ IMPORTANT RULES:
                 </div>
             </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
+        <div class="home-transactions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
             ${(() => {
                     const filter = ui.txFilter || 'all';
                     const filtered = filter === 'all' ? recent : recent.filter(t => t.type === filter);
@@ -3369,6 +4378,7 @@ IMPORTANT RULES:
                         const wCurr = wallet.currency || state.currency.code;
                         return `<div class="tx-row" onclick="openEditTransaction(${t.id})">
                         <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>
+                        ${renderTxAttachmentThumb(t)}
                         <div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div>
                         <div style="text-align:right;flex-shrink:0;">
                             <p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p>
@@ -3726,6 +4736,7 @@ IMPORTANT RULES:
             ui.selectedType = tx.type;
             ui.selectedWalletId = tx.walletId;
             ui.selectedCategoryId = tx.categoryId;
+            ui.txAttachment = tx.attachment || null;
 
             const isEdit = !!(prefill && prefill.id);
             const accentColor = tx.type === 'expense' ? 'var(--rose)' : 'var(--emerald)';
@@ -3809,6 +4820,24 @@ IMPORTANT RULES:
         </div>
     </div>
 
+    <!-- IMAGE ATTACHMENT -->
+    <div style="margin-bottom:16px;">
+        <p class="section-title" style="margin-bottom:8px;">Attachment</p>
+        <div class="tx-attachment-actions">
+            <button class="tx-attachment-btn" onclick="pickTxAttachment('camera')" type="button">
+                <i data-lucide="camera" style="width:16px;height:16px;"></i>
+                Camera
+            </button>
+            <button class="tx-attachment-btn" onclick="pickTxAttachment('file')" type="button">
+                <i data-lucide="image-plus" style="width:16px;height:16px;"></i>
+                Attach image
+            </button>
+        </div>
+        <div id="tx-attachment-preview" class="tx-attachment-preview scroll-hide"></div>
+        <input id="tx-camera-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleTxAttachmentFile(this)">
+        <input id="tx-file-input" type="file" accept="image/*" style="display:none" onchange="handleTxAttachmentFile(this)">
+    </div>
+
     <!-- EXCLUDE FROM TOTALS TOGGLE -->
     <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:20px;">
         <div>
@@ -3836,7 +4865,7 @@ IMPORTANT RULES:
     </button>`}
     `;
 
-            renderWalletChips(); renderCatGrid(); openSheet();
+            renderWalletChips(); renderCatGrid(); renderTxAttachmentPreview(); openSheet();
             lucide.createIcons();
         }
 
@@ -3844,6 +4873,43 @@ IMPORTANT RULES:
             // Visual feedback - shrink font if value gets long
             const len = input.value.length;
             input.style.fontSize = len > 10 ? '32px' : len > 7 ? '40px' : '48px';
+        }
+
+        function pickTxAttachment(mode) {
+            document.getElementById(mode === 'camera' ? 'tx-camera-input' : 'tx-file-input')?.click();
+        }
+
+        async function handleTxAttachmentFile(input) {
+            const file = input?.files?.[0];
+            if (!file) return;
+            try {
+                ui.txAttachment = await compressImageFile(file, 1000, 0.72);
+                renderTxAttachmentPreview();
+                lucide.createIcons();
+            } catch (err) {
+                showToast(err.message || 'Could not attach image', 'error');
+            } finally {
+                input.value = '';
+            }
+        }
+
+        function clearTxAttachment() {
+            ui.txAttachment = null;
+            renderTxAttachmentPreview();
+        }
+
+        function renderTxAttachmentPreview() {
+            const preview = document.getElementById('tx-attachment-preview');
+            if (!preview) return;
+            preview.innerHTML = ui.txAttachment ? `
+                <span class="tx-attachment-chip">
+                    <img src="${ui.txAttachment.dataUrl}" alt="">
+                    <span style="max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(ui.txAttachment.name || 'Transaction image')}</span>
+                    <button onclick="clearTxAttachment()" style="width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--muted);">
+                        <i data-lucide="x" style="width:13px;height:13px;"></i>
+                    </button>
+                </span>
+            ` : `<span style="font-size:12px;color:var(--muted);">No image attached</span>`;
         }
 
         function evaluateAmount(raw) {
@@ -3862,6 +4928,9 @@ IMPORTANT RULES:
 
         function updateTxCurrencyLabel() { const w = state.wallets.find(x => x.id === ui.selectedWalletId); const lbl = document.getElementById('tx-currency-label'); if (lbl && w) lbl.textContent = w.currency || state.currency.code; }
         function openEditTransaction(id) { const tx = state.transactions.find(t => t.id === id); if (tx) openTransactionForm(tx); }
+        function renderTxAttachmentThumb(t) {
+            return t?.attachment?.dataUrl ? `<img src="${t.attachment.dataUrl}" class="tx-thumb" alt="Attachment">` : '';
+        }
         function setType(type) {
             ui.selectedType = type;
             const sign = document.getElementById('sign-label');
@@ -3971,6 +5040,7 @@ IMPORTANT RULES:
             if (!name) return showToast('Enter a name'); const id = name.toLowerCase().replace(/\s+/g, '-') + '_' + genId(); state.categories[type].push({ id, name, icon, color }); saveState(); openTransactionForm();
         }
         function saveTransaction() {
+            const wasEditing = !!ui.editingTransaction;
             const raw = (document.getElementById('tx-amount')?.value || '').trim();
             const amount = safeNum(evaluateAmount(raw), 0.01, 999_999_999);
             if (!amount || amount <= 0) return showToast('Enter a valid amount', 'error');
@@ -4009,6 +5079,7 @@ IMPORTANT RULES:
                     old.name = name; old.amount = amount; old.type = txType;
                     old.categoryId = ui.selectedCategoryId; old.walletId = ui.selectedWalletId;
                     old.date = date; old.note = note; old.excludeFromTotals = excludeFromTotals;
+                    old.attachment = ui.txAttachment || null;
                     wallet.balance += txType === 'expense' ? -amount : amount;
                 }
             } else {
@@ -4016,13 +5087,13 @@ IMPORTANT RULES:
                 const tx = {
                     id: genId(), name, categoryId: ui.selectedCategoryId,
                     type: txType, amount, walletId: ui.selectedWalletId,
-                    date, note, excludeFromTotals
+                    date, note, excludeFromTotals, attachment: ui.txAttachment || null
                 };
                 state.transactions.unshift(tx);
                 wallet.balance += txType === 'expense' ? -amount : amount;
             }
             saveState(); closeSheet(); switchTab('home');
-            showToast(ui.editingTransaction ? 'Updated!' : 'Added!');
+            showToast(wasEditing ? 'Updated!' : 'Added!');
         }
         function deleteTransaction(id) {
             const tx = state.transactions.find(t => t.id === id);
@@ -4031,7 +5102,7 @@ IMPORTANT RULES:
         }
         function openAllTransactions() {
             const sorted = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-            document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:16px;">All Transactions</h2><div style="display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow-y:auto;" class="scroll-hide">${sorted.map(t => { const cat = getCat(t.categoryId); const wallet = state.wallets.find(w => w.id === t.walletId) || {}; const wCurr = wallet.currency || state.currency.code; return `<div class="tx-row" onclick="openEditTransaction(${t.id});openSheet()"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:16px;height:16px;color:${cat.color};"></i></div><div style="flex:1;min-width:0;"><p style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div><p class="syne" style="font-size:13px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p></div>`; }).join('')}${sorted.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px;">No transactions</p>' : ''}</div>`;
+            document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:16px;">All Transactions</h2><div style="display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow-y:auto;" class="scroll-hide">${sorted.map(t => { const cat = getCat(t.categoryId); const wallet = state.wallets.find(w => w.id === t.walletId) || {}; const wCurr = wallet.currency || state.currency.code; return `<div class="tx-row" onclick="openEditTransaction(${t.id});openSheet()"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:16px;height:16px;color:${cat.color};"></i></div>${renderTxAttachmentThumb(t)}<div style="flex:1;min-width:0;"><p style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div><p class="syne" style="font-size:13px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p></div>`; }).join('')}${sorted.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px;">No transactions</p>' : ''}</div>`;
             openSheet(); lucide.createIcons();
         }
 
@@ -4387,17 +5458,14 @@ IMPORTANT RULES:
             const featuredCurr = featured.currency || state.currency.code;
             const converted = featuredCurr !== state.currency.code ? convertCurrency(featured.balance, featuredCurr, state.currency.code) : null;
             const totalLinked = wallets.reduce((sum, w) => sum + convertCurrency(w.balance, w.currency || state.currency.code, state.currency.code), 0);
-            const featuredTxCount = state.transactions.filter(t => t.walletId === featured.id).length;
-            const carouselWallets = wallets.length > 1
-                ? Array.from({ length: 5 }, (_, cycle) => wallets.map(wallet => ({ wallet, cycle }))).flat()
-                : wallets.map(wallet => ({ wallet, cycle: 0 }));
-            const walletCardHTML = ({ wallet, cycle }, duplicateIndex) => {
+            const visibleWallets = wallets.filter(w => !w.excludeFromTotal).length;
+            const walletCardHTML = (wallet, index) => {
                 const curr = wallet.currency || state.currency.code;
                 const convertedValue = curr !== state.currency.code ? convertCurrency(wallet.balance, curr, state.currency.code) : null;
-                const activeCycle = wallets.length > 1 ? 2 : 0;
-                const isActive = wallet.id === featured.id && cycle === activeCycle;
-                return `<div class="wallet-carousel-item ${isActive ? 'is-active' : ''}" data-wallet-id="${wallet.id}" data-cycle="${cycle}" data-duplicate-index="${duplicateIndex}">
-            <button class="wallet-hero-card" onclick="selectWalletCard(${wallet.id}, event)" style="width:100%;text-align:left;background:${wallet.color || 'linear-gradient(135deg,#111827,#10b981)'};" aria-label="Select wallet">
+                const isActive = wallet.id === featured.id;
+                const graph = getWalletMiniGraph(wallet.id);
+                return `<div class="wallet-carousel-item ${isActive ? 'is-active' : ''}" data-wallet-id="${wallet.id}" data-index="${index}">
+            <button class="wallet-hero-card" onclick="openWalletForm(${wallet.id})" style="width:100%;text-align:left;background:${wallet.color || 'linear-gradient(135deg,#111827,#10b981)'};" aria-label="Edit wallet">
                 <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;">
                         <div style="min-width:0;">
@@ -4414,6 +5482,21 @@ IMPORTANT RULES:
                             <p class="wcard-balance" style="font-size:24px;">${curr} ${fmtNum(wallet.balance)}</p>
                             ${convertedValue !== null ? `<p class="wcard-sub">~ ${state.currency.symbol} ${fmtNum(convertedValue)}</p>` : ''}
                         </div>
+                        <svg class="wallet-mini-graph" viewBox="0 0 96 34" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="walletGraphStroke${wallet.id}" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="rgba(255,255,255,0.55)"/>
+                                    <stop offset="55%" stop-color="rgba(255,255,255,0.95)"/>
+                                    <stop offset="100%" stop-color="rgba(255,255,255,0.58)"/>
+                                </linearGradient>
+                                <linearGradient id="walletGraphFill${wallet.id}" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="rgba(255,255,255,0.24)"/>
+                                    <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="${graph.area}" fill="url(#walletGraphFill${wallet.id})"></path>
+                            <path d="${graph.line}" fill="none" stroke="url(#walletGraphStroke${wallet.id})" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
                         ${wallet.isFrozen ? `<span style="font-size:9px;font-weight:900;color:#93c5fd;background:rgba(147,197,253,0.14);border:1px solid rgba(147,197,253,0.24);border-radius:999px;padding:5px 8px;">Frozen</span>` : ''}
                     </div>
                 </div>
@@ -4432,9 +5515,21 @@ IMPORTANT RULES:
             </button>
         </div>
 
+        <div class="wallet-summary-strip">
+            <div class="wallet-summary-item">
+                <p class="tag" style="margin-bottom:4px;color:var(--muted);">Total Balance</p>
+                <p class="syne" style="font-size:22px;font-weight:850;color:var(--text);">${state.currency.symbol} ${fmtNum(totalLinked)}</p>
+            </div>
+            <div class="wallet-summary-item">
+                <p class="tag" style="margin-bottom:4px;color:var(--muted);">Wallets</p>
+                <p class="syne" style="font-size:22px;font-weight:850;color:var(--text);">${wallets.length}</p>
+                <p style="font-size:10px;color:var(--muted);margin-top:2px;">${visibleWallets} shown in total</p>
+            </div>
+        </div>
+
         <div class="wallet-card-stage">
-            <div class="wallet-card-track" id="wallet-card-carousel" onscroll="handleWalletCarouselScroll(this)" onpointerdown="startWalletSwipe(event)" onpointermove="trackWalletSwipe(event)" onpointerup="endWalletSwipe(event)" onpointercancel="cancelWalletSwipe()" onwheel="handleWalletCarouselWheel(event)">
-                ${carouselWallets.map(walletCardHTML).join('')}
+            <div class="wallet-card-track" id="wallet-card-carousel" onscroll="handleWalletCarouselScroll(this)">
+                ${wallets.map(walletCardHTML).join('')}
             </div>
             <div class="wallet-carousel-dots">
                 ${wallets.map(w => `<span class="wallet-carousel-dot ${w.id === featured.id ? 'is-active' : ''}"></span>`).join('')}
@@ -4467,6 +5562,29 @@ IMPORTANT RULES:
             return html;
         }
 
+        function getWalletMiniGraph(walletId) {
+            const txs = state.transactions
+                .filter(t => t.walletId === walletId)
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .slice(-10);
+            let running = 0;
+            const values = txs.length ? txs.map(t => {
+                running += t.type === 'expense' ? -t.amount : t.amount;
+                return running;
+            }) : [0, 4, 2, 7, 5, 9];
+            const min = Math.min(...values);
+            const max = Math.max(...values);
+            const range = max - min || 1;
+            const points = values.map((v, i) => {
+                const x = values.length === 1 ? 48 : (i / (values.length - 1)) * 92 + 2;
+                const y = 30 - ((v - min) / range) * 24;
+                return [x.toFixed(1), y.toFixed(1)];
+            });
+            const line = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p[0]} ${p[1]}`).join(' ');
+            const area = `${line} L94 33 L2 33 Z`;
+            return { line, area };
+        }
+
         function renderWalletCardTransactions(wallet) {
             const curr = wallet.currency || state.currency.code;
             const txs = state.transactions
@@ -4490,6 +5608,7 @@ IMPORTANT RULES:
                         <div class="wallet-mini-icon" style="background:${cat.color}18;border-color:${cat.color}24;">
                             <i data-lucide="${cat.icon}" style="width:15px;height:15px;color:${cat.color};"></i>
                         </div>
+                        ${renderTxAttachmentThumb(t)}
                         <div style="min-width:0;">
                             <p style="font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;">${t.name || cat.name}</p>
                             <p style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;">${cat.name} · ${dateLabel(t.date)}</p>
@@ -4504,14 +5623,6 @@ IMPORTANT RULES:
         }
 
         function selectWalletCard(walletId, event = null) {
-            if (ui.walletSwipeMoved) {
-                if (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                setTimeout(() => { ui.walletSwipeMoved = false; }, 0);
-                return;
-            }
             ui.featuredWalletId = walletId;
             const track = document.getElementById('wallet-card-carousel');
             if (!track) {
@@ -4528,11 +5639,10 @@ IMPORTANT RULES:
             const cards = Array.from(track.querySelectorAll('.wallet-carousel-item'));
             if (!cards.length) return;
             const targetId = ui.featuredWalletId || state.wallets[0]?.id;
-            ui.walletCarouselCycle = state.wallets.length > 1 ? 2 : 0;
-            const targetCard = cards.find(card => parseInt(card.dataset.walletId) === targetId && parseInt(card.dataset.cycle) === ui.walletCarouselCycle) || cards[0];
+            const targetCard = cards.find(card => parseInt(card.dataset.walletId) === targetId) || cards[0];
             ui.walletCarouselJumping = true;
             centerWalletCarouselCard(track, targetCard, 'auto');
-            updateWalletCarouselSelection(track, parseInt(targetCard.dataset.walletId), parseInt(targetCard.dataset.cycle));
+            updateWalletCarouselSelection(track, parseInt(targetCard.dataset.walletId));
             setTimeout(() => { ui.walletCarouselJumping = false; }, 60);
         }
 
@@ -4541,47 +5651,30 @@ IMPORTANT RULES:
             track.scrollTo({ left, behavior });
         }
 
-        function scrollWalletCarouselTo(walletId, behavior = 'smooth', cycle = ui.walletCarouselCycle ?? 2) {
+        function scrollWalletCarouselTo(walletId, behavior = 'smooth') {
             const track = document.getElementById('wallet-card-carousel');
             if (!track) return;
             const cards = Array.from(track.querySelectorAll('.wallet-carousel-item'));
-            const card = cards.find(item => parseInt(item.dataset.walletId) === walletId && parseInt(item.dataset.cycle) === cycle)
-                || cards.find(item => parseInt(item.dataset.walletId) === walletId);
+            const card = cards.find(item => parseInt(item.dataset.walletId) === walletId);
             if (card) centerWalletCarouselCard(track, card, behavior);
         }
 
-        function moveWalletCarousel(direction) {
+        function scrollWalletRail(direction) {
             if (!state.wallets.length) return;
             const currentId = ui.featuredWalletId || state.wallets[0].id;
             const currentIndex = Math.max(0, state.wallets.findIndex(w => w.id === currentId));
             const normalizedDirection = direction >= 0 ? 1 : -1;
-            let targetCycle = ui.walletCarouselCycle ?? (state.wallets.length > 1 ? 2 : 0);
-            let nextIndex = currentIndex + normalizedDirection;
-            if (nextIndex >= state.wallets.length) {
-                nextIndex = 0;
-                targetCycle += 1;
-            } else if (nextIndex < 0) {
-                nextIndex = state.wallets.length - 1;
-                targetCycle -= 1;
-            }
-            if (targetCycle < 0) targetCycle = 0;
-            if (targetCycle > 4) targetCycle = 4;
+            const nextIndex = (currentIndex + normalizedDirection + state.wallets.length) % state.wallets.length;
             const nextWallet = state.wallets[nextIndex];
             if (!nextWallet) return;
-            ui.featuredWalletId = nextWallet.id;
-            ui.walletCarouselCycle = targetCycle;
-            ui.walletGestureLock = true;
             const track = document.getElementById('wallet-card-carousel');
-            scrollWalletCarouselTo(nextWallet.id, 'smooth', targetCycle);
-            if (track) updateWalletCarouselSelection(track, nextWallet.id, targetCycle);
-            setTimeout(() => {
-                if (state.wallets.length > 1 && targetCycle !== 2) {
-                    ui.walletCarouselCycle = 2;
-                    scrollWalletCarouselTo(nextWallet.id, 'auto', 2);
-                    if (track) updateWalletCarouselSelection(track, nextWallet.id, 2);
-                }
-                ui.walletGestureLock = false;
-            }, 390);
+            ui.featuredWalletId = nextWallet.id;
+            scrollWalletCarouselTo(nextWallet.id, 'smooth');
+            if (track) updateWalletCarouselSelection(track, nextWallet.id);
+        }
+
+        function moveWalletCarousel(direction) {
+            scrollWalletRail(direction);
         }
 
         function startWalletSwipe(event) {
@@ -4634,10 +5727,10 @@ IMPORTANT RULES:
         }
 
         function handleWalletCarouselScroll(track) {
-            if (ui.walletGestureLock || ui.walletSwipeStart) return;
+            if (ui.walletCarouselJumping) return;
             clearTimeout(ui.walletCarouselTimer);
             ui.walletCarouselTimer = setTimeout(() => {
-                if (ui.walletGestureLock || ui.walletSwipeStart) return;
+                if (ui.walletCarouselJumping) return;
                 const cards = Array.from(track.querySelectorAll('.wallet-carousel-item'));
                 if (!cards.length) return;
                 const center = track.scrollLeft + track.clientWidth / 2;
@@ -4652,17 +5745,16 @@ IMPORTANT RULES:
                     }
                 });
 
-                updateWalletCarouselSelection(track, parseInt(nearest.dataset.walletId), parseInt(nearest.dataset.cycle));
+                updateWalletCarouselSelection(track, parseInt(nearest.dataset.walletId));
             }, 80);
         }
 
-        function updateWalletCarouselSelection(track, walletId, cycle = ui.walletCarouselCycle ?? 2) {
+        function updateWalletCarouselSelection(track, walletId) {
             const wallet = state.wallets.find(w => w.id === walletId);
             if (!wallet) return;
             ui.featuredWalletId = walletId;
-            ui.walletCarouselCycle = cycle;
             track.querySelectorAll('.wallet-carousel-item').forEach(card => {
-                card.classList.toggle('is-active', parseInt(card.dataset.walletId) === walletId && parseInt(card.dataset.cycle) === cycle);
+                card.classList.toggle('is-active', parseInt(card.dataset.walletId) === walletId);
             });
             document.querySelectorAll('.wallet-carousel-dot').forEach((dot, index) => {
                 dot.classList.toggle('is-active', state.wallets[index]?.id === walletId);
@@ -4756,6 +5848,7 @@ IMPORTANT RULES:
                     const isExp = t.type === 'expense';
                     html += `<div class="tx-row glass" style="border: 1px solid var(--border);" onclick="openEditTransaction(${t.id})">
                 <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>
+                ${renderTxAttachmentThumb(t)}
                 <div style="flex:1; min-width: 0;"><p style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div>
                 <div style="text-align:right; flex-shrink:0;"><p class="syne" style="font-size:14px;font-weight:700;color:${isExp ? 'var(--rose)' : 'var(--emerald)'};">${isExp ? '-' : '+'} ${wallet.currency || state.currency.code} ${fmtNum(t.amount)}</p></div>
             </div>`;
@@ -4768,6 +5861,7 @@ IMPORTANT RULES:
                         const isExp = t.type === 'expense';
                         html += `<div class="tx-row glass" style="border: 1px solid var(--border);" onclick="openEditTransaction(${t.id})">
                     <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>
+                    ${renderTxAttachmentThumb(t)}
                     <div style="flex:1; min-width: 0;"><p style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div>
                     <div style="text-align:right; flex-shrink:0;"><p class="syne" style="font-size:14px;font-weight:700;color:${isExp ? 'var(--rose)' : 'var(--emerald)'};">${isExp ? '-' : '+'} ${wallet.currency || state.currency.code} ${fmtNum(t.amount)}</p></div>
                 </div>`;
@@ -5480,7 +6574,7 @@ IMPORTANT RULES:
 
         // â”€â”€â”€ SHEET & TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function openSheet() { document.getElementById('bottom-sheet').classList.add('open'); document.getElementById('overlay').style.opacity = '1'; document.getElementById('overlay').style.pointerEvents = 'auto'; lucide.createIcons(); }
-        function closeSheet() { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('overlay').style.opacity = '0'; document.getElementById('overlay').style.pointerEvents = 'none'; ui.isManagingCategories = false; ui.editingTransaction = null; }
+        function closeSheet() { document.getElementById('bottom-sheet').classList.remove('open'); document.getElementById('overlay').style.opacity = '0'; document.getElementById('overlay').style.pointerEvents = 'none'; ui.isManagingCategories = false; ui.editingTransaction = null; ui.txAttachment = null; }
         function showToast(msg, type = 'success') { const existing = document.querySelector('.toast-el'); if (existing) existing.remove(); const el = document.createElement('div'); el.className = 'toast-el toast-anim'; el.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;font-family:var(--font-main);z-index:1000;pointer-events:none;white-space:nowrap;background:${type === 'error' ? 'var(--rose)' : type === 'warn' ? '#f59e0b' : 'var(--emerald)'};color:#000;`; el.textContent = msg; document.body.appendChild(el); setTimeout(() => { el.style.transition = 'opacity 0.3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2200); }
 
         // â”€â”€â”€ ANALYTICS PAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
