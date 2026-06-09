@@ -7448,36 +7448,248 @@ IMPORTANT RULES:
 
         // â”€â”€â”€ GOOGLE DRIVE AUTO-SYNC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const GDRIVE_CLIENT_ID = '608503657584-kk54fp09cl297frfnfro32g0m0tp7o5t.apps.googleusercontent.com';
-        let gdrive = { connected: false, syncing: false, fileId: localStorage.getItem('finance_pro_gdrive_fileId') || null, autoSyncEnabled: localStorage.getItem('finance_pro_autosync') === 'true' };
-        let tokenClient; let accessToken = null;
+        const GDRIVE_BACKUP_NAMES = ['finance_pro_backup.json', 'velto_backup.json'];
+        let gdrive = {
+            connected: false,
+            syncing: false,
+            fileId: localStorage.getItem('finance_pro_gdrive_fileId') || null,
+            autoSyncEnabled: localStorage.getItem('finance_pro_autosync') === 'true',
+            initAttempts: 0
+        };
+        let tokenClient;
+        let accessToken = null;
+        let syncTimeout;
 
         function initGoogleDrive() {
-            if (typeof google === 'undefined') return;
+            if (tokenClient) return true;
+            if (!window.google?.accounts?.oauth2) {
+                gdrive.initAttempts += 1;
+                if (gdrive.initAttempts < 12) setTimeout(initGoogleDrive, 500);
+                updateSyncButtonUI();
+                return false;
+            }
             tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: GDRIVE_CLIENT_ID, scope: 'https://www.googleapis.com/auth/drive.file',
-                callback: (tokenResponse) => { if (tokenResponse && tokenResponse.access_token) { accessToken = tokenResponse.access_token; gdrive.connected = true; if (!gdrive.autoSyncEnabled) performFirstSync(); else { updateSyncButtonUI(); if (typeof showToast === 'function') showToast('Auto-sync connected'); if (ui.currentTab === 'settings') switchTab('settings'); } } },
+                client_id: GDRIVE_CLIENT_ID,
+                scope: 'https://www.googleapis.com/auth/drive.file',
+                prompt: '',
+                callback: (tokenResponse) => {
+                    if (tokenResponse?.error) {
+                        gdrive.connected = false;
+                        showToast(`Google Drive: ${tokenResponse.error}`, 'error');
+                        updateSyncButtonUI();
+                        return;
+                    }
+                    if (!tokenResponse?.access_token) return;
+                    accessToken = tokenResponse.access_token;
+                    gdrive.connected = true;
+                    updateSyncButtonUI();
+                    if (!gdrive.autoSyncEnabled) performFirstSync();
+                    else {
+                        showToast('Google Drive connected');
+                        if (ui.currentTab === 'settings') switchTab('settings');
+                    }
+                }
             });
             updateSyncButtonUI();
+            return true;
         }
-        function handleTopSyncClick() { if (!accessToken) tokenClient.requestAccessToken(); else if (!gdrive.autoSyncEnabled) performFirstSync(); else { showToast('Syncing to Drive...'); silentAutoSync(); } }
+
+        function requestDriveToken(prompt = '') {
+            if (!initGoogleDrive() || !tokenClient) {
+                showToast('Google Drive is still loading. Try again in a moment.', 'warn');
+                return false;
+            }
+            tokenClient.requestAccessToken({ prompt });
+            return true;
+        }
+
+        function handleTopSyncClick() {
+            if (!accessToken) {
+                requestDriveToken(gdrive.autoSyncEnabled ? '' : 'consent');
+                return;
+            }
+            if (!gdrive.autoSyncEnabled) performFirstSync();
+            else {
+                showToast('Syncing to Drive...');
+                silentAutoSync(true);
+            }
+        }
+
         async function performFirstSync() {
+            if (!accessToken) return requestDriveToken('consent');
             setSyncingUI(true);
-            try { const file = await findDriveFile(); if (file) { await loadFromDrive(file.id); showToast('Data restored from Drive'); } else { await saveToDrive(); showToast('Initial backup saved to Drive'); } gdrive.autoSyncEnabled = true; localStorage.setItem('finance_pro_autosync', 'true'); updateSyncButtonUI(); if (ui.currentTab === 'settings') switchTab('settings'); }
-            catch (error) { showToast('Sync failed: ' + error.message, 'error'); } finally { setSyncingUI(false); }
+            try {
+                const file = await findDriveFile();
+                if (file) {
+                    await loadFromDrive(file.id);
+                    showToast('Data restored from Drive');
+                } else {
+                    await saveToDrive();
+                    showToast('Initial backup saved to Drive');
+                }
+                gdrive.autoSyncEnabled = true;
+                gdrive.connected = true;
+                localStorage.setItem('finance_pro_autosync', 'true');
+                updateSyncButtonUI();
+                if (ui.currentTab === 'settings') switchTab('settings');
+            } catch (error) {
+                handleDriveError(error);
+                showToast('Sync failed: ' + error.message, 'error');
+            } finally {
+                setSyncingUI(false);
+            }
         }
+
         const originalSaveState = saveState;
-        saveState = function () { originalSaveState(); if (gdrive.autoSyncEnabled && accessToken && !gdrive.syncing) silentAutoSync(); };
-        let syncTimeout; function silentAutoSync() { clearTimeout(syncTimeout); syncTimeout = setTimeout(async () => { if (gdrive.syncing) return; setSyncingUI(true); try { await saveToDrive(); } catch (e) { console.error('Auto-sync error:', e); } finally { setSyncingUI(false); } }, 2500); }
-        async function findDriveFile() { const resp = await fetch('https://www.googleapis.com/drive/v3/files?q=name="finance_pro_backup.json" and trashed=false&spaces=drive', { headers: { 'Authorization': `Bearer ${accessToken}` } }); const data = await resp.json(); if (data.files && data.files.length > 0) { gdrive.fileId = data.files[0].id; localStorage.setItem('finance_pro_gdrive_fileId', gdrive.fileId); return data.files[0]; } return null; }
-        async function loadFromDrive(fileId) { const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers: { 'Authorization': `Bearer ${accessToken}` } }); const data = await resp.json(); if (data && data.wallets) { state = data; originalSaveState(); if (typeof switchTab === 'function') switchTab(ui.currentTab || 'home'); } }
-        async function saveToDrive() {
-            const metadata = { name: 'finance_pro_backup.json', mimeType: 'application/json' }; const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' })); form.append('file', new Blob([JSON.stringify(state)], { type: 'application/json' }));
-            let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart'; let method = 'POST';
-            if (gdrive.fileId) { url = `https://www.googleapis.com/upload/drive/v3/files/${gdrive.fileId}?uploadType=multipart`; method = 'PATCH'; }
-            const resp = await fetch(url, { method, headers: { 'Authorization': `Bearer ${accessToken}` }, body: form }); const result = await resp.json(); if (result.id) { gdrive.fileId = result.id; localStorage.setItem('finance_pro_gdrive_fileId', result.id); }
+        saveState = function () {
+            originalSaveState();
+            if (gdrive.autoSyncEnabled && accessToken && !gdrive.syncing) silentAutoSync();
+        };
+
+        function silentAutoSync(immediate = false) {
+            clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(async () => {
+                if (gdrive.syncing || !accessToken) return;
+                setSyncingUI(true);
+                try {
+                    await saveToDrive();
+                    gdrive.connected = true;
+                } catch (e) {
+                    handleDriveError(e);
+                    console.error('Auto-sync error:', e);
+                } finally {
+                    setSyncingUI(false);
+                }
+            }, immediate ? 0 : 2500);
         }
-        function setSyncingUI(isSyncing) { gdrive.syncing = isSyncing; const icon = document.getElementById('sync-icon'); if (icon) { if (isSyncing) { icon.classList.add('spin'); icon.style.color = 'var(--emerald)'; } else { icon.classList.remove('spin'); updateSyncButtonUI(); } } }
-        function updateSyncButtonUI() { const icon = document.getElementById('sync-icon'); const btn = document.getElementById('top-sync-btn'); if (icon && btn) { if (gdrive.autoSyncEnabled && accessToken) { icon.style.color = 'var(--emerald)'; btn.style.borderColor = 'rgba(16,185,129,0.3)'; } else if (gdrive.autoSyncEnabled && !accessToken) { icon.style.color = '#f59e0b'; btn.style.borderColor = 'rgba(245,158,11,0.3)'; } else { icon.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--border)'; } } }
+
+        async function driveFetch(url, options = {}) {
+            if (!accessToken) throw new Error('Google Drive session expired');
+            const resp = await fetch(url, {
+                ...options,
+                headers: {
+                    ...(options.headers || {}),
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+            let data = null;
+            const contentType = resp.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                data = await resp.json().catch(() => null);
+            } else {
+                data = await resp.text().catch(() => null);
+            }
+            if (!resp.ok) {
+                const message = data?.error?.message || data?.error || resp.statusText || 'Google Drive request failed';
+                const err = new Error(message);
+                err.status = resp.status;
+                throw err;
+            }
+            return data;
+        }
+
+        async function findDriveFile() {
+            if (gdrive.fileId) {
+                try {
+                    const file = await driveFetch(`https://www.googleapis.com/drive/v3/files/${gdrive.fileId}?fields=id,name,modifiedTime`);
+                    return file;
+                } catch (err) {
+                    if (err.status !== 404) throw err;
+                    gdrive.fileId = null;
+                    localStorage.removeItem('finance_pro_gdrive_fileId');
+                }
+            }
+            const q = `(${GDRIVE_BACKUP_NAMES.map(name => `name='${name}'`).join(' or ')}) and trashed=false`;
+            const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&spaces=drive&fields=files(id,name,modifiedTime)&orderBy=modifiedTime desc`;
+            const data = await driveFetch(url);
+            const file = data.files?.[0] || null;
+            if (file) {
+                gdrive.fileId = file.id;
+                localStorage.setItem('finance_pro_gdrive_fileId', file.id);
+            }
+            return file;
+        }
+
+        async function loadFromDrive(fileId) {
+            const data = await driveFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+            if (!data || !Array.isArray(data.wallets) || !Array.isArray(data.transactions)) {
+                throw new Error('Drive backup is not a valid Finance Pro backup');
+            }
+            state = { ...JSON.parse(JSON.stringify(DEFAULT_STATE)), ...data };
+            originalSaveState();
+            if (typeof switchTab === 'function') switchTab(ui.currentTab || 'home');
+        }
+
+        async function saveToDrive() {
+            const metadata = { name: GDRIVE_BACKUP_NAMES[0], mimeType: 'application/json' };
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', new Blob([JSON.stringify(state)], { type: 'application/json' }));
+            let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime';
+            let method = 'POST';
+            if (gdrive.fileId) {
+                url = `https://www.googleapis.com/upload/drive/v3/files/${gdrive.fileId}?uploadType=multipart&fields=id,name,modifiedTime`;
+                method = 'PATCH';
+            }
+            try {
+                const result = await driveFetch(url, { method, body: form });
+                if (result.id) {
+                    gdrive.fileId = result.id;
+                    localStorage.setItem('finance_pro_gdrive_fileId', result.id);
+                }
+                return result;
+            } catch (err) {
+                if (err.status === 404 && gdrive.fileId) {
+                    gdrive.fileId = null;
+                    localStorage.removeItem('finance_pro_gdrive_fileId');
+                    return saveToDrive();
+                }
+                throw err;
+            }
+        }
+
+        function handleDriveError(error) {
+            if (error?.status === 401 || error?.status === 403) {
+                accessToken = null;
+                gdrive.connected = false;
+            }
+            updateSyncButtonUI();
+            if (ui.currentTab === 'settings') switchTab('settings');
+        }
+
+        function setSyncingUI(isSyncing) {
+            gdrive.syncing = isSyncing;
+            const icon = document.getElementById('sync-icon');
+            if (icon) {
+                if (isSyncing) {
+                    icon.classList.add('spin');
+                    icon.style.color = 'var(--emerald)';
+                } else {
+                    icon.classList.remove('spin');
+                    updateSyncButtonUI();
+                }
+            }
+        }
+
+        function updateSyncButtonUI() {
+            const icon = document.getElementById('sync-icon');
+            const btn = document.getElementById('top-sync-btn');
+            if (icon && btn) {
+                if (gdrive.autoSyncEnabled && accessToken) {
+                    icon.style.color = 'var(--emerald)';
+                    btn.style.borderColor = 'rgba(16,185,129,0.3)';
+                    btn.setAttribute('aria-label', 'Sync to Google Drive');
+                } else if (gdrive.autoSyncEnabled && !accessToken) {
+                    icon.style.color = '#f59e0b';
+                    btn.style.borderColor = 'rgba(245,158,11,0.3)';
+                    btn.setAttribute('aria-label', 'Reconnect Google Drive');
+                } else {
+                    icon.style.color = 'var(--muted)';
+                    btn.style.borderColor = 'var(--border)';
+                    btn.setAttribute('aria-label', 'Enable Google Drive sync');
+                }
+            }
+        }
 
         // â”€â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         loadState();
