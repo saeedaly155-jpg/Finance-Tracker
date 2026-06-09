@@ -146,14 +146,14 @@
         }
 
         .sheet {
-            transform: translateY(100%);
-            transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
+            transform: translate3d(0, 100%, 0);
+            transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
             will-change: transform;
             z-index: 100;
         }
 
         .sheet.open {
-            transform: translateY(0);
+            transform: translate3d(0, 0, 0);
         }
 
         /* â”€â”€ Apple iOS 26 / VisionOS Glass Effect â”€â”€ */
@@ -240,19 +240,58 @@
         @keyframes fade-up {
             from {
                 opacity: 0;
-                transform: scale(0.985);
-                filter: blur(8px);
+                transform: translate3d(0, 12px, 0) scale(0.992);
+                filter: blur(4px);
             }
 
             to {
                 opacity: 1;
-                transform: scale(1);
+                transform: translate3d(0, 0, 0) scale(1);
                 filter: blur(0);
             }
         }
 
         .fade-up {
-            animation: fade-up 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+            animation: fade-up 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+        }
+
+        .main-scroll {
+            will-change: transform, opacity, filter;
+            transform-origin: 50% 80%;
+        }
+
+        .main-scroll.ios-page-enter {
+            animation: ios-page-enter 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
+        }
+
+        .main-scroll.ios-page-exit {
+            animation: ios-page-exit 0.18s cubic-bezier(0.32, 0.72, 0, 1) both;
+        }
+
+        @keyframes ios-page-enter {
+            from {
+                opacity: 0;
+                transform: translate3d(0, var(--page-y, 14px), 0) scale(0.992);
+                filter: blur(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes ios-page-exit {
+            from {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+                filter: blur(0);
+            }
+            to {
+                opacity: 0;
+                transform: translate3d(0, var(--page-exit-y, -10px), 0) scale(0.996);
+                filter: blur(3px);
+            }
         }
 
         @keyframes spin {
@@ -379,6 +418,32 @@
 
         .tx-row:active {
             background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tx-day-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .tx-day-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 6px 2px 2px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .tx-day-total {
+            letter-spacing: 0;
+            text-transform: none;
+            font-size: 10px;
+            font-weight: 750;
         }
 
         .icon-box {
@@ -515,7 +580,7 @@
             gap: 14px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
             padding: 2px max(20px, calc((100vw - 342px) / 2)) 16px;
             scrollbar-width: none;
             -webkit-overflow-scrolling: touch;
@@ -588,8 +653,22 @@
             overflow: hidden;
             color: #fff;
             border: 1px solid rgba(255,255,255,0.16);
+            background: linear-gradient(145deg, #1b1c22 0%, #2b2c34 58%, #121318 100%) !important;
             box-shadow: 0 24px 58px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.18);
             transform: translateZ(0);
+        }
+
+        body.light-mode .wallet-hero-card {
+            background: linear-gradient(145deg, #f8f8fb 0%, #e3e4ea 58%, #c8cad3 100%) !important;
+            color: #111 !important;
+        }
+
+        body.light-mode .wallet-hero-card .wcard-label,
+        body.light-mode .wallet-hero-card .wcard-sub,
+        body.light-mode .wallet-hero-card p,
+        body.light-mode .wallet-hero-card span {
+            color: rgba(0,0,0,0.68) !important;
+            -webkit-text-fill-color: rgba(0,0,0,0.68) !important;
         }
 
         .wallet-hero-card::before {
@@ -658,7 +737,7 @@
 
         .wallet-actions {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 10px;
             max-width: 342px;
             margin: 0 auto 24px;
@@ -684,6 +763,12 @@
 
         .wallet-action-pill:active {
             transform: scale(0.97);
+        }
+
+        #wallet-freeze-btn,
+        #wallet-freeze-btn * {
+            animation: none !important;
+            transition: none !important;
         }
 
         .wallet-section-head {
@@ -843,6 +928,12 @@
             inherits: false;
         }
 
+        @property --ai-glow-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
         @keyframes border-rotate {
             from {
                 --angle: 0deg;
@@ -866,55 +957,85 @@
             position: relative;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             padding: 10px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 0;
             border-radius: 999px;
-            background: #000;
+            background:
+                linear-gradient(#050507, #050507) padding-box,
+                linear-gradient(115deg, #00d4ff, #7c3aed, #ff2d55, #00ff85, #ffd60a, #00d4ff) border-box;
             color: #fff;
             font-weight: 700;
             cursor: pointer;
             overflow: hidden;
-            transition: background 0.2s ease;
-            box-shadow: 0 0 28px rgba(16, 185, 129, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+            isolation: isolate;
+            transition: transform 0.18s ease, box-shadow 0.22s ease;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.06),
+                0 0 24px rgba(116, 79, 255, 0.32),
+                0 0 42px rgba(223, 75, 255, 0.22),
+                0 0 58px rgba(255, 151, 74, 0.16),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
             width: 100%;
             max-width: 100%;
         }
 
+        .ai-mode-btn > * {
+            position: relative;
+            z-index: 2;
+        }
+
         .ai-mode-btn:hover {
             transform: none;
-            background: #000;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.08),
+                0 0 34px rgba(116, 79, 255, 0.42),
+                0 0 58px rgba(223, 75, 255, 0.3),
+                0 0 76px rgba(255, 151, 74, 0.24),
+                inset 0 1px 0 rgba(255, 255, 255, 0.14);
+        }
+
+        .ai-mode-btn.is-launching {
+            transform: translate3d(0, -2px, 0) scaleX(1.02) scaleY(1.16);
+            opacity: 0.78;
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.12),
+                0 0 44px rgba(116, 79, 255, 0.5),
+                0 0 70px rgba(217, 70, 239, 0.38),
+                0 0 90px rgba(255, 151, 74, 0.28);
         }
 
         .ai-mode-btn::before {
             content: '';
             position: absolute;
-            inset: -4px;
+            inset: 0;
             border-radius: 999px;
-            background: linear-gradient(90deg, #10b981, #3b82f6, #ec4899, #f97316, #8b5cf6, #10b981);
-            filter: blur(14px);
-            opacity: 0.9;
-            z-index: -2;
-            animation: glow-scroll 3.5s linear infinite;
+            padding: 1.5px;
+            background: conic-gradient(from var(--ai-glow-angle, 0deg), #7c4dff, #4f8cff, #d946ef, #ff5f9e, #ff9f43, #7c4dff);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.95;
+            z-index: 1;
+            animation: ai-stroke-spin 4.2s linear infinite;
         }
 
         .ai-mode-btn::after {
             content: '';
             position: absolute;
-            inset: 0;
+            inset: 2px;
             border-radius: 999px;
-            padding: 1px;
-            background: linear-gradient(90deg, #10b981, #3b82f6, #ec4899, #f97316, #8b5cf6, #10b981);
-            -webkit-mask: linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            -webkit-mask-composite: xor;
-            z-index: -1;
+            background:
+                radial-gradient(circle at 18% 20%, rgba(116, 79, 255, 0.2), transparent 28%),
+                radial-gradient(circle at 78% 76%, rgba(255, 151, 74, 0.18), transparent 34%),
+                radial-gradient(circle at 48% 50%, rgba(217, 70, 239, 0.12), transparent 42%),
+                rgba(255, 255, 255, 0.035);
+            z-index: 0;
         }
 
-        @keyframes glow-scroll {
-            from { transform: translateX(-30%); }
-            to { transform: translateX(30%); }
+        @keyframes ai-stroke-spin {
+            to { --ai-glow-angle: 360deg; }
         }
 
         .ai-chat-bar input {
@@ -983,20 +1104,36 @@
             position: fixed;
             inset: 0;
             z-index: 95;
-            display: none;
-            padding: 18px 18px 0;
-            background: rgba(8, 8, 12, 0.48);
-            backdrop-filter: blur(28px) saturate(150%);
-            -webkit-backdrop-filter: blur(28px) saturate(150%);
+            display: flex;
+            visibility: hidden;
+            padding: 10px 12px 0;
+            marging:20px;
+            background:
+                radial-gradient(circle at 50% 7%, rgba(124, 77, 255, 0.22), transparent 34%),
+                radial-gradient(circle at 82% 78%, rgba(255, 151, 74, 0.16), transparent 28%),
+                radial-gradient(circle at 18% 86%, rgba(217, 70, 239, 0.14), transparent 30%),
+                rgba(5, 6, 20, 0.74);
+            backdrop-filter: blur(38px) saturate(175%);
+            -webkit-backdrop-filter: blur(38px) saturate(175%);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transition: opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1);
         }
 
         .ai-glass-overlay.open {
-            display: flex;
+            visibility: visible;
             opacity: 1;
             pointer-events: auto;
+            padding: 10px 12px env(safe-area-inset-bottom);
+        }
+
+        .ai-glass-overlay.preopen {
+            visibility: visible;
+        }
+
+        .ai-glass-overlay.closing {
+            visibility: visible;
+            pointer-events: none;
         }
 
         .ai-glass-panel {
@@ -1008,43 +1145,85 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-        }
-
-        .ai-orb {
-            width: 76px;
-            height: 76px;
-            border-radius: 999px;
-            position: relative;
+            border-radius: 999px 999px 0 0;
             background:
-                radial-gradient(circle at 30% 22%, rgba(255,255,255,0.95), transparent 18%),
-                conic-gradient(from var(--angle, 0deg), #ff6b35, #ff3d8b, #835cff, #20d6ff, #2ef2a0, #ffcf54, #ff6b35);
-            box-shadow: 0 0 42px rgba(131, 92, 255, 0.42), 0 0 72px rgba(32, 214, 255, 0.28);
-            animation: border-rotate 4s linear infinite, siri-pulse 2.6s ease-in-out infinite;
-        }
-
-        .ai-orb::before,
-        .ai-orb::after {
-            content: '';
-            position: absolute;
-            inset: -12px;
-            border-radius: inherit;
-            background: inherit;
-            filter: blur(18px);
-            opacity: 0.45;
-            z-index: -1;
-        }
-
-        .ai-orb::after {
-            inset: 12px;
+                linear-gradient(180deg, rgba(11, 12, 30, 0.82), rgba(8, 9, 20, 0.54)),
+                rgba(5, 6, 18, 0.58);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+            transform-origin: 50% 100%;
+            transform: translate3d(0, calc(100vh - 118px), 0) scaleX(0.82) scaleY(0.12);
             filter: blur(10px);
-            opacity: 0.6;
-            background: radial-gradient(circle, rgba(255,255,255,0.9), transparent 62%);
+            opacity: 0;
+            transition:
+                transform 0.42s cubic-bezier(0.2, 0.82, 0.18, 1),
+                filter 0.34s cubic-bezier(0.2, 0.82, 0.18, 1),
+                opacity 0.24s ease,
+                border-radius 0.42s cubic-bezier(0.2, 0.82, 0.18, 1);
         }
 
-        @keyframes siri-pulse {
-            0%, 100% { transform: scale(1); border-radius: 48% 52% 50% 50%; }
-            35% { transform: scale(1.05); border-radius: 58% 42% 54% 46%; }
-            70% { transform: scale(0.97); border-radius: 44% 56% 45% 55%; }
+        .ai-glass-overlay.open .ai-glass-panel {
+            transform: translate3d(0, 0, 0) scale(1);
+            filter: blur(0);
+            opacity: 1;
+            border-radius: 34px 34px 0 0;
+            padding: 20px;
+        }
+
+        .siri-mark {
+            width: 48px;
+            height: 48px;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        .siri-mark span {
+            width: 3px;
+            height: 14px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #0a84ff, #bf5af2, #ff375f);
+            opacity: 0.9;
+            transform-origin: 50% 50%;
+            animation: siri-wave 1.25s ease-in-out infinite;
+        }
+
+        .siri-mark span:nth-child(2) { height: 22px; animation-delay: 0.08s; }
+        .siri-mark span:nth-child(3) { height: 30px; animation-delay: 0.16s; }
+        .siri-mark span:nth-child(4) { height: 20px; animation-delay: 0.24s; }
+        .siri-mark span:nth-child(5) { height: 12px; animation-delay: 0.32s; }
+
+        @keyframes siri-wave {
+            0%, 100% { transform: scaleY(0.62); opacity: 0.62; }
+            45% { transform: scaleY(1); opacity: 1; }
+        }
+
+        .siri-thinking {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .siri-thinking span {
+            width: 5px;
+            height: 5px;
+            border-radius: 999px;
+            background: var(--muted);
+            opacity: 0.45;
+            animation: siri-dot 1s ease-in-out infinite;
+        }
+
+        .siri-thinking span:nth-child(2) { animation-delay: 0.12s; }
+        .siri-thinking span:nth-child(3) { animation-delay: 0.24s; }
+
+        @keyframes siri-dot {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            45% { transform: translateY(-3px); opacity: 1; }
         }
 
         .ai-overlay-head {
@@ -1052,14 +1231,16 @@
             align-items: center;
             justify-content: space-between;
             gap: 14px;
-            padding-top: 6px;
+            padding: 10px 4px 14px;
             z-index: 2;
+            flex-shrink: 0;
         }
 
         .ai-close-btn,
         .ai-attach-btn {
             width: 46px;
             height: 46px;
+            flex: 0 0 46px;
             border-radius: 999px;
             border: 1px solid rgba(255,255,255,0.16);
             background: rgba(255,255,255,0.08);
@@ -1070,13 +1251,42 @@
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
         }
 
+        .ai-close-btn {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .ai-context-strip {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 0 2px 14px;
+            flex-shrink: 0;
+        }
+
+        .ai-context-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 34px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.075);
+            color: var(--text);
+            font-size: 11px;
+            font-weight: 760;
+            white-space: nowrap;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
         .ai-messages {
             flex: 1;
+            min-height: 0;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             overflow-y: auto;
-            padding: 22px 0 150px;
+            padding: 8px 2px 188px;
         }
 
         .ai-welcome {
@@ -1084,31 +1294,88 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            gap: 16px;
-            padding: 54px 16px 20px;
+            gap: 14px;
+            padding: 42px 16px 20px;
             color: var(--text);
+        }
+
+        .ai-suggestion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        @media (max-width: 360px) {
+            .ai-suggestion-grid { grid-template-columns: 1fr; }
+            .ai-welcome { padding-left: 8px; padding-right: 8px; }
+        }
+
+        .ai-suggestion-card {
+            min-height: 70px;
+            border-radius: 22px;
+            padding: 12px;
+            text-align: left;
+            color: var(--text);
+            background:
+                linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.04)),
+                radial-gradient(circle at 20% 0%, rgba(124, 77, 255, 0.16), transparent 36%);
+            border: 1px solid rgba(255,255,255,0.11);
+            box-shadow: 0 14px 34px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .ai-suggestion-card:active {
+            transform: scale(0.97);
+            border-color: rgba(255, 151, 74, 0.32);
+        }
+
+        .ai-suggestion-card i {
+            width: 15px;
+            height: 15px;
+            margin-bottom: 9px;
+            color: #d946ef;
+            filter: drop-shadow(0 0 8px rgba(217, 70, 239, 0.48));
+        }
+
+        .ai-suggestion-card span {
+            display: block;
+            font-size: 12px;
+            font-weight: 780;
+            line-height: 1.25;
         }
 
         .ai-compose {
             position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 18px;
+            left: 4px;
+            right: 4px;
+            bottom: max(16px, env(safe-area-inset-bottom));
             display: flex;
             flex-direction: column;
             gap: 8px;
             padding: 10px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.16);
-            background: rgba(26, 26, 34, 0.72);
-            backdrop-filter: blur(24px) saturate(145%);
-            -webkit-backdrop-filter: blur(24px) saturate(145%);
-            box-shadow: 0 22px 70px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,255,255,0.08);
+            border-radius: 26px;
+            border: 0;
+            background:
+                linear-gradient(rgba(20, 21, 31, 0.96), rgba(17, 18, 27, 0.94)) padding-box,
+                conic-gradient(from var(--ai-glow-angle, 0deg), #7c4dff, #4f8cff, #d946ef, #ff5f9e, #ff9f43, #7c4dff) border-box;
+            border: 1.5px solid transparent;
+            backdrop-filter: blur(30px) saturate(170%);
+            -webkit-backdrop-filter: blur(30px) saturate(170%);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04),
+                0 0 28px rgba(124, 77, 255, 0.36),
+                0 0 54px rgba(217, 70, 239, 0.24),
+                0 0 74px rgba(255, 151, 74, 0.18),
+                0 22px 80px rgba(0,0,0,0.52),
+                inset 0 1px 0 rgba(255,255,255,0.12);
             transition: bottom 0.36s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.36s cubic-bezier(0.2, 0.8, 0.2, 1);
+            animation: ai-stroke-spin 4.2s linear infinite;
         }
 
         .ai-compose.input-focused {
-            bottom: 8px;
+            bottom: max(8px, env(safe-area-inset-bottom));
             transform: scale(0.992);
         }
 
@@ -1116,14 +1383,16 @@
             display: flex;
             align-items: flex-end;
             gap: 8px;
+            min-width: 0;
         }
 
         .ai-compose textarea {
             flex: 1;
-            min-height: 46px;
-            max-height: 118px;
+            min-width: 0;
+            min-height: 58px;
+            max-height: 132px;
             resize: none;
-            padding: 13px 4px;
+            padding: 12px 4px 8px;
             border: 0;
             outline: 0;
             background: transparent;
@@ -1132,17 +1401,62 @@
             line-height: 1.35;
         }
 
+        .ai-compose textarea::placeholder {
+            color: rgba(255,255,255,0.62);
+        }
+
+        .ai-compose-tools {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+            padding-left: 1px;
+        }
+
+        .ai-tool-pill {
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 10px;
+            border-radius: 999px;
+            color: rgba(255,255,255,0.82);
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 11px;
+            font-weight: 760;
+        }
+
         .ai-send-btn {
-            width: 46px;
-            height: 46px;
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
             border-radius: 999px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            background: conic-gradient(from var(--angle, 0deg), #ff6b35, #ff3d8b, #835cff, #20d6ff, #2ef2a0, #ff6b35);
-            animation: border-rotate 5s linear infinite;
-            box-shadow: 0 0 24px rgba(131, 92, 255, 0.38);
+            background: linear-gradient(135deg, #7c4dff, #d946ef 48%, #ff9f43);
+            box-shadow: 0 0 24px rgba(124, 77, 255, 0.46), 0 0 36px rgba(255, 151, 74, 0.22);
+        }
+
+        .chat-bubble {
+            border-radius: 24px;
+            padding: 13px 15px;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.14);
+        }
+
+        .chat-user {
+            background: linear-gradient(135deg, rgba(16,185,129,0.18), rgba(32,214,255,0.1));
+            border-color: rgba(16,185,129,0.2);
+            border-bottom-right-radius: 10px;
+        }
+
+        .chat-bot {
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-bottom-left-radius: 10px;
         }
 
         .ai-attachment-strip,
@@ -1207,14 +1521,18 @@
         }
 
         body.light-mode .ai-glass-overlay {
-            background: rgba(242, 242, 247, 0.58);
+            background:
+                radial-gradient(circle at 50% 10%, rgba(10,132,255,0.14), transparent 34%),
+                rgba(242, 242, 247, 0.68);
         }
 
         body.light-mode .ai-compose,
         body.light-mode .ai-close-btn,
         body.light-mode .ai-attach-btn,
         body.light-mode .ai-attachment-chip,
-        body.light-mode .tx-attachment-chip {
+        body.light-mode .tx-attachment-chip,
+        body.light-mode .ai-context-chip,
+        body.light-mode .ai-suggestion-card {
             background: rgba(255,255,255,0.76);
             border-color: rgba(0,0,0,0.08);
         }
@@ -2366,19 +2684,19 @@
         }
 
         .finance-panel.finance-swipe-in {
-            animation: finance-swipe-drop 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+            animation: finance-swipe-drop 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
         }
 
         @keyframes finance-swipe-drop {
             from {
                 opacity: 0;
-                transform: translate3d(var(--finance-x, 18px), -18px, 0) scale(0.985);
-                clip-path: inset(0 0 12% 0 round 28px);
+                transform: translate3d(0, var(--finance-y, 10px), 0) scale(0.994);
+                filter: blur(3px);
             }
             to {
                 opacity: 1;
                 transform: translate3d(0, 0, 0) scale(1);
-                clip-path: inset(0 0 0 0 round 0);
+                filter: blur(0);
             }
         }
 
@@ -2455,6 +2773,17 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 10px 22px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.16);
+            background: linear-gradient(145deg, #1b1c22 0%, #2b2c34 58%, #121318 100%) !important;
+        }
+
+        body.light-mode .home-mini-card {
+            background: linear-gradient(145deg, #f8f8fb 0%, #e3e4ea 58%, #c8cad3 100%) !important;
+            color: #111 !important;
+        }
+
+        body.light-mode .home-mini-card .home-card-balance,
+        body.light-mode .home-mini-card span {
+            color: #111 !important;
         }
 
         .home-mini-card::after {
@@ -2649,6 +2978,62 @@
         body.light-mode .home-budget-ring::before {
             background: #fff;
         }
+
+        /* App-wide simple Apple motion tuning */
+        #overlay {
+            transition:
+                opacity 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+                backdrop-filter 0.28s cubic-bezier(0.32, 0.72, 0, 1) !important;
+        }
+
+        .app-bottom-nav,
+        .nav-pill,
+        .nav-search-wrap,
+        .nav-search-pill,
+        .nav-search-btn,
+        .nav-fab,
+        .nav-tab-btn {
+            transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+
+        .nav-pill {
+            transition-duration: 0.28s !important;
+        }
+
+        .nav-search-wrap,
+        .nav-search-pill {
+            transition-duration: 0.32s !important;
+        }
+
+        .nav-search-input {
+            transition:
+                opacity 0.22s ease 0.06s,
+                transform 0.26s cubic-bezier(0.32, 0.72, 0, 1) !important;
+            transform: translate3d(6px, 0, 0);
+        }
+
+        .nav-search-pill.search-expanded .nav-search-input {
+            transform: translate3d(0, 0, 0);
+        }
+
+        .toast-anim,
+        .chat-bubble,
+        .tx-row,
+        .card,
+        .wallet-hero-card {
+            transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 
@@ -2683,7 +3068,7 @@
             </div>
         </header>
 
-        <main class="main-scroll scroll-hide" id="main-content" style="transition: opacity 0.2s;"></main>
+        <main class="main-scroll scroll-hide" id="main-content"></main>
         <div id="ai-overlay" class="ai-glass-overlay" aria-hidden="true"></div>
         <nav class="app-bottom-nav" aria-label="Main navigation">
             <!-- Main tabs pill -->
@@ -3082,7 +3467,7 @@
         }
         function loadState() {
             try {
-                const saved = localStorage.getItem('velto_state_v4');
+                const saved = localStorage.getItem('finance_pro_state_v4');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     // â”€â”€ Schema validation: must have core arrays â”€â”€
@@ -3256,13 +3641,13 @@
                         console.warn('State too large, trimming old transactions');
                         state.transactions = state.transactions.slice(0, 500);
                     }
-                    localStorage.setItem('velto_state_v4', JSON.stringify(state));
+                    localStorage.setItem('finance_pro_state_v4', JSON.stringify(state));
                 } catch (e) {
                     if (e.name === 'QuotaExceededError') {
                         // Trim transactions and retry once
                         try {
                             state.transactions = state.transactions.slice(0, 200);
-                            localStorage.setItem('velto_state_v4', JSON.stringify(state));
+                            localStorage.setItem('finance_pro_state_v4', JSON.stringify(state));
                             showToast('Storage full - older transactions trimmed', 'warn');
                         } catch (_) { /* silently fail */ }
                     }
@@ -3296,6 +3681,66 @@
             return label;
         }
 
+        function transactionDayKey(dateStr) {
+            return (dateStr || today()).split('T')[0];
+        }
+
+        function transactionDayLabel(dayKey) {
+            const d = new Date(`${dayKey}T00:00:00`);
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const diff = Math.round((start - d) / 86400000);
+            if (diff === 0) return 'Today';
+            if (diff === 1) return 'Yesterday';
+            return d.toLocaleDateString('en', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        function renderTransactionRow(t, options = {}) {
+            const cat = getCat(t.categoryId, t.type);
+            const wallet = state.wallets.find(w => w.id === t.walletId) || {};
+            const wCurr = wallet.currency || state.currency.code;
+            const amountColor = t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)';
+            const sign = t.type === 'expense' ? '-' : '+';
+            const click = options.sheet ? `openEditTransaction(${t.id});openSheet()` : `openEditTransaction(${t.id})`;
+            return `<div class="tx-row" onclick="${click}">
+                <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>
+                ${renderTxAttachmentThumb(t)}
+                <div style="flex:1;min-width:0;">
+                    <p style="font-size:${options.compact ? '13px' : '14px'};font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p>
+                    <p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p>
+                </div>
+                <div style="text-align:right;flex-shrink:0;">
+                    <p class="syne" style="font-size:${options.compact ? '13px' : '14px'};font-weight:700;color:${amountColor};">${sign} ${wCurr} ${fmtNum(t.amount)}</p>
+                    ${options.showWallet !== false ? `<p style="font-size:9px;color:var(--muted);">${wallet.name || ''}</p>` : ''}
+                </div>
+            </div>`;
+        }
+
+        function renderTransactionDayGroups(transactions, options = {}) {
+            const sorted = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const groups = new Map();
+            sorted.forEach(t => {
+                const key = transactionDayKey(t.date);
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push(t);
+            });
+            return [...groups.entries()].map(([day, items]) => {
+                const total = items.reduce((sum, t) => {
+                    if (t.isTransfer || t.excludeFromTotals) return sum;
+                    const wallet = state.wallets.find(w => w.id === t.walletId) || { currency: state.currency.code };
+                    const amount = convertCurrency(t.amount, wallet.currency, state.currency.code);
+                    return sum + (t.type === 'income' ? amount : -amount);
+                }, 0);
+                return `<div class="tx-day-group">
+                    <div class="tx-day-header">
+                        <span>${transactionDayLabel(day)}</span>
+                        <span class="tx-day-total" style="color:${total < 0 ? 'var(--rose)' : 'var(--emerald)'};">${total < 0 ? '-' : '+'} ${fmt(Math.abs(total))}</span>
+                    </div>
+                    ${items.map(t => renderTransactionRow(t, options)).join('')}
+                </div>`;
+            }).join('');
+        }
+
         function getCurrentMonthSpend(categoryId) {
             const now = new Date();
             const month = now.getMonth(); const year = now.getFullYear();
@@ -3320,11 +3765,16 @@
 
 
         // â”€â”€â”€ TAB SWITCHING & NEW FINANCE PAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        function switchTab(tabId) {
+        function switchTab(tabId, options = {}) {
+            const previousTab = ui.currentTab || 'home';
             ui.currentTab = tabId;
             // 1. Ù…Ù†Ø·Ù‚ Ø°ÙƒÙŠ Ù„ØªÙˆØ¬ÙŠÙ‡ Ø§Ù„ØªØ¨ÙˆÙŠØ¨Ø§Øª Ø§Ù„ÙØ±Ø¹ÙŠØ© Ù„Ù„Ù€ Finance
             const isFinanceTab = ['income', 'budgets', 'debts'].includes(tabId);
             const target = isFinanceTab ? 'finance' : tabId;
+            const tabOrder = ['home', 'finance', 'wallets', 'settings', 'search', 'chat'];
+            const prevIndex = Math.max(0, tabOrder.indexOf(previousTab));
+            const nextIndex = Math.max(0, tabOrder.indexOf(tabId));
+            const direction = nextIndex >= prevIndex ? 1 : -1;
 
             // 2. ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù€ Active class
             document.querySelectorAll('.nav-tab-btn').forEach(btn => {
@@ -3346,8 +3796,15 @@
             // 3. Ø§Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„Ù…Ø±Ø¦ÙŠ ÙˆØ§Ù„Ù…Ø­ØªÙˆÙ‰
             const main = document.getElementById('main-content');
             const title = document.getElementById('header-title');
+            const skipPageMotion = !!options.noMotion;
 
-            main.style.opacity = '0';
+            main.style.opacity = '';
+            main.style.setProperty('--page-exit-y', `${direction * -10}px`);
+            main.classList.remove('ios-page-enter', 'ios-page-exit');
+            if (!skipPageMotion) {
+                void main.offsetWidth;
+                main.classList.add('ios-page-exit');
+            }
             Object.keys(charts).forEach(k => destroyChart(k));
 
             setTimeout(() => {
@@ -3375,7 +3832,7 @@
                     main.innerHTML = (renders[tabId] || renderHome)();
                     if (tabId === 'chat') {
                         renderChatMessages();
-                        setTimeout(() => document.getElementById('chat-input')?.focus(), 100);
+                        focusAIInput();
                     }
 
                     lucide.createIcons();
@@ -3386,8 +3843,13 @@
                     console.error('Tab render error:', err);
                     main.innerHTML = `<div style="padding:40px 20px;text-align:center;color:var(--muted);"><p style="font-size:14px;">Something went wrong. Tap to retry.</p><button onclick="switchTab('home')" style="margin-top:16px;padding:12px 24px;background:var(--emerald);color:#000;border-radius:14px;font-weight:700;font-size:14px;">Go to Dashboard</button></div>`;
                 }
-                main.style.opacity = '1';
-            }, 160);
+                main.classList.remove('ios-page-exit', 'ios-page-enter');
+                main.style.setProperty('--page-y', `${direction * 14}px`);
+                if (!skipPageMotion) {
+                    void main.offsetWidth;
+                    main.classList.add('ios-page-enter');
+                }
+            }, skipPageMotion ? 0 : 90);
         }
 
         function switchFinanceTab(tab) {
@@ -3398,7 +3860,7 @@
             if (ui.currentTab === 'finance') {
                 const contentEl = document.getElementById('finance-content');
                 if (contentEl) {
-                    contentEl.style.setProperty('--finance-x', `${direction * 24}px`);
+                    contentEl.style.setProperty('--finance-y', `${direction * 12}px`);
                     contentEl.classList.remove('finance-swipe-in');
                     contentEl.innerHTML = getFinanceTabContent();
                     void contentEl.offsetWidth;
@@ -3638,10 +4100,34 @@
             showToast(`Paid ${wallet.currency || state.currency.code} ${fmtNum(item.amount)} to ${item.name}!`);
         }
         // â”€â”€â”€ AI CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function focusInputForKeyboard(selector) {
+            const input = document.querySelector(selector);
+            if (!input) return;
+            input.focus({ preventScroll: true });
+            const length = input.value?.length || 0;
+            try { input.setSelectionRange(length, length); } catch (e) { }
+        }
+
+        function focusAIInput() {
+            focusInputForKeyboard('#chat-input');
+            setTimeout(() => focusInputForKeyboard('#chat-input'), 60);
+            setTimeout(() => focusInputForKeyboard('#chat-input'), 180);
+        }
+
+        function focusSearchInput() {
+            focusInputForKeyboard('#nav-search-input');
+            setTimeout(() => focusInputForKeyboard('#nav-search-input'), 60);
+            setTimeout(() => focusInputForKeyboard('#nav-search-input'), 220);
+        }
+
         function openAIChat() {
             if (document.getElementById('bottom-sheet').classList.contains('open')) closeSheet();
+            const trigger = document.querySelector('.ai-mode-btn');
+            trigger?.classList.add('is-launching');
+            setTimeout(() => trigger?.classList.remove('is-launching'), 420);
             ui.chatReturnTab = ui.currentTab || 'home';
             renderAIOverlay();
+            focusAIInput();
         }
 
         function renderChatPage() {
@@ -3658,16 +4144,25 @@
             return `
                 <div class="ai-compose" id="ai-compose">
                     <div class="ai-attachment-strip scroll-hide" id="ai-attachment-strip"></div>
+                    <div class="ai-compose-tools">
+                        <button class="ai-tool-pill" onclick="pickAIAttachment('file')" aria-label="Attach image">
+                            <i data-lucide="plus" style="width:14px;height:14px;"></i>
+                        </button>
+                        <button class="ai-tool-pill" onclick="useAISuggestion('Analyze my month and tell me the three decisions I should make next')">
+                            <i data-lucide="sliders-horizontal" style="width:13px;height:13px;"></i>
+                            <span>Tools</span>
+                        </button>
+                    </div>
                     <div class="ai-compose-row">
                         <button class="ai-attach-btn" onclick="pickAIAttachment('camera')" aria-label="Camera">
                             <i data-lucide="camera" style="width:19px;height:19px;"></i>
                         </button>
-                        <button class="ai-attach-btn" onclick="pickAIAttachment('file')" aria-label="Attach image">
-                            <i data-lucide="paperclip" style="width:19px;height:19px;"></i>
+                        <button class="ai-attach-btn" onclick="startAIVoiceInput()" aria-label="Voice">
+                            <i data-lucide="mic" style="width:19px;height:19px;"></i>
                         </button>
-                        <textarea id="chat-input" class="scroll-hide" placeholder="Ask about this month or all time..." onfocus="setAIInputFocus(true)" onblur="setAIInputFocus(false)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
+                        <textarea id="chat-input" class="scroll-hide" placeholder="Ask Finance Pro anything..." oninput="autoGrowAIInput(this)" onfocus="setAIInputFocus(true)" onblur="setAIInputFocus(false)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMessage();}"></textarea>
                         <button onclick="sendChatMessage()" class="ai-send-btn" aria-label="Send">
-                            <i data-lucide="send" style="width:19px;height:19px;"></i>
+                            <i data-lucide="arrow-up" style="width:19px;height:19px;"></i>
                         </button>
                     </div>
                     <input id="ai-camera-input" type="file" accept="image/*" capture="environment" style="display:none" onchange="handleAIAttachmentFile(this)">
@@ -3679,30 +4174,44 @@
         function renderAIOverlay() {
             const overlay = document.getElementById('ai-overlay');
             if (!overlay) return;
+            const monthLabel = new Date().toLocaleDateString('en', { month: 'short' });
             overlay.innerHTML = `
                 <div class="ai-glass-panel">
                     <div class="ai-overlay-head">
                         <div style="display:flex;align-items:center;gap:13px;">
-                            <div class="ai-orb" aria-hidden="true"></div>
+                            <div class="siri-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
                             <div>
-                                <p class="tag" style="margin:0;color:var(--muted);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;">Velto Intelligence</p>
-                                <h2 class="syne" style="font-size:24px;line-height:1.05;margin-top:5px;">Ask your money</h2>
+                                <p class="tag" style="margin:0;color:var(--muted);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;">Assistant</p>
+                                <h2 class="syne" style="font-size:25px;line-height:1.05;margin-top:5px;">Finance Pro</h2>
                             </div>
                         </div>
                         <button onclick="closeChatPage()" class="ai-close-btn" aria-label="Close AI">
                             <i data-lucide="x" style="width:20px;height:20px;"></i>
                         </button>
                     </div>
+                    <div class="ai-context-strip scroll-hide">
+                        <span class="ai-context-chip"><i data-lucide="calendar-days" style="width:14px;height:14px;"></i>${monthLabel}</span>
+                        <span class="ai-context-chip"><i data-lucide="database" style="width:14px;height:14px;"></i>All time</span>
+                        <span class="ai-context-chip"><i data-lucide="image" style="width:14px;height:14px;"></i>Images</span>
+                    </div>
                     <div id="chat-messages" class="ai-messages scroll-hide"></div>
                     ${renderAICompose()}
                 </div>
             `;
-            overlay.classList.add('open');
+            overlay.classList.remove('open');
+            overlay.classList.remove('closing');
+            overlay.classList.add('preopen');
             overlay.setAttribute('aria-hidden', 'false');
             renderChatMessages();
             renderAIAttachmentStrip();
             lucide.createIcons();
-            setTimeout(() => document.getElementById('chat-input')?.focus(), 140);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    overlay.classList.add('open');
+                    overlay.classList.remove('preopen');
+                    focusAIInput();
+                });
+            });
         }
 
         function renderChatMessages() {
@@ -3717,10 +4226,28 @@
             } else {
                 chatContainer.innerHTML = `
                     <div class="ai-welcome">
-                        <div class="ai-orb" aria-hidden="true"></div>
+                        <div class="siri-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
                         <div>
-                            <h2 class="syne" style="font-size:26px;line-height:1.05;margin-bottom:8px;">What do you need?</h2>
-                            <p style="font-size:13px;color:var(--muted);line-height:1.45;">I can read your current month, all-time history, and any image you attach.</p>
+                            <h2 class="syne" style="font-size:27px;line-height:1.05;margin-bottom:8px;">What should we improve?</h2>
+                            <p style="font-size:13px;color:var(--muted);line-height:1.45;">Finance Pro can read your month, all-time history, budgets, wallets, and receipt images.</p>
+                        </div>
+                        <div class="ai-suggestion-grid">
+                            <button class="ai-suggestion-card" onclick="useAISuggestion('Audit this month and give me the top 3 money leaks with exact transactions')">
+                                <i data-lucide="sparkles"></i>
+                                <span>Find money leaks</span>
+                            </button>
+                            <button class="ai-suggestion-card" onclick="useAISuggestion('Build a realistic budget for next month from my spending history')">
+                                <i data-lucide="pie-chart"></i>
+                                <span>Build next budget</span>
+                            </button>
+                            <button class="ai-suggestion-card" onclick="useAISuggestion('Compare this month against all time and explain what changed')">
+                                <i data-lucide="chart-no-axes-combined"></i>
+                                <span>Month vs all time</span>
+                            </button>
+                            <button class="ai-suggestion-card" onclick="pickAIAttachment('camera')">
+                                <i data-lucide="camera"></i>
+                                <span>Scan a receipt</span>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -3728,16 +4255,66 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        function useAISuggestion(text) {
+            const input = document.getElementById('chat-input');
+            if (!input) return;
+            input.value = text;
+            autoGrowAIInput(input);
+            input.focus();
+            setAIInputFocus(true);
+        }
+
         function closeChatPage() {
             const overlay = document.getElementById('ai-overlay');
             if (!overlay) return;
+            document.activeElement?.blur?.();
+            overlay.classList.add('closing');
             overlay.classList.remove('open');
+            overlay.classList.remove('preopen');
             overlay.setAttribute('aria-hidden', 'true');
-            setTimeout(() => { if (!overlay.classList.contains('open')) overlay.innerHTML = ''; }, 340);
+            setTimeout(() => {
+                if (!overlay.classList.contains('open')) {
+                    overlay.classList.remove('closing');
+                    overlay.innerHTML = '';
+                }
+            }, 430);
         }
 
         function setAIInputFocus(isFocused) {
             document.getElementById('ai-compose')?.classList.toggle('input-focused', isFocused);
+        }
+
+        function autoGrowAIInput(input) {
+            if (!input) return;
+            input.style.height = 'auto';
+            input.style.height = `${Math.min(input.scrollHeight, 132)}px`;
+        }
+
+        function startAIVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const input = document.getElementById('chat-input');
+            if (!SpeechRecognition || !input) {
+                useAISuggestion('Analyze this month and find unusual spending patterns');
+                showToast('Voice input is not available in this browser', 'warn');
+                return;
+            }
+            try {
+                const recognition = new SpeechRecognition();
+                recognition.lang = navigator.language || 'en-US';
+                recognition.interimResults = true;
+                recognition.continuous = false;
+                showToast('Listening...');
+                recognition.onresult = (event) => {
+                    const text = Array.from(event.results).map(r => r[0]?.transcript || '').join(' ').trim();
+                    input.value = text;
+                    autoGrowAIInput(input);
+                    focusAIInput();
+                };
+                recognition.onerror = () => showToast('Could not hear you clearly', 'error');
+                recognition.start();
+            } catch (err) {
+                showToast('Voice input could not start', 'error');
+            }
         }
 
         function pickAIAttachment(mode) {
@@ -3843,7 +4420,7 @@
         }
 
         async function sendChatMessage() {
-            const apiKey = localStorage.getItem('velto_gemini_key');
+            const apiKey = localStorage.getItem('finance_pro_gemini_key');
             const inputEl = document.getElementById('chat-input');
             const text = inputEl ? inputEl.value.trim() : '';
             const sentAttachments = [...aiPendingAttachments];
@@ -3858,7 +4435,7 @@
             renderAIAttachmentStrip();
             chatContainer.scrollTop = chatContainer.scrollHeight;
             const loadingId = 'loading-' + Date.now();
-            chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex;gap:8px;align-items:center;"><span class="ai-orb" style="width:24px;height:24px;flex-shrink:0;"></span> Thinking...</div>`;
+            chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble chat-bot" style="display:flex;gap:9px;align-items:center;"><span class="siri-thinking" aria-hidden="true"><span></span><span></span><span></span></span><span>Thinking...</span></div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
             if (!apiKey) {
                 document.getElementById(loadingId)?.remove();
@@ -3868,7 +4445,7 @@
             }
             try {
                 const aiState = buildAIStateSnapshot();
-                const sysPrompt = `You are a powerful AI assistant built into Velto Finance - the user's personal finance app. You can do anything they ask: answer questions, analyze their finances, read attached images, AND execute real actions in the app.
+                const sysPrompt = `You are a powerful AI assistant built into Finance Pro - the user's personal finance app. You can do anything they ask: answer questions, analyze their finances, read attached images, AND execute real actions in the app.
 
             Language: Reply in the same language the user writes in.If they write Arabic, reply in friendly Egyptian Arabic.If English, reply in English.
 
@@ -4105,13 +4682,7 @@ IMPORTANT RULES:
             if (ui.currentTab !== 'search') ui.searchReturnTab = ui.currentTab || 'home';
             if (ui.currentTab !== 'search') switchTab('search');
             syncSearchUI();
-            if (shouldFocus) {
-                setTimeout(() => {
-                    const navInput = document.getElementById('nav-search-input');
-                    const pageInput = document.getElementById('search-input');
-                    (navInput || pageInput)?.focus();
-                }, 220);
-            }
+            if (shouldFocus) focusSearchInput();
         }
 
         function closeSearchMode() {
@@ -4130,7 +4701,7 @@ IMPORTANT RULES:
             if (tabsPill) tabsPill.classList.toggle('search-active', isSearch);
             if (navInput) {
                 navInput.value = ui.searchQuery || '';
-                if (isSearch) setTimeout(() => navInput.focus(), 320);
+                if (isSearch) focusSearchInput();
             }
             const pageInput = document.getElementById('search-input');
             if (pageInput) pageInput.value = ui.searchQuery || '';
@@ -4203,25 +4774,6 @@ IMPORTANT RULES:
             return html;
         }
 
-        function renderHomeMiniCards() {
-            const visibleWallets = state.wallets.filter(w => !w.excludeFromTotal).slice(0, 5);
-            return `
-                <div class="home-card-strip scroll-hide">
-                    ${visibleWallets.map(w => {
-                        const curr = w.currency || state.currency.code;
-                        return `<button class="home-mini-card" onclick="switchTab('wallets')" style="background:${w.color || GRADIENT_COLORS[0]};">
-                           
-                            <span style="font-size:8px;font-weight:850;letter-spacing:0.08em;opacity:0.9;z-index:1;">${curr}</span>
-                            <span class="home-card-balance">${curr} ${fmtNum(w.balance)}</span>
-                        </button>`;
-                    }).join('')}
-                    <button class="home-add-card" onclick="openWalletForm()" aria-label="Add wallet">
-                        <i data-lucide="plus" style="width:18px;height:18px;"></i>
-                    </button>
-                </div>
-            `;
-        }
-
         function renderHomeOverview(total, monthIn, monthOut) {
             const primaryBudget = state.budgets[0] || null;
             const budgetSpent = primaryBudget ? getCurrentMonthSpend(primaryBudget.categoryId) : monthOut;
@@ -4234,9 +4786,7 @@ IMPORTANT RULES:
                             <p class="home-balance-label">Total Balance</p>
                             <h2 class="home-balance-value">${fmt(total)}<small>${Object.keys(liveRates).length > 0 ? ' live' : ''}</small></h2>
                         </div>
-                        <button onclick="switchTab('wallets')" class="home-view-link">View all</button>
                     </div>
-                    ${renderHomeMiniCards()}
                     <div class="home-duo-grid">
                         <div>
                             <p class="home-block-title">Statistics</p>
@@ -4372,20 +4922,7 @@ IMPORTANT RULES:
                     const filter = ui.txFilter || 'all';
                     const filtered = filter === 'all' ? recent : recent.filter(t => t.type === filter);
                     if (filtered.length === 0) return `<div style="text-align:center;padding:32px 20px;color:var(--muted);"><i data-lucide="inbox" style="width:28px;height:28px;margin:0 auto 8px;opacity:0.4;display:block;"></i><p style="font-size:13px;">No transactions in ${monthName}</p></div>`;
-                    return filtered.map(t => {
-                        const cat = getCat(t.categoryId, t.type);
-                        const wallet = state.wallets.find(w => w.id === t.walletId) || {};
-                        const wCurr = wallet.currency || state.currency.code;
-                        return `<div class="tx-row" onclick="openEditTransaction(${t.id})">
-                        <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>
-                        ${renderTxAttachmentThumb(t)}
-                        <div style="flex:1;min-width:0;"><p style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div>
-                        <div style="text-align:right;flex-shrink:0;">
-                            <p class="syne" style="font-size:14px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p>
-                            <p style="font-size:9px;color:var(--muted);">${wallet.name || ''}</p>
-                        </div>
-                    </div>`;
-                    }).join('');
+                    return renderTransactionDayGroups(filtered);
                 })()}
         </div>
     </div>`;
@@ -5101,8 +5638,8 @@ IMPORTANT RULES:
             closeSheet(); switchTab('home'); showToast('Deleted');
         }
         function openAllTransactions() {
-            const sorted = [...state.transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
-            document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:16px;">All Transactions</h2><div style="display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow-y:auto;" class="scroll-hide">${sorted.map(t => { const cat = getCat(t.categoryId); const wallet = state.wallets.find(w => w.id === t.walletId) || {}; const wCurr = wallet.currency || state.currency.code; return `<div class="tx-row" onclick="openEditTransaction(${t.id});openSheet()"><div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:16px;height:16px;color:${cat.color};"></i></div>${renderTxAttachmentThumb(t)}<div style="flex:1;min-width:0;"><p style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name} ${t.excludeFromTotals ? `<span style="font-size:9px;font-weight:800;letter-spacing:0.04em;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);padding:1px 4px;border-radius:4px;margin-left:4px;vertical-align:middle;">Excluded</span>` : ''}</p><p style="font-size:10px;color:var(--muted);">${cat.name} · ${dateLabel(t.date)}</p></div><p class="syne" style="font-size:13px;font-weight:700;color:${t.type === 'expense' ? 'var(--rose)' : 'var(--emerald)'};">${t.type === 'expense' ? '-' : '+'} ${wCurr} ${fmtNum(t.amount)}</p></div>`; }).join('')}${sorted.length === 0 ? '<p style="text-align:center;color:var(--muted);padding:30px;">No transactions</p>' : ''}</div>`;
+            const grouped = renderTransactionDayGroups(state.transactions, { sheet: true, compact: true });
+            document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:16px;">All Transactions</h2><div style="display:flex;flex-direction:column;gap:10px;max-height:70vh;overflow-y:auto;" class="scroll-hide">${state.transactions.length ? grouped : '<p style="text-align:center;color:var(--muted);padding:30px;">No transactions</p>'}</div>`;
             openSheet(); lucide.createIcons();
         }
 
@@ -5452,7 +5989,7 @@ IMPORTANT RULES:
             ui.currentTab = 'wallets';
             const wallets = state.wallets;
             const featured = wallets.find(w => w.id === ui.featuredWalletId) || wallets[0];
-            if (!featured) return `<div class="fade-up wallet-page"><p style="text-align:center;color:var(--muted);padding:40px 0;">No wallets yet</p></div>`;
+            if (!featured) return `<div class="wallet-page"><p style="text-align:center;color:var(--muted);padding:40px 0;">No wallets yet</p></div>`;
 
             ui.featuredWalletId = featured.id;
             const featuredCurr = featured.currency || state.currency.code;
@@ -5465,7 +6002,7 @@ IMPORTANT RULES:
                 const isActive = wallet.id === featured.id;
                 const graph = getWalletMiniGraph(wallet.id);
                 return `<div class="wallet-carousel-item ${isActive ? 'is-active' : ''}" data-wallet-id="${wallet.id}" data-index="${index}">
-            <button class="wallet-hero-card" onclick="openWalletForm(${wallet.id})" style="width:100%;text-align:left;background:${wallet.color || 'linear-gradient(135deg,#111827,#10b981)'};" aria-label="Edit wallet">
+            <button class="wallet-hero-card" onclick="openWalletForm(${wallet.id})" style="width:100%;text-align:left;" aria-label="Edit wallet">
                 <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;">
                         <div style="min-width:0;">
@@ -5497,14 +6034,14 @@ IMPORTANT RULES:
                             <path d="${graph.area}" fill="url(#walletGraphFill${wallet.id})"></path>
                             <path d="${graph.line}" fill="none" stroke="url(#walletGraphStroke${wallet.id})" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
-                        ${wallet.isFrozen ? `<span style="font-size:9px;font-weight:900;color:#93c5fd;background:rgba(147,197,253,0.14);border:1px solid rgba(147,197,253,0.24);border-radius:999px;padding:5px 8px;">Frozen</span>` : ''}
+                        <span class="wallet-frozen-state" style="display:${wallet.isFrozen ? 'inline-flex' : 'none'};font-size:9px;font-weight:900;color:#93c5fd;background:rgba(147,197,253,0.14);border:1px solid rgba(147,197,253,0.24);border-radius:999px;padding:5px 8px;">Frozen</span>
                     </div>
                 </div>
             </button>
         </div>`;
             };
 
-            const html = `<div class="fade-up wallet-page">
+            const html = `<div class="wallet-page">
         <div class="wallet-topbar">
             <button class="wallet-icon-btn" onclick="switchTab('home')" aria-label="Back to home">
                 <i data-lucide="chevron-left" style="width:20px;height:20px;"></i>
@@ -5539,11 +6076,15 @@ IMPORTANT RULES:
         <div class="wallet-actions">
             <button id="wallet-freeze-btn" class="wallet-action-pill" onclick="toggleWalletFreeze(${featured.id})">
                 <i data-lucide="${featured.isFrozen ? 'snowflake' : 'asterisk'}" style="width:15px;height:15px;"></i>
-                <span>${featured.isFrozen ? 'Unfreeze Card' : 'Freeze Card'}</span>
+                <span>${featured.isFrozen ? 'Unfreeze' : 'Freeze'}</span>
             </button>
             <button id="wallet-details-btn" class="wallet-action-pill" onclick="openTransactionForm({type:'expense', walletId:${featured.id}})">
                 <i data-lucide="receipt" style="width:15px;height:15px;"></i>
-                <span>Add Transaction</span>
+                <span>Transaction</span>
+            </button>
+            <button class="wallet-action-pill" onclick="openTransferForm()">
+                <i data-lucide="arrow-right-left" style="width:15px;height:15px;"></i>
+                <span>Transfer</span>
             </button>
         </div>
 
@@ -5629,7 +6170,7 @@ IMPORTANT RULES:
                 switchTab('wallets');
                 return;
             }
-            scrollWalletCarouselTo(walletId, 'smooth');
+            scrollWalletCarouselTo(walletId, 'auto');
             updateWalletCarouselSelection(track, walletId);
         }
 
@@ -5646,12 +6187,12 @@ IMPORTANT RULES:
             setTimeout(() => { ui.walletCarouselJumping = false; }, 60);
         }
 
-        function centerWalletCarouselCard(track, card, behavior = 'smooth') {
+        function centerWalletCarouselCard(track, card, behavior = 'auto') {
             const left = card.offsetLeft - (track.clientWidth - card.clientWidth) / 2;
             track.scrollTo({ left, behavior });
         }
 
-        function scrollWalletCarouselTo(walletId, behavior = 'smooth') {
+        function scrollWalletCarouselTo(walletId, behavior = 'auto') {
             const track = document.getElementById('wallet-card-carousel');
             if (!track) return;
             const cards = Array.from(track.querySelectorAll('.wallet-carousel-item'));
@@ -5669,7 +6210,7 @@ IMPORTANT RULES:
             if (!nextWallet) return;
             const track = document.getElementById('wallet-card-carousel');
             ui.featuredWalletId = nextWallet.id;
-            scrollWalletCarouselTo(nextWallet.id, 'smooth');
+            scrollWalletCarouselTo(nextWallet.id, 'auto');
             if (track) updateWalletCarouselSelection(track, nextWallet.id);
         }
 
@@ -5754,7 +6295,11 @@ IMPORTANT RULES:
             if (!wallet) return;
             ui.featuredWalletId = walletId;
             track.querySelectorAll('.wallet-carousel-item').forEach(card => {
-                card.classList.toggle('is-active', parseInt(card.dataset.walletId) === walletId);
+                const cardWalletId = parseInt(card.dataset.walletId);
+                const cardWallet = state.wallets.find(w => w.id === cardWalletId);
+                card.classList.toggle('is-active', cardWalletId === walletId);
+                const frozenState = card.querySelector('.wallet-frozen-state');
+                if (frozenState && cardWallet) frozenState.style.display = cardWallet.isFrozen ? 'inline-flex' : 'none';
             });
             document.querySelectorAll('.wallet-carousel-dot').forEach((dot, index) => {
                 dot.classList.toggle('is-active', state.wallets[index]?.id === walletId);
@@ -5769,7 +6314,7 @@ IMPORTANT RULES:
                 const icon = freezeBtn.querySelector('i');
                 const label = freezeBtn.querySelector('span');
                 if (icon) icon.setAttribute('data-lucide', wallet.isFrozen ? 'snowflake' : 'asterisk');
-                if (label) label.textContent = wallet.isFrozen ? 'Unfreeze Card' : 'Freeze Card';
+                if (label) label.textContent = wallet.isFrozen ? 'Unfreeze' : 'Freeze';
             }
             const detailsBtn = document.getElementById('wallet-details-btn');
             if (detailsBtn) detailsBtn.setAttribute('onclick', `openTransactionForm({type:'expense', walletId:${walletId}})`);
@@ -5787,7 +6332,7 @@ IMPORTANT RULES:
             if (!wallet) return;
             wallet.isFrozen = !wallet.isFrozen;
             saveState();
-            switchTab('wallets');
+            updateWalletCarouselSelection(document.getElementById('wallet-card-carousel'), walletId);
             showToast(wallet.isFrozen ? 'Card frozen' : 'Card unfrozen');
         }
 
@@ -5901,7 +6446,6 @@ IMPORTANT RULES:
         function openWalletForm(id = null) {
             const w = id ? state.wallets.find(x => x.id === parseInt(id)) : null;
             const icons = ['wallet', 'landmark', 'credit-card', 'banknote', 'piggy-bank', 'briefcase', 'building-2', 'coins', 'shopping-bag', 'truck'];
-            const currentColor = w?.color || GRADIENT_COLORS[0];
             const isExcluded = w?.excludeFromTotal || false;
             document.getElementById('sheet-content').innerHTML = `
         <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${w ? 'Edit' : 'Add'} Wallet</h2>
@@ -5922,7 +6466,6 @@ IMPORTANT RULES:
             </div>
 
             <div><p class="section-title">Icon</p><div style="display:flex;flex-wrap:wrap;gap:8px;">${icons.map(i => `<button onclick="document.querySelectorAll('.w-icon-opt').forEach(b=>b.style.background='var(--bg)');this.style.background='rgba(255,255,255,0.1)';document.getElementById('w-icon').value='${i}'" class="w-icon-opt" style="width:40px;height:40px;border-radius:12px;background:${w?.icon === i ? 'rgba(255,255,255,0.1)' : 'var(--bg)'};border:1px solid var(--border);display:flex;align-items:center;justify-content:center;"><i data-lucide="${i}" style="width:16px;height:16px;color:var(--muted);"></i></button>`).join('')}</div><input type="hidden" id="w-icon" value="${w?.icon || 'wallet'}"></div>
-            <div><p class="section-title">Card Theme <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(${GRADIENT_COLORS.length} styles)</span></p><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-height:160px;overflow-y:auto;padding:2px 2px 10px;" class="scroll-hide">${GRADIENT_COLORS.map((c, i) => `<button onclick="document.querySelectorAll('.w-color-opt').forEach(b=>{b.style.outline='none';b.style.transform='scale(1)'});this.style.outline='2.5px solid rgba(255,255,255,0.7)';this.style.transform='scale(1.12)';document.getElementById('w-color').value='${c}'" class="w-color-opt" style="height:44px;border-radius:12px;background:${c};outline:${currentColor === c ? '2.5px solid rgba(255,255,255,0.7)' : 'none'};transform:${currentColor === c ? 'scale(1.12)' : 'scale(1)'};box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08);flex-shrink:0;border:1px solid rgba(255,255,255,0.06);transition:all 0.15s;"></button>`).join('')}</div><input type="hidden" id="w-color" value="${currentColor}"></div>
             <div style="display:${w ? 'grid' : 'flex'};grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">${w ? `<button onclick="deleteWallet(${w.id})" style="padding:14px;border-radius:16px;border:1px solid var(--rose);color:var(--rose);font-weight:700;">Delete</button>` : ''}<button onclick="saveWallet(${w ? w.id : 'null'})" class="btn-primary">${w ? 'Save' : 'Add Wallet'}</button></div>
         </div>`;
             openSheet(); lucide.createIcons();
@@ -5952,8 +6495,7 @@ IMPORTANT RULES:
             const balance = safeNum(document.getElementById('w-balance')?.value, -999_999_999, 999_999_999);
             const rawIcon = document.getElementById('w-icon')?.value || 'wallet';
             const icon = /^[a-z0-9\-]+$/.test(rawIcon) ? rawIcon : 'wallet'; // only allow lucide icon names
-            const rawColor = document.getElementById('w-color')?.value || '';
-            const color = /^(#[0-9a-fA-F]{3,8}|linear-gradient[^<>"']{0,300})$/.test(rawColor) ? rawColor : '#10b981';
+            const color = 'neutral';
             const rawCurrency = (document.getElementById('w-currency')?.value || state.currency.code).toUpperCase();
             const currency = /^[A-Z]{2,6}$/.test(rawCurrency) ? rawCurrency : state.currency.code;
             const excludeFromTotal = document.getElementById('w-exclude')?.value === '1';
@@ -6060,7 +6602,7 @@ IMPORTANT RULES:
 }
         // â”€â”€â”€ SETTINGS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderSettings() {
-            const apiKey = localStorage.getItem('velto_gemini_key') || '';
+            const apiKey = localStorage.getItem('finance_pro_gemini_key') || '';
             const photo = state.user.photo || ''; const initial = (state.user.name || 'U').charAt(0).toUpperCase();
             const gd = gdrive; const driveStatusColor = (gd.autoSyncEnabled && gd.connected) ? 'var(--emerald)' : '#52525b';
             const driveStatusText = gd.syncing ? 'Syncing...' : (gd.autoSyncEnabled && gd.connected) ? 'Auto-sync active' : gd.autoSyncEnabled ? 'Session expired - Tap top sync' : 'Sync not enabled';
@@ -6208,14 +6750,14 @@ IMPORTANT RULES:
 
         function saveApiKey() {
             const key = document.getElementById('gemini-key').value.trim();
-            localStorage.setItem('velto_gemini_key', key);
+            localStorage.setItem('finance_pro_gemini_key', key);
             showToast('API Key Saved Successfully!');
         }
 
         function openProfileEdit() { document.getElementById('sheet-content').innerHTML = `<h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">Edit Profile</h2><div style="display:flex;flex-direction:column;gap:12px;"><input type="text" id="p-name" class="input" placeholder="Your name" value="${state.user.name || ''}"><input type="email" id="p-email" class="input" placeholder="Email" value="${state.user.email || ''}"><input type="url" id="p-photo" class="input" placeholder="Photo URL (optional)" value="${state.user.photo || ''}"><button onclick="saveProfile()" class="btn-primary">Save Profile</button></div>`; openSheet(); }
         function saveProfile() { state.user.name = document.getElementById('p-name').value.trim() || 'User'; state.user.email = document.getElementById('p-email').value.trim(); state.user.photo = document.getElementById('p-photo').value.trim() || null; saveState(); closeSheet(); switchTab('settings'); showToast('Profile updated!'); }
         function setCurrency(code) { state.currency = SUPPORTED_CURRENCIES.find(c => c.code === code) || SUPPORTED_CURRENCIES[0]; saveState(); showToast(`Base Currency: ${state.currency.code}`); }
-        function exportData() { const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `velto-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Exported!'); }
+        function exportData() { const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `finance-pro-backup-${today()}.json`; a.click(); URL.revokeObjectURL(url); showToast('Exported!'); }
         function importDataPrompt() { const input = document.createElement('input'); input.type = 'file'; input.accept = '.json'; input.onchange = e => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = evt => { try { const parsed = JSON.parse(evt.target.result); if (parsed.wallets && parsed.transactions) { state = parsed; saveState(); switchTab('home'); showToast('Data imported!'); } else showToast('Invalid file'); } catch { showToast('Failed to parse'); } }; reader.readAsText(file); }; input.click(); }
         function confirmReset() { document.getElementById('sheet-content').innerHTML = `<div style="text-align:center;padding:10px 0;"><div style="width:60px;height:60px;border-radius:20px;background:rgba(244,63,94,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i data-lucide="alert-triangle" style="width:28px;height:28px;color:var(--rose);"></i></div><h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:8px;">Reset Everything?</h2><p style="font-size:13px;color:var(--muted);margin-bottom:24px;">This will permanently delete all your data.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><button onclick="closeSheet()" style="padding:14px;border-radius:16px;background:var(--surface2);color:var(--text);font-weight:700;">Cancel</button><button onclick="resetData()" style="padding:14px;border-radius:16px;background:var(--rose);color:#fff;font-weight:700;">Reset</button></div></div>`; openSheet(); lucide.createIcons(); }
         function resetData() { state = JSON.parse(JSON.stringify(DEFAULT_STATE)); saveState(); closeSheet(); switchTab('home'); showToast('Data reset'); }
@@ -6861,7 +7403,7 @@ IMPORTANT RULES:
         // â”€â”€â”€ THEME TOGGLE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function toggleTheme() {
             const isLight = document.body.classList.toggle('light-mode');
-            localStorage.setItem('velto_theme', isLight ? 'light' : 'dark');
+            localStorage.setItem('finance_pro_theme', isLight ? 'light' : 'dark');
             const icon = document.getElementById('theme-icon');
             if (icon) icon.setAttribute('data-lucide', isLight ? 'moon' : 'sun');
             lucide.createIcons({ nodes: document.querySelectorAll('#theme-icon') });
@@ -6872,7 +7414,7 @@ IMPORTANT RULES:
         }
 
         function applyTheme() {
-            const saved = localStorage.getItem('velto_theme');
+            const saved = localStorage.getItem('finance_pro_theme');
             if (saved === 'light') {
                 document.body.classList.add('light-mode');
                 setTimeout(() => {
@@ -6906,7 +7448,7 @@ IMPORTANT RULES:
 
         // â”€â”€â”€ GOOGLE DRIVE AUTO-SYNC â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const GDRIVE_CLIENT_ID = '608503657584-kk54fp09cl297frfnfro32g0m0tp7o5t.apps.googleusercontent.com';
-        let gdrive = { connected: false, syncing: false, fileId: localStorage.getItem('velto_gdrive_fileId') || null, autoSyncEnabled: localStorage.getItem('velto_autosync') === 'true' };
+        let gdrive = { connected: false, syncing: false, fileId: localStorage.getItem('finance_pro_gdrive_fileId') || null, autoSyncEnabled: localStorage.getItem('finance_pro_autosync') === 'true' };
         let tokenClient; let accessToken = null;
 
         function initGoogleDrive() {
@@ -6920,19 +7462,19 @@ IMPORTANT RULES:
         function handleTopSyncClick() { if (!accessToken) tokenClient.requestAccessToken(); else if (!gdrive.autoSyncEnabled) performFirstSync(); else { showToast('Syncing to Drive...'); silentAutoSync(); } }
         async function performFirstSync() {
             setSyncingUI(true);
-            try { const file = await findDriveFile(); if (file) { await loadFromDrive(file.id); showToast('Data restored from Drive'); } else { await saveToDrive(); showToast('Initial backup saved to Drive'); } gdrive.autoSyncEnabled = true; localStorage.setItem('velto_autosync', 'true'); updateSyncButtonUI(); if (ui.currentTab === 'settings') switchTab('settings'); }
+            try { const file = await findDriveFile(); if (file) { await loadFromDrive(file.id); showToast('Data restored from Drive'); } else { await saveToDrive(); showToast('Initial backup saved to Drive'); } gdrive.autoSyncEnabled = true; localStorage.setItem('finance_pro_autosync', 'true'); updateSyncButtonUI(); if (ui.currentTab === 'settings') switchTab('settings'); }
             catch (error) { showToast('Sync failed: ' + error.message, 'error'); } finally { setSyncingUI(false); }
         }
         const originalSaveState = saveState;
         saveState = function () { originalSaveState(); if (gdrive.autoSyncEnabled && accessToken && !gdrive.syncing) silentAutoSync(); };
         let syncTimeout; function silentAutoSync() { clearTimeout(syncTimeout); syncTimeout = setTimeout(async () => { if (gdrive.syncing) return; setSyncingUI(true); try { await saveToDrive(); } catch (e) { console.error('Auto-sync error:', e); } finally { setSyncingUI(false); } }, 2500); }
-        async function findDriveFile() { const resp = await fetch('https://www.googleapis.com/drive/v3/files?q=name="velto_backup.json" and trashed=false&spaces=drive', { headers: { 'Authorization': `Bearer ${accessToken}` } }); const data = await resp.json(); if (data.files && data.files.length > 0) { gdrive.fileId = data.files[0].id; localStorage.setItem('velto_gdrive_fileId', gdrive.fileId); return data.files[0]; } return null; }
+        async function findDriveFile() { const resp = await fetch('https://www.googleapis.com/drive/v3/files?q=name="finance_pro_backup.json" and trashed=false&spaces=drive', { headers: { 'Authorization': `Bearer ${accessToken}` } }); const data = await resp.json(); if (data.files && data.files.length > 0) { gdrive.fileId = data.files[0].id; localStorage.setItem('finance_pro_gdrive_fileId', gdrive.fileId); return data.files[0]; } return null; }
         async function loadFromDrive(fileId) { const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, { headers: { 'Authorization': `Bearer ${accessToken}` } }); const data = await resp.json(); if (data && data.wallets) { state = data; originalSaveState(); if (typeof switchTab === 'function') switchTab(ui.currentTab || 'home'); } }
         async function saveToDrive() {
-            const metadata = { name: 'velto_backup.json', mimeType: 'application/json' }; const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' })); form.append('file', new Blob([JSON.stringify(state)], { type: 'application/json' }));
+            const metadata = { name: 'finance_pro_backup.json', mimeType: 'application/json' }; const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' })); form.append('file', new Blob([JSON.stringify(state)], { type: 'application/json' }));
             let url = 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart'; let method = 'POST';
             if (gdrive.fileId) { url = `https://www.googleapis.com/upload/drive/v3/files/${gdrive.fileId}?uploadType=multipart`; method = 'PATCH'; }
-            const resp = await fetch(url, { method, headers: { 'Authorization': `Bearer ${accessToken}` }, body: form }); const result = await resp.json(); if (result.id) { gdrive.fileId = result.id; localStorage.setItem('velto_gdrive_fileId', result.id); }
+            const resp = await fetch(url, { method, headers: { 'Authorization': `Bearer ${accessToken}` }, body: form }); const result = await resp.json(); if (result.id) { gdrive.fileId = result.id; localStorage.setItem('finance_pro_gdrive_fileId', result.id); }
         }
         function setSyncingUI(isSyncing) { gdrive.syncing = isSyncing; const icon = document.getElementById('sync-icon'); if (icon) { if (isSyncing) { icon.classList.add('spin'); icon.style.color = 'var(--emerald)'; } else { icon.classList.remove('spin'); updateSyncButtonUI(); } } }
         function updateSyncButtonUI() { const icon = document.getElementById('sync-icon'); const btn = document.getElementById('top-sync-btn'); if (icon && btn) { if (gdrive.autoSyncEnabled && accessToken) { icon.style.color = 'var(--emerald)'; btn.style.borderColor = 'rgba(16,185,129,0.3)'; } else if (gdrive.autoSyncEnabled && !accessToken) { icon.style.color = '#f59e0b'; btn.style.borderColor = 'rgba(245,158,11,0.3)'; } else { icon.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--border)'; } } }
