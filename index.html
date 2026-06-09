@@ -3862,6 +3862,7 @@
                         );
                         state.wallets.forEach((w, index) => {
                             if (!w.currency) w.currency = state.currency.code;
+                            if (!w.cardType) w.cardType = getWalletCardType(w);
                             const oldPalette = [
                                 'linear-gradient(135deg, #1a4a3a 0%, #0e7f8a 40%, #1a2d6b 100%)',
                                 'linear-gradient(135deg, #2d1b69 0%, #0a6b7a 50%, #1a4a3a 100%)',
@@ -6444,24 +6445,43 @@ IMPORTANT RULES:
             return ['base', 'sber', 'sber-plus', 'premier', 'premier-plus', 'travel', 'travel-plus', 'credit'][index % 8];
         }
 
-        const WALLET_CARD_THEMES = [
-            { id: 'default', label: 'Default / Main' },
-            { id: 'base', label: 'Base Silver' },
-            { id: 'sber', label: 'Sber Green' },
-            { id: 'sber-plus', label: 'Sber+ Lime' },
-            { id: 'premier', label: 'Premier Teal' },
-            { id: 'premier-plus', label: 'Premier+/SB1' },
-            { id: 'travel', label: 'Travel Blue' },
-            { id: 'travel-plus', label: 'Travel+ Navy' },
+        function getWalletCardType(wallet = {}) {
+            const typeIds = WALLET_CARD_TYPES.map(t => t.id);
+            if (wallet.cardType && typeIds.includes(wallet.cardType)) return wallet.cardType;
+            const text = `${wallet.name || ''} ${wallet.icon || ''}`.toLowerCase();
+            if (/travel|trip|flight|truck/.test(text)) return 'travel';
+            if (/credit|visa|card/.test(text)) return 'credit';
+            if (/premium|premier|special|vip|investment|invest/.test(text)) return 'premium';
+            if (/saving|savings|safe|vault|emergency|fund|piggy|coins/.test(text)) return 'savings';
+            return 'main';
+        }
+
+        const WALLET_CARD_TYPES = [
+            { id: 'main', label: 'Main Card' },
+            { id: 'savings', label: 'Savings / Safe' },
+            { id: 'travel', label: 'Travel Card' },
             { id: 'credit', label: 'Credit Card' },
+            { id: 'premium', label: 'Premium Card' }
+        ];
+
+        const WALLET_CARD_THEMES = [
+            { id: 'default', label: 'Graphite Silver' },
+            { id: 'base', label: 'Pearl Silver' },
+            { id: 'sber', label: 'Neon Green Stack' },
+            { id: 'sber-plus', label: 'Lime Green Stack' },
+            { id: 'premier', label: 'Premier Teal' },
+            { id: 'premier-plus', label: 'Black Magenta' },
+            { id: 'travel', label: 'Travel Blue' },
+            { id: 'travel-plus', label: 'Travel Navy' },
+            { id: 'credit', label: 'Dark Credit Graphite' },
             { id: 'premium', label: 'Premium Magenta' },
             { id: 'blue-soft', label: 'Blue Soft Glow' },
             { id: 'blue-night', label: 'Blue Night' },
             { id: 'violet-deep', label: 'Violet Deep' },
             { id: 'midnight', label: 'Midnight Navy' },
-            { id: 'green-rare', label: 'Green Rarely' },
-            { id: 'green-week', label: 'Green Weekly' },
-            { id: 'green-day', label: 'Green One Day' },
+            { id: 'green-rare', label: 'Green Rare Glow' },
+            { id: 'green-week', label: 'Green Weekly Glow' },
+            { id: 'green-day', label: 'Green One Day Glow' },
             { id: 'green-everyday', label: 'Green Everyday' },
             { id: 'green-bottom', label: 'Green Bottom Glow' },
             { id: 'green-top', label: 'Green Top Glow' },
@@ -6942,13 +6962,23 @@ IMPORTANT RULES:
             const icons = ['wallet', 'landmark', 'credit-card', 'banknote', 'piggy-bank', 'briefcase', 'building-2', 'coins', 'shopping-bag', 'truck'];
             const isExcluded = w?.excludeFromTotal || false;
             const currentTheme = getWalletPremiumTheme(w || {}, 0);
+            const currentCardType = getWalletCardType(w || {});
             document.getElementById('sheet-content').innerHTML = `
         <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${w ? 'Edit' : 'Add'} Wallet</h2>
         <div style="display:flex;flex-direction:column;gap:12px;">
             <input type="text" id="w-name" class="input" placeholder="Wallet name" value="${w?.name || ''}">
             <div style="display:flex;gap:10px;"><input type="number" id="w-balance" class="input" placeholder="Starting balance" value="${w?.balance || 0}" inputmode="decimal" style="flex:1;"><select id="w-currency" class="input" style="width:100px;">${SUPPORTED_CURRENCIES.map(c => `<option value="${c.code}" ${w?.currency === c.code || (!w && state.currency.code === c.code) ? 'selected' : ''}>${c.code}</option>`).join('')}</select></div>
             <div>
-                <p class="section-title">Card Theme</p>
+                <p class="section-title">Card Type</p>
+                <div style="position:relative;">
+                    <select id="w-card-type" class="input" style="width:100%;height:46px;border-radius:999px;padding-right:38px;appearance:none;-webkit-appearance:none;font-weight:800;">
+                        ${WALLET_CARD_TYPES.map(t => `<option value="${t.id}" ${currentCardType === t.id ? 'selected' : ''}>${t.label}</option>`).join('')}
+                    </select>
+                    <i data-lucide="chevron-down" style="pointer-events:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);"></i>
+                </div>
+            </div>
+            <div>
+                <p class="section-title">Card Color</p>
                 <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:10px 12px;">
                     <span id="w-theme-preview" class="wallet-theme-swatch wallet-theme-${currentTheme}" style="width:74px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,0.16);box-shadow:0 10px 24px rgba(0,0,0,0.32);flex-shrink:0;"></span>
                     <div style="position:relative;flex:1;min-width:0;">
@@ -7012,6 +7042,8 @@ IMPORTANT RULES:
             const color = 'neutral';
             const rawCurrency = (document.getElementById('w-currency')?.value || state.currency.code).toUpperCase();
             const currency = /^[A-Z]{2,6}$/.test(rawCurrency) ? rawCurrency : state.currency.code;
+            const rawCardType = document.getElementById('w-card-type')?.value || 'main';
+            const cardType = WALLET_CARD_TYPES.some(t => t.id === rawCardType) ? rawCardType : 'main';
             const rawTheme = document.getElementById('w-theme')?.value || 'default';
             const cardTheme = WALLET_CARD_THEMES.some(t => t.id === rawTheme) ? rawTheme : 'default';
             const excludeFromTotal = document.getElementById('w-exclude')?.value === '1';
@@ -7024,10 +7056,10 @@ IMPORTANT RULES:
                         const type = diff > 0 ? 'income' : 'expense';
                         state.transactions.unshift({ id: genId(), name: 'Wallet Adjustment', categoryId: 'other', type, amount: safeNum(Math.abs(diff)), walletId: w.id, date: nowWithTime(), note: 'Manual balance update' });
                     }
-                    w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.cardTheme = cardTheme; w.excludeFromTotal = excludeFromTotal;
+                    w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.cardType = cardType; w.cardTheme = cardTheme; w.excludeFromTotal = excludeFromTotal;
                 }
             } else {
-                state.wallets.push({ id: genId(), name, balance, icon, color, currency, cardTheme, excludeFromTotal });
+                state.wallets.push({ id: genId(), name, balance, icon, color, currency, cardType, cardTheme, excludeFromTotal });
             }
             saveState(); closeSheet(); switchTab('wallets'); showToast(id ? 'Wallet Updated!' : 'Wallet added!');
         }
