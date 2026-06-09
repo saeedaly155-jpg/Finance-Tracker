@@ -2640,6 +2640,370 @@
             45% { background-position: 100% 50%; }
         }
 
+        /* Premium digital bank card themes. Replace/update this block to tune wallet-card visuals only. */
+        .wallet-card-track {
+            gap: 18px;
+            padding-top: 10px;
+            padding-bottom: 26px;
+        }
+
+        .wallet-carousel-item {
+            transform: translate3d(0, 6px, 0) scale(0.91);
+            opacity: 0.48;
+            filter: saturate(0.78) brightness(0.72);
+            transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.24s ease, filter 0.24s ease;
+        }
+
+        .wallet-carousel-item.is-active {
+            transform: translate3d(0, 0, 0) scale(1);
+            opacity: 1;
+            filter: saturate(1.08) brightness(1);
+        }
+
+        .wallet-hero-card {
+            --card-bg: linear-gradient(145deg, #050607 0%, #16191d 46%, #30343a 68%, #08090b 100%);
+            --card-glow-1: rgba(255,255,255,0.24);
+            --card-glow-2: rgba(132,144,160,0.2);
+            --card-accent: rgba(255,255,255,0.72);
+            height: 204px;
+            border-radius: 28px !important;
+            border: 1px solid rgba(255,255,255,0.16);
+            background:
+                radial-gradient(circle at 22% 12%, var(--card-glow-1), transparent 30%),
+                radial-gradient(circle at 86% 78%, var(--card-glow-2), transparent 34%),
+                var(--card-bg) !important;
+            box-shadow:
+                0 28px 70px rgba(0,0,0,0.45),
+                0 10px 28px rgba(0,0,0,0.28),
+                0 0 34px color-mix(in srgb, var(--card-accent), transparent 78%),
+                inset 0 1px 0 rgba(255,255,255,0.25),
+                inset 0 -1px 0 rgba(0,0,0,0.35);
+            isolation: isolate;
+            transform: translateZ(0);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+
+        .wallet-carousel-item.is-active .wallet-hero-card {
+            border-color: rgba(255,255,255,0.24);
+            box-shadow:
+                0 32px 78px rgba(0,0,0,0.5),
+                0 0 48px color-mix(in srgb, var(--card-accent), transparent 72%),
+                inset 0 1px 0 rgba(255,255,255,0.28),
+                inset 0 -1px 0 rgba(0,0,0,0.38);
+        }
+
+        .wallet-hero-card:active {
+            transform: translate3d(0, 1px, 0) scale(0.985);
+        }
+
+        .wallet-hero-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background:
+                radial-gradient(circle at 72% 18%, color-mix(in srgb, var(--card-accent), transparent 38%), transparent 22%),
+                radial-gradient(circle at 18% 18%, rgba(255,255,255,0.2), transparent 22%),
+                linear-gradient(154deg, rgba(255,255,255,0.28) 0%, transparent 20%, rgba(255,255,255,0.08) 36%, transparent 54%),
+                repeating-linear-gradient(135deg, rgba(255,255,255,0.028) 0 1px, transparent 1px 9px);
+            opacity: 0.78;
+            pointer-events: none;
+        }
+
+        .wallet-hero-card::after {
+            content: "";
+            position: absolute;
+            inset: auto -14% -38% 28%;
+            z-index: 1;
+            width: 82%;
+            height: 68%;
+            border-radius: 999px;
+            background:
+                radial-gradient(ellipse at center, color-mix(in srgb, var(--card-accent), transparent 42%), transparent 66%);
+            opacity: 0.46;
+            transform: rotate(-13deg);
+            pointer-events: none;
+        }
+
+        .wallet-carousel-item.is-active .wallet-hero-card::before {
+            animation: wallet-active-shine 4.8s ease-in-out infinite;
+        }
+
+        @keyframes wallet-active-shine {
+            0%, 100% { opacity: 0.62; transform: translate3d(-2%, 0, 0); }
+            48% { opacity: 0.9; transform: translate3d(2%, 0, 0); }
+        }
+
+        .wallet-hero-card > div {
+            z-index: 2 !important;
+        }
+
+        .wallet-hero-card > div::before {
+            content: ".... 2086";
+            position: absolute;
+            left: 0;
+            top: 50px;
+            color: rgba(255,255,255,0.54);
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            pointer-events: none;
+        }
+
+        .wallet-hero-card > div::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            bottom: 4px;
+            width: 34px;
+            height: 20px;
+            border-radius: 999px;
+            background:
+                radial-gradient(circle at 34% 50%, transparent 0 8px, rgba(255,255,255,0.58) 8.5px 9.4px, transparent 10px),
+                radial-gradient(circle at 66% 50%, transparent 0 8px, rgba(255,255,255,0.58) 8.5px 9.4px, transparent 10px);
+            opacity: 0.72;
+            filter: drop-shadow(0 0 8px color-mix(in srgb, var(--card-accent), transparent 64%));
+            pointer-events: none;
+        }
+
+        .wallet-card-brand {
+            border-radius: 999px !important;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.22);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.24), 0 0 18px color-mix(in srgb, var(--card-accent), transparent 72%);
+        }
+
+        .wallet-card-badge {
+            background: rgba(0,0,0,0.18);
+            border-color: rgba(255,255,255,0.16);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .wallet-hero-card p,
+        .wallet-hero-card span,
+        .wallet-hero-card i {
+            color: rgba(255,255,255,0.9) !important;
+            -webkit-text-fill-color: currentColor;
+        }
+
+        .wallet-theme-default {
+            --card-bg: linear-gradient(145deg, #040506 0%, #14171a 38%, #42464b 66%, #090a0c 100%);
+            --card-glow-1: rgba(255,255,255,0.32);
+            --card-glow-2: rgba(185,194,204,0.2);
+            --card-accent: rgba(245,248,255,0.85);
+        }
+
+        .wallet-theme-base {
+            --card-bg: linear-gradient(145deg, #fbfbfb 0%, #dedede 36%, #b9bdc0 62%, #777d82 100%);
+            --card-glow-1: rgba(255,255,255,0.66);
+            --card-glow-2: rgba(165,173,181,0.28);
+            --card-accent: rgba(255,255,255,0.95);
+        }
+
+        .wallet-theme-sber {
+            --card-bg: linear-gradient(145deg, #071411 0%, #0c4b2a 32%, #19c737 60%, #a2f528 100%);
+            --card-glow-1: rgba(178,255,56,0.62);
+            --card-glow-2: rgba(24,194,55,0.32);
+            --card-accent: #a8ff25;
+        }
+
+        .wallet-theme-sber-plus {
+            --card-bg: linear-gradient(145deg, #03201a 0%, #008e62 35%, #19f083 64%, #a8f40f 100%);
+            --card-glow-1: rgba(44,255,137,0.66);
+            --card-glow-2: rgba(180,255,27,0.32);
+            --card-accent: #33ff89;
+        }
+
+        .wallet-theme-premier {
+            --card-bg: linear-gradient(145deg, #020807 0%, #083027 42%, #126852 68%, #14d18e 100%);
+            --card-glow-1: rgba(24,222,151,0.46);
+            --card-glow-2: rgba(13,91,73,0.34);
+            --card-accent: #1de69c;
+        }
+
+        .wallet-theme-premier-plus {
+            --card-bg: linear-gradient(145deg, #020303 0%, #08221e 46%, #0b4739 66%, #9f176c 100%);
+            --card-glow-1: rgba(26,210,168,0.34);
+            --card-glow-2: rgba(245,31,179,0.48);
+            --card-accent: #f23ac7;
+        }
+
+        .wallet-theme-travel {
+            --card-bg: linear-gradient(145deg, #040923 0%, #102c78 42%, #177bce 68%, #41d7ff 100%);
+            --card-glow-1: rgba(87,204,255,0.52);
+            --card-glow-2: rgba(42,105,255,0.26);
+            --card-accent: #38d5ff;
+        }
+
+        .wallet-theme-travel-plus {
+            --card-bg: linear-gradient(145deg, #03100d 0%, #03513d 42%, #00db82 70%, #b6ff26 100%);
+            --card-glow-1: rgba(80,255,135,0.56);
+            --card-glow-2: rgba(190,255,48,0.3);
+            --card-accent: #75ff70;
+        }
+
+        .wallet-theme-credit {
+            --card-bg: linear-gradient(145deg, #020706 0%, #08231e 44%, #105c4d 68%, #11c79c 100%);
+            --card-glow-1: rgba(24,222,174,0.42);
+            --card-glow-2: rgba(51,255,216,0.18);
+            --card-accent: #2df3d0;
+        }
+
+        .wallet-theme-premium {
+            --card-bg: linear-gradient(145deg, #020303 0%, #0a1a17 44%, #0c4538 64%, #120615 100%);
+            --card-glow-1: rgba(25,218,172,0.34);
+            --card-glow-2: rgba(245,31,179,0.42);
+            --card-accent: #f23ac7;
+        }
+
+        .wallet-theme-blue-soft {
+            --card-bg: linear-gradient(145deg, #111a42 0%, #203174 48%, #17215c 100%);
+            --card-glow-1: rgba(82,180,255,0.56);
+            --card-glow-2: rgba(71,111,255,0.22);
+            --card-accent: #69c8ff;
+        }
+
+        .wallet-theme-blue-night {
+            --card-bg: linear-gradient(145deg, #121231 0%, #201f54 48%, #11152c 100%);
+            --card-glow-1: rgba(104,94,255,0.28);
+            --card-glow-2: rgba(15,18,49,0.48);
+            --card-accent: #6d67ff;
+        }
+
+        .wallet-theme-violet-deep {
+            --card-bg: linear-gradient(145deg, #17143b 0%, #28205b 45%, #15172f 100%);
+            --card-glow-1: rgba(126,98,255,0.32);
+            --card-glow-2: rgba(42,34,86,0.46);
+            --card-accent: #8e7bff;
+        }
+
+        .wallet-theme-midnight {
+            --card-bg: linear-gradient(145deg, #11152f 0%, #171b3f 52%, #0d1025 100%);
+            --card-glow-1: rgba(47,65,153,0.2);
+            --card-glow-2: rgba(13,16,36,0.5);
+            --card-accent: #7686ff;
+        }
+
+        .wallet-theme-green-rare {
+            --card-bg: linear-gradient(145deg, #09271f 0%, #0f5b43 42%, #14e48a 100%);
+            --card-glow-1: rgba(32,255,137,0.62);
+            --card-glow-2: rgba(20,107,80,0.32);
+            --card-accent: #28ff9a;
+        }
+
+        .wallet-theme-green-week {
+            --card-bg: linear-gradient(145deg, #071b18 0%, #0e4035 48%, #087456 100%);
+            --card-glow-1: rgba(31,241,113,0.58);
+            --card-glow-2: rgba(15,93,72,0.34);
+            --card-accent: #25f47c;
+        }
+
+        .wallet-theme-green-day {
+            --card-bg: linear-gradient(145deg, #06100f 0%, #0f4435 42%, #0a7d5c 100%);
+            --card-glow-1: rgba(31,255,122,0.55);
+            --card-glow-2: rgba(12,24,22,0.5);
+            --card-accent: #2cff87;
+        }
+
+        .wallet-theme-green-everyday {
+            --card-bg: linear-gradient(145deg, #05231b 0%, #12d965 48%, #0c5960 100%);
+            --card-glow-1: rgba(58,255,126,0.7);
+            --card-glow-2: rgba(30,215,233,0.28);
+            --card-accent: #3cff8c;
+        }
+
+        .wallet-theme-green-bottom {
+            --card-bg: linear-gradient(145deg, #0b2b25 0%, #0d604f 48%, #20f184 100%);
+            --card-glow-1: rgba(32,255,133,0.42);
+            --card-glow-2: rgba(28,255,126,0.58);
+            --card-accent: #28ff95;
+        }
+
+        .wallet-theme-green-top {
+            --card-bg: linear-gradient(145deg, #08251f 0%, #16d774 42%, #0a3c33 100%);
+            --card-glow-1: rgba(36,255,133,0.66);
+            --card-glow-2: rgba(12,65,52,0.4);
+            --card-accent: #33ff95;
+        }
+
+        .wallet-theme-green-center {
+            --card-bg: linear-gradient(145deg, #06120f 0%, #0b352b 36%, #18e978 68%, #07120f 100%);
+            --card-glow-1: rgba(28,255,125,0.54);
+            --card-glow-2: rgba(31,255,112,0.5);
+            --card-accent: #22ff86;
+        }
+
+        .wallet-theme-green-cyan {
+            --card-bg: linear-gradient(145deg, #083b45 0%, #12db6a 42%, #26e2b6 72%, #0b261f 100%);
+            --card-glow-1: rgba(53,255,132,0.7);
+            --card-glow-2: rgba(36,224,255,0.36);
+            --card-accent: #31f8d2;
+        }
+
+        .wallet-theme-aurora-orange {
+            --card-bg: linear-gradient(145deg, #2b0b33 0%, #462065 35%, #9b3155 62%, #ff9146 100%);
+            --card-glow-1: rgba(122,76,255,0.42);
+            --card-glow-2: rgba(255,145,70,0.46);
+            --card-accent: #ff994e;
+        }
+
+        .wallet-theme-purple-fold {
+            --card-bg: linear-gradient(145deg, #251b58 0%, #6a42c8 46%, #b324ff 78%, #261340 100%);
+            --card-glow-1: rgba(226,167,255,0.52);
+            --card-glow-2: rgba(155,36,255,0.46);
+            --card-accent: #b55cff;
+        }
+
+        .wallet-theme-yellow-blue {
+            --card-bg: linear-gradient(145deg, #191a24 0%, #414052 44%, #e4e61e 64%, #2331f6 100%);
+            --card-glow-1: rgba(245,245,30,0.5);
+            --card-glow-2: rgba(41,50,255,0.48);
+            --card-accent: #f4f51d;
+        }
+
+        .wallet-theme-black-red {
+            --card-bg: linear-gradient(145deg, #080a08 0%, #151916 48%, #3d1122 100%);
+            --card-glow-1: rgba(80,20,40,0.24);
+            --card-glow-2: rgba(220,37,96,0.22);
+            --card-accent: #d92664;
+        }
+
+        .wallet-theme-lime-blue {
+            --card-bg: linear-gradient(145deg, #1235f0 0%, #395bff 40%, #adff24 58%, #1e58d8 100%);
+            --card-glow-1: rgba(175,255,36,0.56);
+            --card-glow-2: rgba(54,95,255,0.46);
+            --card-accent: #b8ff2b;
+        }
+
+        .wallet-theme-cyan-yellow {
+            --card-bg: linear-gradient(145deg, #1a7c83 0%, #63f1d0 38%, #dfff15 64%, #10221e 100%);
+            --card-glow-1: rgba(100,255,211,0.56);
+            --card-glow-2: rgba(224,255,22,0.54);
+            --card-accent: #e4ff1f;
+        }
+
+        .wallet-theme-navy-black {
+            --card-bg: linear-gradient(145deg, #071253 0%, #111f63 48%, #05070f 100%);
+            --card-glow-1: rgba(47,82,255,0.3);
+            --card-glow-2: rgba(5,7,15,0.5);
+            --card-accent: #415cff;
+        }
+
+        .wallet-theme-slate {
+            --card-bg: linear-gradient(145deg, #718294 0%, #617387 45%, #435263 100%);
+            --card-glow-1: rgba(205,223,240,0.32);
+            --card-glow-2: rgba(75,92,110,0.28);
+            --card-accent: #c8d8e8;
+        }
+
+        .wallet-theme-swatch {
+            background:
+                radial-gradient(circle at 22% 12%, var(--card-glow-1), transparent 32%),
+                radial-gradient(circle at 86% 78%, var(--card-glow-2), transparent 34%),
+                var(--card-bg) !important;
+        }
+
         #wallet-card-transactions.wallet-detail-card {
             background: transparent !important;
             border: 0 !important;
@@ -3539,7 +3903,7 @@
                 state = JSON.parse(JSON.stringify(DEFAULT_STATE));
             }
             const now = new Date();
-            ui = { currentTab: 'home', financeTab: 'budgets', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false, txMonth: now.getMonth(), txYear: now.getFullYear(), txFilter: 'all', milestonesExpanded: false };
+            ui = { currentTab: 'home', financeTab: 'budgets', selectedType: 'expense', selectedWalletId: state.wallets[0]?.id, selectedCategoryId: 'food', isManagingCategories: false, expandedWalletId: null, chartPeriod: '7d', isWalletExpanded: false, txMonth: now.getMonth(), txYear: now.getFullYear(), txFilter: 'all', searchMonth: 'all', searchWalletId: 'all', milestonesExpanded: false };
         }
 
         let ui = {};
@@ -4709,6 +5073,8 @@ IMPORTANT RULES:
         }
 
         function renderSearch() {
+            if (!ui.searchMonth) ui.searchMonth = 'all';
+            if (!ui.searchWalletId) ui.searchWalletId = 'all';
             return `<div class="fade-up search-page" style="position:relative;z-index:20;padding-top:14px;">
                 <div style="position:relative;margin-bottom:18px;">
                     <i data-lucide="search" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none;"></i>
@@ -4716,10 +5082,44 @@ IMPORTANT RULES:
                         value="${esc(ui.searchQuery || '')}" oninput="handleSearch(this.value)"
                         style="height:54px;border-radius:999px;padding-left:46px;background:var(--surface2);">
                 </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                    <label style="display:flex;align-items:center;gap:8px;height:42px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);padding:0 12px;">
+                        <i data-lucide="calendar-days" style="width:15px;height:15px;color:var(--muted);flex-shrink:0;"></i>
+                        <select id="search-month-filter" onchange="setSearchFilter('month', this.value)" style="width:100%;min-width:0;background:transparent;color:var(--text);font-size:12px;font-weight:750;outline:none;">
+                            ${getSearchMonthOptionsHTML()}
+                        </select>
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;height:42px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);padding:0 12px;">
+                        <i data-lucide="wallet" style="width:15px;height:15px;color:var(--muted);flex-shrink:0;"></i>
+                        <select id="search-wallet-filter" onchange="setSearchFilter('wallet', this.value)" style="width:100%;min-width:0;background:transparent;color:var(--text);font-size:12px;font-weight:750;outline:none;">
+                            <option value="all" ${ui.searchWalletId === 'all' ? 'selected' : ''}>All wallets</option>
+                            ${state.wallets.map(w => `<option value="${w.id}" ${String(ui.searchWalletId) === String(w.id) ? 'selected' : ''}>${esc(w.name)}</option>`).join('')}
+                        </select>
+                    </label>
+                </div>
                 <div id="search-results" style="display:flex;flex-direction:column;gap:10px;" class="scroll-hide">
                     ${getSearchResultsHTML(ui.searchQuery || '')}
                 </div>
             </div>`;
+        }
+
+        function getSearchMonthOptionsHTML() {
+            const months = new Map();
+            state.transactions.forEach(t => {
+                const d = new Date(t.date);
+                if (isNaN(d.getTime())) return;
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                if (!months.has(key)) months.set(key, d);
+            });
+            const sorted = [...months.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+            return `<option value="all" ${ui.searchMonth === 'all' ? 'selected' : ''}>All months</option>` +
+                sorted.map(([key, d]) => `<option value="${key}" ${ui.searchMonth === key ? 'selected' : ''}>${d.toLocaleDateString('en', { month: 'short', year: 'numeric' })}</option>`).join('');
+        }
+
+        function setSearchFilter(type, value) {
+            if (type === 'month') ui.searchMonth = value || 'all';
+            if (type === 'wallet') ui.searchWalletId = value || 'all';
+            renderSearchResults();
         }
 
         function handleSearch(value) {
@@ -4740,6 +5140,15 @@ IMPORTANT RULES:
 
         function getSearchResultsHTML(queryValue) {
             const query = (queryValue || '').toLowerCase().trim();
+            const passesSearchFilters = (t) => {
+                if (ui.searchWalletId && ui.searchWalletId !== 'all' && String(t.walletId) !== String(ui.searchWalletId)) return false;
+                if (ui.searchMonth && ui.searchMonth !== 'all') {
+                    const d = new Date(t.date);
+                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                    if (key !== ui.searchMonth) return false;
+                }
+                return true;
+            };
             if (!query) {
                 return `<div style="text-align:center;padding:46px 20px;color:var(--muted);">
                     <i data-lucide="search" style="width:34px;height:34px;margin:0 auto 12px;opacity:0.5;"></i>
@@ -4757,8 +5166,46 @@ IMPORTANT RULES:
                 html += '<p class="section-title" style="margin-top:10px;">Goals</p>';
                 html += goals.map(g => `<div class="tx-row" onclick="openGoalForm(${g.id})"><div class="icon-box" style="background:${g.color}18;"><i data-lucide="${g.icon}" style="color:${g.color};"></i></div><div style="flex:1;"><p style="font-size:14px;font-weight:600;">${g.name}</p><p style="font-size:10px;color:var(--muted);">${fmt(g.saved)} / ${fmt(g.target)}</p></div></div>`).join('');
             }
+            const matchingCategories = [...state.categories.expense, ...state.categories.income].filter(cat => cat.name.toLowerCase().includes(query));
+            if (matchingCategories.length) {
+                html += '<p class="section-title" style="margin-top:10px;">Category Totals</p>';
+                html += matchingCategories.map(cat => {
+                    const catTxs = state.transactions.filter(t => t.categoryId === cat.id && passesSearchFilters(t));
+                    let income = 0;
+                    let expense = 0;
+                    catTxs.forEach(t => {
+                        if (t.isTransfer || t.excludeFromTotals) return;
+                        const wallet = state.wallets.find(w => w.id === t.walletId) || { currency: state.currency.code };
+                        const amount = convertCurrency(t.amount, wallet.currency || state.currency.code, state.currency.code);
+                        if (t.type === 'income') income += amount;
+                        else expense += amount;
+                    });
+                    const net = income - expense;
+                    return `<div class="card" style="padding:15px;border-radius:22px;background:var(--surface2);">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                            <div class="icon-box" style="background:${cat.color}18;"><i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};"></i></div>
+                            <div style="flex:1;min-width:0;">
+                                <p style="font-size:15px;font-weight:800;color:var(--text);">${cat.name}</p>
+                                <p style="font-size:10px;color:var(--muted);">${catTxs.length} transaction${catTxs.length === 1 ? '' : 's'} in selected filters</p>
+                            </div>
+                            <p class="syne" style="font-size:16px;font-weight:850;color:${net < 0 ? 'var(--rose)' : 'var(--emerald)'};">${net < 0 ? '-' : '+'}${fmt(Math.abs(net))}</p>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                            <div style="border-radius:15px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.12);padding:10px;">
+                                <p style="font-size:10px;color:var(--muted);font-weight:750;">Income</p>
+                                <p class="syne" style="font-size:15px;color:var(--emerald);font-weight:850;">+${fmt(income)}</p>
+                            </div>
+                            <div style="border-radius:15px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.12);padding:10px;">
+                                <p style="font-size:10px;color:var(--muted);font-weight:750;">Expense</p>
+                                <p class="syne" style="font-size:15px;color:var(--rose);font-weight:850;">-${fmt(expense)}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
             const txs = state.transactions.filter(t => {
                 const cat = getCat(t.categoryId);
+                if (!passesSearchFilters(t)) return false;
                 return t.name.toLowerCase().includes(query) || (t.note && t.note.toLowerCase().includes(query)) || cat.name.toLowerCase().includes(query);
             });
             if (txs.length) {
@@ -5985,6 +6432,51 @@ IMPORTANT RULES:
         function deleteDebt(type, id) { state.debts[type] = state.debts[type].filter(d => d.id !== id); saveState(); closeSheet(); switchFinanceTab('debts'); showToast('Removed'); }
 
         // â”€â”€â”€ WALLETS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        function getWalletPremiumTheme(wallet, index = 0) {
+            const themeIds = WALLET_CARD_THEMES.map(t => t.id);
+            if (wallet?.cardTheme && themeIds.includes(wallet.cardTheme)) return wallet.cardTheme;
+            const text = `${wallet?.name || ''} ${wallet?.icon || ''}`.toLowerCase();
+            if (/travel|trip|flight|truck/.test(text)) return index % 2 ? 'travel-plus' : 'travel';
+            if (/credit|visa|card/.test(text)) return 'credit';
+            if (/premium|premier|special|vip|investment|invest/.test(text)) return 'premier-plus';
+            if (/plus/.test(text)) return 'sber-plus';
+            if (/saving|savings|safe|vault|emergency|fund|piggy|coins/.test(text)) return 'sber';
+            return ['base', 'sber', 'sber-plus', 'premier', 'premier-plus', 'travel', 'travel-plus', 'credit'][index % 8];
+        }
+
+        const WALLET_CARD_THEMES = [
+            { id: 'default', label: 'Default / Main' },
+            { id: 'base', label: 'Base Silver' },
+            { id: 'sber', label: 'Sber Green' },
+            { id: 'sber-plus', label: 'Sber+ Lime' },
+            { id: 'premier', label: 'Premier Teal' },
+            { id: 'premier-plus', label: 'Premier+/SB1' },
+            { id: 'travel', label: 'Travel Blue' },
+            { id: 'travel-plus', label: 'Travel+ Navy' },
+            { id: 'credit', label: 'Credit Card' },
+            { id: 'premium', label: 'Premium Magenta' },
+            { id: 'blue-soft', label: 'Blue Soft Glow' },
+            { id: 'blue-night', label: 'Blue Night' },
+            { id: 'violet-deep', label: 'Violet Deep' },
+            { id: 'midnight', label: 'Midnight Navy' },
+            { id: 'green-rare', label: 'Green Rarely' },
+            { id: 'green-week', label: 'Green Weekly' },
+            { id: 'green-day', label: 'Green One Day' },
+            { id: 'green-everyday', label: 'Green Everyday' },
+            { id: 'green-bottom', label: 'Green Bottom Glow' },
+            { id: 'green-top', label: 'Green Top Glow' },
+            { id: 'green-center', label: 'Green Center Glow' },
+            { id: 'green-cyan', label: 'Green Cyan' },
+            { id: 'aurora-orange', label: 'Aurora Orange' },
+            { id: 'purple-fold', label: 'Purple Fold' },
+            { id: 'yellow-blue', label: 'Yellow Blue' },
+            { id: 'black-red', label: 'Black Red' },
+            { id: 'lime-blue', label: 'Lime Blue' },
+            { id: 'cyan-yellow', label: 'Cyan Yellow' },
+            { id: 'navy-black', label: 'Navy Black' },
+            { id: 'slate', label: 'Slate Grey' }
+        ];
+
         function renderWallets() {
             ui.currentTab = 'wallets';
             const wallets = state.wallets;
@@ -6001,8 +6493,9 @@ IMPORTANT RULES:
                 const convertedValue = curr !== state.currency.code ? convertCurrency(wallet.balance, curr, state.currency.code) : null;
                 const isActive = wallet.id === featured.id;
                 const graph = getWalletMiniGraph(wallet.id);
+                const theme = getWalletPremiumTheme(wallet, index);
                 return `<div class="wallet-carousel-item ${isActive ? 'is-active' : ''}" data-wallet-id="${wallet.id}" data-index="${index}">
-            <button class="wallet-hero-card" onclick="openWalletForm(${wallet.id})" style="width:100%;text-align:left;" aria-label="Edit wallet">
+            <button class="wallet-hero-card wallet-theme-${theme}" onclick="openWalletForm(${wallet.id})" style="width:100%;text-align:left;" aria-label="Edit wallet">
                 <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;">
                         <div style="min-width:0;">
@@ -6167,7 +6660,7 @@ IMPORTANT RULES:
             ui.featuredWalletId = walletId;
             const track = document.getElementById('wallet-card-carousel');
             if (!track) {
-                switchTab('wallets');
+                updateWalletCarouselSelection(document, walletId);
                 return;
             }
             scrollWalletCarouselTo(walletId, 'auto');
@@ -6294,7 +6787,8 @@ IMPORTANT RULES:
             const wallet = state.wallets.find(w => w.id === walletId);
             if (!wallet) return;
             ui.featuredWalletId = walletId;
-            track.querySelectorAll('.wallet-carousel-item').forEach(card => {
+            const root = track || document;
+            root.querySelectorAll('.wallet-carousel-item').forEach(card => {
                 const cardWalletId = parseInt(card.dataset.walletId);
                 const cardWallet = state.wallets.find(w => w.id === cardWalletId);
                 card.classList.toggle('is-active', cardWalletId === walletId);
@@ -6447,12 +6941,24 @@ IMPORTANT RULES:
             const w = id ? state.wallets.find(x => x.id === parseInt(id)) : null;
             const icons = ['wallet', 'landmark', 'credit-card', 'banknote', 'piggy-bank', 'briefcase', 'building-2', 'coins', 'shopping-bag', 'truck'];
             const isExcluded = w?.excludeFromTotal || false;
+            const currentTheme = getWalletPremiumTheme(w || {}, 0);
             document.getElementById('sheet-content').innerHTML = `
         <h2 class="syne" style="font-size:20px;font-weight:800;margin-bottom:20px;">${w ? 'Edit' : 'Add'} Wallet</h2>
         <div style="display:flex;flex-direction:column;gap:12px;">
             <input type="text" id="w-name" class="input" placeholder="Wallet name" value="${w?.name || ''}">
             <div style="display:flex;gap:10px;"><input type="number" id="w-balance" class="input" placeholder="Starting balance" value="${w?.balance || 0}" inputmode="decimal" style="flex:1;"><select id="w-currency" class="input" style="width:100px;">${SUPPORTED_CURRENCIES.map(c => `<option value="${c.code}" ${w?.currency === c.code || (!w && state.currency.code === c.code) ? 'selected' : ''}>${c.code}</option>`).join('')}</select></div>
-            
+            <div>
+                <p class="section-title">Card Theme</p>
+                <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:10px 12px;">
+                    <span id="w-theme-preview" class="wallet-theme-swatch wallet-theme-${currentTheme}" style="width:74px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,0.16);box-shadow:0 10px 24px rgba(0,0,0,0.32);flex-shrink:0;"></span>
+                    <div style="position:relative;flex:1;min-width:0;">
+                        <select id="w-theme" class="input" onchange="selectWalletTheme(this.value)" style="width:100%;height:46px;border-radius:999px;padding-right:38px;appearance:none;-webkit-appearance:none;background:rgba(255,255,255,0.04);font-weight:800;">
+                            ${WALLET_CARD_THEMES.map(t => `<option value="${t.id}" ${currentTheme === t.id ? 'selected' : ''}>${t.label}</option>`).join('')}
+                        </select>
+                        <i data-lucide="chevron-down" style="pointer-events:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);"></i>
+                    </div>
+                </div>
+            </div>
             <!-- Include in Total Balance toggle -->
             <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:14px 16px;">
                 <div>
@@ -6480,6 +6986,14 @@ IMPORTANT RULES:
             document.getElementById('w-exclude').value = newOn ? '0' : '1';
         }
 
+        function selectWalletTheme(theme) {
+            const select = document.getElementById('w-theme');
+            if (select && select.value !== theme) select.value = theme;
+            const preview = document.getElementById('w-theme-preview');
+            if (!preview) return;
+            preview.className = `wallet-theme-swatch wallet-theme-${theme}`;
+        }
+
         function toggleTxInclude(el) {
             const isOn = el.dataset.on === 'true';
             const newOn = !isOn;
@@ -6498,6 +7012,8 @@ IMPORTANT RULES:
             const color = 'neutral';
             const rawCurrency = (document.getElementById('w-currency')?.value || state.currency.code).toUpperCase();
             const currency = /^[A-Z]{2,6}$/.test(rawCurrency) ? rawCurrency : state.currency.code;
+            const rawTheme = document.getElementById('w-theme')?.value || 'default';
+            const cardTheme = WALLET_CARD_THEMES.some(t => t.id === rawTheme) ? rawTheme : 'default';
             const excludeFromTotal = document.getElementById('w-exclude')?.value === '1';
             if (!name) return showToast('Enter wallet name', 'error');
             if (id) {
@@ -6508,10 +7024,10 @@ IMPORTANT RULES:
                         const type = diff > 0 ? 'income' : 'expense';
                         state.transactions.unshift({ id: genId(), name: 'Wallet Adjustment', categoryId: 'other', type, amount: safeNum(Math.abs(diff)), walletId: w.id, date: nowWithTime(), note: 'Manual balance update' });
                     }
-                    w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.excludeFromTotal = excludeFromTotal;
+                    w.name = name; w.balance = balance; w.icon = icon; w.color = color; w.currency = currency; w.cardTheme = cardTheme; w.excludeFromTotal = excludeFromTotal;
                 }
             } else {
-                state.wallets.push({ id: genId(), name, balance, icon, color, currency, excludeFromTotal });
+                state.wallets.push({ id: genId(), name, balance, icon, color, currency, cardTheme, excludeFromTotal });
             }
             saveState(); closeSheet(); switchTab('wallets'); showToast(id ? 'Wallet Updated!' : 'Wallet added!');
         }
